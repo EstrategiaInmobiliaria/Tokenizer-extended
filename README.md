@@ -1,17 +1,51 @@
-![Tiktokenizer](https://user-images.githubusercontent.com/1443449/222597674-287aefdc-f0e1-491b-9bf9-16431b1b8054.svg)
+# Agartha Monetization Hub
 
-***
+Sitio comercial y sistema de captura de oportunidades para Agartha Bienes
+Raíces.
 
-# Tiktokenizer
+## Fuentes de ingreso
 
-Online playground for `openai/tiktoken`, calculating the correct number of tokens for a given prompt.
+- Captación de compradores e inversionistas para desarrollos.
+- Diagnósticos y servicios de estrategia inmobiliaria.
+- Venta de sistemas y prompts de inteligencia artificial.
+- Conversión de enlaces guardados en investigación y contenido mediante
+  `/radar`.
 
-Special thanks to [Diagram](https://diagram.com/) for sponsorship and guidance.
+## Configuración segura
 
-https://user-images.githubusercontent.com/1443449/222598119-0a5a536e-6785-44ad-ba28-e26e04f15163.mp4
+1. Copia `.env.example` como `.env`.
+2. Sustituye los canales oficiales y enlaces públicos.
+3. Crea los enlaces de checkout dentro de Stripe, Mercado Pago, Gumroad o
+   Lemon Squeezy.
+4. Configura la cuenta receptora directamente con el proveedor de pago.
 
-## Acknowledgments
+La aplicación no solicita ni almacena números de tarjeta, cuentas bancarias,
+CVV, NIP, contraseñas o códigos de verificación.
 
-- [T3 Stack](https://create.t3.gg/)
-- [shadcn/ui](https://github.com/shadcn/ui)
-- [openai/tiktoken](https://github.com/openai/tiktoken)
+## Desarrollo
+
+```bash
+yarn
+yarn dev
+```
+
+## Validación
+
+```bash
+yarn lint
+yarn build
+```
+
+## Flujo comercial
+
+1. Instagram y TikTok dirigen al sitio.
+2. El visitante elige desarrollos, estrategia o productos digitales.
+3. Los prospectos inmobiliarios se califican por WhatsApp o email.
+4. Los productos digitales se cobran mediante checkout alojado por el
+   proveedor.
+5. El `/radar` guarda enlaces localmente y genera un prompt para analizarlos
+   con la IA elegida.
+
+Antes de publicar desarrollos deben agregarse inventario real, precios
+vigentes, permisos de uso de imágenes, avisos de privacidad y términos
+aplicables a la jurisdicción de operación.
