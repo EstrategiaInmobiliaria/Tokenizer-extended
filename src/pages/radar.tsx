@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   ArrowLeft,
@@ -9,8 +10,8 @@ import {
   ExternalLink,
   Link2,
   Plus,
-  Sparkles,
   Trash2,
+  Wand2,
 } from "lucide-react";
 
 type Signal = {
@@ -140,10 +141,10 @@ const Radar: NextPage = () => {
       <main className="min-h-screen bg-[#f2f0e9] text-[#17352b]">
         <header className="border-b border-[#17352b]/10 bg-[#17352b] px-6 py-5 text-white">
           <div className="mx-auto flex max-w-7xl items-center justify-between">
-            <a href="/" className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3">
               <ArrowLeft size={18} />
               <span className="font-semibold tracking-[0.18em]">AGARTHA</span>
-            </a>
+            </Link>
             <button
               onClick={exportCsv}
               disabled={!signals.length}
@@ -260,7 +261,7 @@ const Radar: NextPage = () => {
               {!signals.length ? (
                 <div className="grid min-h-[390px] place-items-center rounded-2xl border border-dashed border-white/20 text-center">
                   <div>
-                    <Sparkles className="mx-auto text-[#d7c69a]" />
+                    <Wand2 className="mx-auto text-[#d7c69a]" />
                     <p className="mt-4 font-medium">Tu radar está listo.</p>
                     <p className="mt-2 max-w-xs text-sm text-white/55">
                       Guarda el primer enlace y conviértelo en contenido original.

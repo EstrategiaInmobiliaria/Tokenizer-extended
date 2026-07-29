@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import {
   ArrowRight,
@@ -11,8 +12,8 @@ import {
   Menu,
   MessageCircle,
   ShieldCheck,
-  Sparkles,
   TrendingUp,
+  Wand2,
   X,
 } from "lucide-react";
 
@@ -45,7 +46,7 @@ const incomeLines = [
     href: links.strategy,
   },
   {
-    icon: Sparkles,
+    icon: Wand2,
     eyebrow: "Producto digital",
     title: "Sistemas y prompts de IA",
     description:
@@ -330,9 +331,9 @@ const Home: NextPage = () => {
                     </p>
                   </div>
                 </div>
-                <a className="button button-dark shrink-0" href="/radar">
+                <Link className="button button-dark shrink-0" href="/radar">
                   Abrir radar <ArrowRight size={17} />
-                </a>
+                </Link>
               </div>
             </div>
           </section>
