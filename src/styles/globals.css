@@ -42,7 +42,7 @@
   }
 
   .nav-cta {
-    @apply rounded-full border border-white/35 px-5 py-2.5 font-medium text-white hover:bg-white hover:text-[#17352b];
+    @apply rounded-full border border-white/30 px-5 py-2.5 font-medium text-white hover:bg-white hover:text-[#17352b];
   }
 
   .eyebrow-light {
@@ -66,7 +66,7 @@
   }
 
   .glass-panel {
-    @apply rounded-[28px] border border-white/15 bg-white/[0.06] p-7 backdrop-blur-md sm:p-9;
+    @apply rounded-[28px] border border-white/10 bg-white/[0.06] p-7 backdrop-blur-md sm:p-9;
   }
 
   .income-card {

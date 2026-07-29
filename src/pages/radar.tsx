@@ -263,7 +263,7 @@ const Radar: NextPage = () => {
                   <div>
                     <Wand2 className="mx-auto text-[#d7c69a]" />
                     <p className="mt-4 font-medium">Tu radar está listo.</p>
-                    <p className="mt-2 max-w-xs text-sm text-white/55">
+                    <p className="mt-2 max-w-xs text-sm text-white/50">
                       Guarda el primer enlace y conviértelo en contenido original.
                     </p>
                   </div>
@@ -306,7 +306,7 @@ const Radar: NextPage = () => {
                           onChange={(event) =>
                             updateStatus(signal.id, event.target.value as Signal["status"])
                           }
-                          className="rounded-full border border-white/15 bg-[#17352b] px-3 py-1.5 text-xs capitalize"
+                          className="rounded-full border border-white/10 bg-[#17352b] px-3 py-1.5 text-xs capitalize"
                         >
                           <option value="capturada">Capturada</option>
                           <option value="analizada">Analizada</option>

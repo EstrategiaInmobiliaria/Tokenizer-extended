@@ -285,13 +285,13 @@ const Home: NextPage = () => {
                     <p className="max-w-md font-serif text-4xl italic leading-tight text-[#d7c69a] sm:text-5xl">
                       La oportunidad correcta empieza con la pregunta correcta.
                     </p>
-                    <div className="mt-10 grid grid-cols-2 gap-4 border-t border-white/15 pt-6 text-sm">
+                    <div className="mt-10 grid grid-cols-2 gap-4 border-t border-white/10 pt-6 text-sm">
                       <div>
-                        <p className="text-white/45">Enfoque</p>
+                        <p className="text-white/40">Enfoque</p>
                         <p className="mt-1">México · mercados selectos</p>
                       </div>
                       <div>
-                        <p className="text-white/45">Acceso</p>
+                        <p className="text-white/40">Acceso</p>
                         <p className="mt-1">Bajo perfil de inversión</p>
                       </div>
                     </div>
@@ -404,7 +404,7 @@ const Home: NextPage = () => {
           </section>
         </main>
 
-        <footer className="bg-[#102820] px-6 py-10 text-white/55 lg:px-10">
+        <footer className="bg-[#102820] px-6 py-10 text-white/50 lg:px-10">
           <div className="mx-auto flex max-w-7xl flex-col gap-6 text-sm sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-semibold tracking-[0.18em] text-white">AGARTHA</p>
