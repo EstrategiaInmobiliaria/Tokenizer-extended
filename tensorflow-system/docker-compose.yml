@@ -1,6 +1,24 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tensorflow-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tensorflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tensorflow}
+      POSTGRES_DB: ${POSTGRES_DB:-tensorflow_bi}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tensorflow}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   tensorflow-api:
     build:
       context: ./backend
@@ -16,6 +34,15 @@ services:
       - LOG_LEVEL=info
       - API_HOST=0.0.0.0
       - API_PORT=3001
+      # Repositorio central para Power BI (DirectQuery / Import)
+      - DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER:-tensorflow}:${POSTGRES_PASSWORD:-tensorflow}@postgres:5432/${POSTGRES_DB:-tensorflow_bi}
+      - POWERBI_EXPORT_MODE=${POWERBI_EXPORT_MODE:-hybrid}
+      - POWERBI_PUSH_URL=${POWERBI_PUSH_URL:-}
+      - POWERBI_AUTO_EXPORT_ON_PREDICT=${POWERBI_AUTO_EXPORT_ON_PREDICT:-true}
+      - POWERBI_SQL_TABLE=predicciones_tensorflow
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
@@ -55,6 +82,7 @@ services:
 volumes:
   n8n_data:
   redis_data:
+  postgres_data:
 
 networks:
   default:

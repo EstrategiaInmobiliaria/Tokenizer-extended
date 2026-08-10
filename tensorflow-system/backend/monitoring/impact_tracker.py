@@ -331,21 +331,46 @@ Decisiones optimizadas:         {metrics.decisions_optimized:>10,}
         
         return pd.DataFrame(predictions)
     
-    def export_to_powerbi(self, output_file: str = None):
-        """Exporta métricas en formato CSV para Power BI"""
-        
+    def export_to_powerbi(self, output_file: str = None, to_sql: bool = True):
+        """
+        Exporta predicciones a Power BI.
+
+        Preferido: repositorio SQL (to_sql=True) vía PowerBIExportPipeline.
+        Fallback: CSV plano para Import manual.
+        """
         if output_file is None:
             output_file = self.data_dir / "powerbi_export.csv"
-        
+
         df = self.get_predictions_df()
-        
-        if not df.empty:
-            # Aplanar columnas anidadas para Power BI
-            df_flat = pd.json_normalize(df.to_dict('records'))
-            df_flat.to_csv(output_file, index=False)
-            print(f"✅ Datos exportados para Power BI: {output_file}")
-        else:
+
+        if df.empty:
             print("⚠️  No hay datos para exportar")
+            return None
+
+        # CSV legacy (opcional / auditoría)
+        df_flat = pd.json_normalize(df.to_dict("records"))
+        df_flat.to_csv(output_file, index=False)
+        print(f"✅ CSV exportado: {output_file}")
+
+        result = None
+        if to_sql:
+            try:
+                import sys
+                from pathlib import Path
+
+                backend = Path(__file__).resolve().parent.parent
+                sys.path.insert(0, str(backend / "integrations"))
+                from powerbi_exporter import PowerBIExportPipeline
+
+                pipeline = PowerBIExportPipeline()
+                result = pipeline.export_batch_file(
+                    self.predictions_file, write_mode="append"
+                )
+                print(f"✅ SQL/Push export: {result}")
+            except Exception as e:
+                print(f"⚠️  Export SQL/Push falló (CSV disponible): {e}")
+
+        return result
 
 
 # Función helper para uso fácil

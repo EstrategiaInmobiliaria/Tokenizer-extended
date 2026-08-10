@@ -184,8 +184,21 @@ curl http://localhost:3001/health
 # Reporte WhatsApp
 curl -X POST "http://localhost:3001/api/integrations/whatsapp-report?tipo=inmobiliario"
 
-# Datos Power BI
+# Datos Power BI (JSON / Get Data → Web)
 curl http://localhost:3001/api/integrations/powerbi-data
+
+# Estado integración Power BI (SQL + Push)
+curl http://localhost:3001/api/integrations/powerbi/status
+
+# Exportar predicciones → SQL (+ Push si hay POWERBI_PUSH_URL)
+curl -X POST "http://localhost:3001/api/integrations/powerbi/export?source=live&write_mode=append"
+
+# Script orquestador (recomendado en cron / GitHub Actions)
+cd backend && python scripts/export_to_powerbi.py --source live --mode hybrid
+
+# Postgres local (Docker)
+docker-compose up -d postgres
+export DATABASE_URL="postgresql+psycopg2://tensorflow:tensorflow@localhost:5432/tensorflow_bi"
 ```
 
 ## 📊 Datos

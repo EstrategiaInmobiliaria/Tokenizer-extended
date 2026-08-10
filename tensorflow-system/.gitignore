@@ -55,6 +55,9 @@ saved_model/
 # Data (excepto ejemplos)
 data/*/
 !data/README.md
+!data/powerbi/README.md
+backend/data/powerbi/*.db
+backend/data/metrics/
 
 # Temporary files
 *.tmp
@@ -86,3 +89,4 @@ dump.rdb
 
 # n8n
 n8n_data/
+backend/data/powerbi/*.db

@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
+import json
 import sys
 from pathlib import Path
 import uvicorn
@@ -25,6 +26,11 @@ sys.path.insert(0, str(backend_path / "monitoring"))
 from impact_tracker import ImpactTracker, MetricCategory, PredictionOutcome
 from alert_system import SmartAlertSystem, check_and_alert_prediction, check_and_alert_metrics
 
+# Power BI export (repositorio central + Push Dataset)
+sys.path.insert(0, str(backend_path / "integrations"))
+from powerbi_exporter import PowerBIExportPipeline, PredictionRowBuilder
+import os
+
 # Inicializar FastAPI
 app = FastAPI(
     title="Sistema de Inteligencia TensorFlow",
@@ -35,6 +41,8 @@ app = FastAPI(
 # Inicializar tracker de impacto
 impact_tracker = ImpactTracker()
 alert_system = SmartAlertSystem()
+powerbi_pipeline = PowerBIExportPipeline()
+POWERBI_AUTO_EXPORT = os.getenv("POWERBI_AUTO_EXPORT_ON_PREDICT", "true").lower() == "true"
 
 # CORS
 app.add_middleware(
@@ -198,6 +206,20 @@ async def predict_real_estate(data: RealEstateInput):
         
         # Verificar alertas
         check_and_alert_prediction(resultado, "real_estate")
+
+        # Export automático a Power BI (SQL + Push Dataset si está configurado)
+        if POWERBI_AUTO_EXPORT:
+            try:
+                powerbi_pipeline.export_from_model_output(
+                    category="real_estate",
+                    model="real_estate_opportunity",
+                    prediction=resultado,
+                    input_data=data.dict(),
+                    id_negocio=pred_id,
+                    confidence_score=resultado.get("probabilidad_venta_12m"),
+                )
+            except Exception:
+                pass  # No bloquear predicción si falla el export
         
         # Agregar ID a respuesta
         resultado['prediction_id'] = pred_id
@@ -480,31 +502,160 @@ Días estimados: {mejor['dias_estimados']}
 
 
 @app.get("/api/integrations/powerbi-data")
-async def get_powerbi_data():
+async def get_powerbi_data(limit: int = 500):
     """
-    Endpoint para conectar Power BI
-    Retorna datos en formato compatible con Power BI
+    Endpoint REST para Power BI (Get Data → Web).
+
+    Preferible para pruebas. En producción usa el repositorio SQL
+    (DirectQuery/Import) vía DATABASE_URL — sin Personal Gateway Python.
     """
     try:
-        # Datos de ejemplo para visualización
-        return {
-            "real_estate": {
-                "desarrollos_analizados": 50,
-                "oportunidades_alta_prioridad": 12,
-                "tasa_exito_predicciones": 0.89
-            },
-            "social_media": {
-                "posts_analizados": 200,
-                "engagement_promedio": 847,
-                "posts_virales_predichos": 15
-            },
-            "personal": {
-                "decisiones_optimizadas": 8,
-                "ahorro_total_estimado": 42000
+        df = powerbi_pipeline.db.fetch_recent(limit=limit)
+        if df.empty:
+            # Fallback: métricas agregadas si aún no hay filas exportadas
+            return {
+                "mode": "aggregate_fallback",
+                "hint": "Ejecuta POST /api/integrations/powerbi/export o el script export_to_powerbi.py",
+                "real_estate": {
+                    "desarrollos_analizados": 0,
+                    "oportunidades_alta_prioridad": 0,
+                    "tasa_exito_predicciones": 0.0,
+                },
+                "rows": [],
             }
+
+        records = json.loads(df.to_json(orient="records", date_format="iso"))
+        return {
+            "mode": "repository",
+            "table": powerbi_pipeline.db.table_name,
+            "total_in_db": powerbi_pipeline.db.count_rows(),
+            "returned": len(records),
+            "rows": records,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/integrations/powerbi/export")
+async def export_to_powerbi(
+    source: str = "tracker",
+    write_mode: str = "append",
+    mode: Optional[str] = None,
+):
+    """
+    Dispara exportación TensorFlow → Power BI.
+
+    - source: tracker | live
+    - write_mode: append | replace | upsert
+    - mode: repository | streaming | hybrid
+
+    Arquitectura recomendada: repository/hybrid → SQL → Power BI Import/DirectQuery.
+    Evita ejecutar Python dentro de Power Query (Personal Gateway).
+    """
+    try:
+        pipeline = PowerBIExportPipeline(mode=mode) if mode else powerbi_pipeline
+
+        if source == "live":
+            # Generar predicciones frescas de muestra y exportar
+            rows = []
+            builder = PredictionRowBuilder()
+            sample = {
+                "precio_m2": 45000,
+                "ubicacion": "Querétaro",
+                "amenidades": 12,
+                "velocidad_ventas": 0.85,
+                "cap_rate": 7.2,
+            }
+            pred = re_detector.predict(sample)
+            rows.append(
+                builder.build_row(
+                    category="real_estate",
+                    model="real_estate_opportunity",
+                    prediction=pred,
+                    input_data=sample,
+                    id_negocio="LIVE-API-EXPORT",
+                    confidence_score=pred.get("probabilidad_venta_12m"),
+                )
+            )
+            result = pipeline.export_predictions(rows, write_mode=write_mode)
+        else:
+            metrics_file = backend_path / "data" / "metrics" / "predictions.jsonl"
+            if metrics_file.exists():
+                result = pipeline.export_batch_file(
+                    metrics_file, write_mode=write_mode
+                )
+            else:
+                # Bootstrap: una predicción live si no hay historial
+                source = "live"
+                sample = {
+                    "precio_m2": 45000,
+                    "ubicacion": "Querétaro",
+                    "amenidades": 12,
+                    "velocidad_ventas": 0.85,
+                    "cap_rate": 7.2,
+                }
+                pred = re_detector.predict(sample)
+                result = pipeline.export_predictions(
+                    [
+                        PredictionRowBuilder.build_row(
+                            category="real_estate",
+                            model="real_estate_opportunity",
+                            prediction=pred,
+                            input_data=sample,
+                            id_negocio="BOOTSTRAP-EXPORT",
+                            confidence_score=pred.get("probabilidad_venta_12m"),
+                        )
+                    ],
+                    write_mode=write_mode,
+                )
+
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/integrations/powerbi/push")
+async def push_to_powerbi_streaming(rows: List[Dict[str, Any]]):
+    """
+    Envía filas directamente al Push Dataset de Power BI (streaming).
+    Requiere POWERBI_PUSH_URL en el entorno.
+    """
+    try:
+        if not powerbi_pipeline.push.enabled:
+            raise HTTPException(
+                status_code=400,
+                detail="POWERBI_PUSH_URL no configurada. Crea un Streaming Dataset en Power BI Service y pega la URL.",
+            )
+        result = powerbi_pipeline.push.push_rows(rows)
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/integrations/powerbi/status")
+async def powerbi_export_status():
+    """Estado de la integración Power BI (DB + Push)."""
+    return {
+        "export_mode": powerbi_pipeline.mode,
+        "auto_export_on_predict": POWERBI_AUTO_EXPORT,
+        "database": {
+            "scheme": powerbi_pipeline.db.database_url.split("://", 1)[0],
+            "table": powerbi_pipeline.db.table_name,
+            "row_count": powerbi_pipeline.db.count_rows(),
+        },
+        "push_dataset": {
+            "configured": powerbi_pipeline.push.enabled,
+            "url_set": bool(powerbi_pipeline.push.push_url),
+        },
+        "recommended_powerbi_connection": {
+            "production": "SQL DirectQuery/Import sobre DATABASE_URL",
+            "dev_web": "GET /api/integrations/powerbi-data",
+            "realtime": "Push Dataset via POWERBI_PUSH_URL",
+            "avoid": "Python script dentro de Power Query (requiere Personal Gateway)",
+        },
+    }
 
 
 # ==================== MAIN ====================
