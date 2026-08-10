@@ -266,30 +266,58 @@ class DatabaseExporter:
 
 
 # ---------------------------------------------------------------------------
-# 3. Push Dataset (streaming / tiempo real)
+# 3. Push Dataset (streaming / tiempo real) — Power BI Service
 # ---------------------------------------------------------------------------
 
 class PowerBIPushClient:
     """
-    Envía predicciones a un Push / Streaming Dataset de Power BI.
+    Envía predicciones al Streaming Dataset de Power BI (nube Microsoft).
 
-    Setup en Power BI Service:
-      Área de trabajo → Nuevo → Conjunto de datos de streaming → API
-      Campos sugeridos:
-        - id_registro (Text)
-        - categoria (Text)
-        - modelo (Text)
-        - probabilidad (Number)
-        - confianza (Number)
-        - recomendacion (Text)
-        - fecha_prediccion (DateTime)
-        - id_negocio (Text)
-        - batch_id (Text)
+    Setup en app.powerbi.com:
+      1. Área de trabajo → Nuevo → Conjunto de datos de streaming → API
+      2. Nombre: Predicciones_TensorFlow
+      3. Definir campos EXACTOS (ver STREAMING_SCHEMA abajo)
+      4. Activar "Análisis de datos históricos" (crítico)
+      5. Crear → copiar Push URL de la pestaña Raw → POWERBI_PUSH_URL
+
+    Los nombres de campo son case-sensitive y deben coincidir 1:1 con el JSON.
     """
 
-    def __init__(self, push_url: Optional[str] = None, api_key: Optional[str] = None):
-        self.push_url = push_url or os.getenv("POWERBI_PUSH_URL", "")
+    # Schema canónico para crear en Power BI Service (API streaming)
+    # name → Power BI type
+    STREAMING_SCHEMA = {
+        "ID_Registro": "Number",       # ID numérico único por fila
+        "ID_Negocio": "Text",          # Clave de negocio (DEV-QRO-001, etc.)
+        "Categoria": "Text",           # real_estate | social_media | personal_*
+        "Modelo": "Text",              # nombre del modelo TFLite
+        "Probabilidad": "Number",      # 0.0 – 1.0
+        "Confianza": "Number",         # 0.0 – 1.0
+        "Recomendacion": "Text",       # ALTA PRIORIDAD | PUBLICAR | ...
+        "Fecha_Prediccion": "DateTime",
+        "Batch_ID": "Text",
+        "Ubicacion": "Text",           # dimensión opcional (inmobiliario)
+        "Precio_Estimado": "Number",   # métrica opcional
+    }
+
+    # Mínimo compatible con el ejemplo clásico (3 campos)
+    STREAMING_SCHEMA_MINIMAL = {
+        "ID_Registro": "Number",
+        "Probabilidad": "Number",
+        "Fecha_Prediccion": "DateTime",
+    }
+
+    def __init__(
+        self,
+        push_url: Optional[str] = None,
+        api_key: Optional[str] = None,
+        schema_mode: Optional[str] = None,
+    ):
+        self.push_url = (push_url or os.getenv("POWERBI_PUSH_URL", "")).strip()
         self.api_key = api_key or os.getenv("POWERBI_API_KEY", "")
+        # full | minimal  — debe coincidir con lo que creaste en Power BI
+        self.schema_mode = (
+            schema_mode or os.getenv("POWERBI_STREAMING_SCHEMA", "full")
+        ).lower()
 
     @property
     def enabled(self) -> bool:
@@ -301,26 +329,106 @@ class PowerBIPushClient:
             headers["Authorization"] = f"Bearer {self.api_key}"
         return headers
 
+    @classmethod
+    def schema_definition(cls, mode: str = "full") -> Dict[str, str]:
+        """Campos a crear en el panel de Power BI Service."""
+        return dict(cls.STREAMING_SCHEMA_MINIMAL if mode == "minimal" else cls.STREAMING_SCHEMA)
+
+    @classmethod
+    def sample_payload(cls, mode: str = "full") -> List[Dict[str, Any]]:
+        """
+        Payload de muestra equivalente al que Power BI muestra al crear el dataset.
+        Úsalo para validar que el esquema coincide.
+        """
+        now = datetime.now(timezone.utc).isoformat()
+        if mode == "minimal":
+            return [
+                {
+                    "ID_Registro": 1042,
+                    "Probabilidad": 0.873,
+                    "Fecha_Prediccion": now,
+                }
+            ]
+        return [
+            {
+                "ID_Registro": 1042,
+                "ID_Negocio": "DEV-QRO-001",
+                "Categoria": "real_estate",
+                "Modelo": "real_estate_opportunity",
+                "Probabilidad": 0.873,
+                "Confianza": 0.873,
+                "Recomendacion": "ALTA PRIORIDAD",
+                "Fecha_Prediccion": now,
+                "Batch_ID": "sample_batch",
+                "Ubicacion": "Querétaro",
+                "Precio_Estimado": 14200000.0,
+            }
+        ]
+
+    @staticmethod
+    def _numeric_id(row: Dict[str, Any]) -> int:
+        """Genera ID_Registro numérico estable a partir del UUID / negocio."""
+        raw = str(row.get("id_registro") or row.get("ID_Registro") or "")
+        if isinstance(row.get("ID_Registro"), (int, float)) and not isinstance(
+            row.get("ID_Registro"), bool
+        ):
+            return int(row["ID_Registro"])
+        # Hash determinístico → entero positivo de 9 dígitos
+        return abs(hash(raw or uuid.uuid4().hex)) % 1_000_000_000
+
+    def to_powerbi_payload(self, rows: Sequence[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Transforma filas internas (snake_case) al JSON exacto del Streaming Dataset.
+        Los nombres DEBEN coincidir con los definidos en app.powerbi.com.
+        """
+        payload: List[Dict[str, Any]] = []
+        for row in rows:
+            # Acepta ya-formateado (PascalCase) o interno (snake_case)
+            probabilidad = row.get("Probabilidad", row.get("probabilidad"))
+            confianza = row.get("Confianza", row.get("confianza", probabilidad))
+            fecha = row.get("Fecha_Prediccion", row.get("fecha_prediccion"))
+
+            if self.schema_mode == "minimal":
+                item = {
+                    "ID_Registro": self._numeric_id(row),
+                    "Probabilidad": float(probabilidad) if probabilidad is not None else 0.0,
+                    "Fecha_Prediccion": self._to_iso(fecha),
+                }
+            else:
+                item = {
+                    "ID_Registro": self._numeric_id(row),
+                    "ID_Negocio": str(row.get("ID_Negocio", row.get("id_negocio", ""))),
+                    "Categoria": str(row.get("Categoria", row.get("categoria", ""))),
+                    "Modelo": str(row.get("Modelo", row.get("modelo", ""))),
+                    "Probabilidad": float(probabilidad) if probabilidad is not None else 0.0,
+                    "Confianza": float(confianza) if confianza is not None else 0.0,
+                    "Recomendacion": str(
+                        row.get("Recomendacion", row.get("recomendacion", ""))
+                    ),
+                    "Fecha_Prediccion": self._to_iso(fecha),
+                    "Batch_ID": str(row.get("Batch_ID", row.get("batch_id", ""))),
+                    "Ubicacion": str(
+                        row.get(
+                            "Ubicacion",
+                            row.get("input_ubicacion", row.get("ubicacion", "")),
+                        )
+                    ),
+                    "Precio_Estimado": float(
+                        row.get(
+                            "Precio_Estimado",
+                            row.get("precio_estimado", 0) or 0,
+                        )
+                    ),
+                }
+            payload.append(item)
+        return payload
+
     def push_rows(self, rows: Sequence[Dict[str, Any]], timeout: int = 30) -> Dict[str, Any]:
-        """POST rows al Push Dataset. Power BI espera un array JSON."""
+        """POST array JSON a la Push URL (pestaña Raw de Power BI)."""
         if not self.enabled:
             return {"status": "skipped", "reason": "POWERBI_PUSH_URL no configurada"}
 
-        # Payload tipado para streaming datasets
-        payload = []
-        for row in rows:
-            item = {
-                "id_registro": str(row.get("id_registro", "")),
-                "id_negocio": str(row.get("id_negocio", "")),
-                "categoria": str(row.get("categoria", "")),
-                "modelo": str(row.get("modelo", "")),
-                "probabilidad": float(row["probabilidad"]) if row.get("probabilidad") is not None else 0.0,
-                "confianza": float(row["confianza"]) if row.get("confianza") is not None else 0.0,
-                "recomendacion": str(row.get("recomendacion", "")),
-                "fecha_prediccion": self._to_iso(row.get("fecha_prediccion")),
-                "batch_id": str(row.get("batch_id", "")),
-            }
-            payload.append(item)
+        payload = self.to_powerbi_payload(rows)
 
         response = requests.post(
             self.push_url,
@@ -333,6 +441,8 @@ class PowerBIPushClient:
             "status": "ok" if response.ok else "error",
             "status_code": response.status_code,
             "rows_sent": len(payload),
+            "schema_mode": self.schema_mode,
+            "payload_sample": payload[:1],
             "response_text": response.text[:500],
         }
 
@@ -341,6 +451,23 @@ class PowerBIPushClient:
             return {"status": "skipped", "reason": "DataFrame vacío"}
         rows = df.to_dict(orient="records")
         return self.push_rows(rows)
+
+    def test_connection(self) -> Dict[str, Any]:
+        """Envía 1 fila de muestra para validar Push URL + esquema."""
+        sample = self.sample_payload(self.schema_mode)
+        # Marcar como test
+        if sample:
+            sample[0]["ID_Registro"] = int(datetime.now(timezone.utc).timestamp()) % 1_000_000_000
+            if self.schema_mode != "minimal":
+                sample[0]["Batch_ID"] = "connection_test"
+                sample[0]["Recomendacion"] = "TEST_CONNECTION"
+        result = self.push_rows(sample)
+        result["hint"] = (
+            "Si status_code=200, el dataset recibió la fila. "
+            "Revisa el dashboard/streaming tile en app.powerbi.com. "
+            "Si 400, el schema no coincide (nombres/tipos)."
+        )
+        return result
 
     @staticmethod
     def _to_iso(value: Any) -> str:

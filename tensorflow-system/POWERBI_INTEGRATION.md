@@ -103,26 +103,33 @@ pipeline.export_predictions([row], write_mode="append")  # df.to_sql(..., if_exi
 
 ## Arquitectura B — Push Dataset (streaming)
 
-Ideal para tableros en tiempo real sin base de datos intermedia.
+Ideal para tableros en tiempo real en la **nube de Microsoft**.
 
 ### Setup en Power BI Service
 
-1. Área de trabajo → **Nuevo** → **Conjunto de datos de streaming** → **API**
-2. Definir campos:
+Guía detallada paso a paso: **[POWERBI_STREAMING_SETUP.md](./POWERBI_STREAMING_SETUP.md)**
+
+1. [app.powerbi.com](https://app.powerbi.com) → Área de trabajo → **Nuevo** → **Conjunto de datos de streaming** → **API**
+2. Nombre: `Predicciones_TensorFlow`
+3. Definir campos **exactos** (PascalCase):
 
 ```
-id_registro        Text
-id_negocio         Text
-categoria          Text
-modelo             Text
-probabilidad       Number
-confianza          Number
-recomendacion      Text
-fecha_prediccion   DateTime
-batch_id           Text
+ID_Registro        Number
+ID_Negocio         Text
+Categoria          Text
+Modelo             Text
+Probabilidad       Number
+Confianza          Number
+Recomendacion      Text
+Fecha_Prediccion   DateTime
+Batch_ID           Text
+Ubicacion          Text
+Precio_Estimado    Number
 ```
 
-3. Copiar la **URL de inserción** → `POWERBI_PUSH_URL` en `.env`
+4. **Activar "Análisis de datos históricos"** (crítico para retener datos)
+5. Crear → copiar Push URL de la pestaña **Raw** → `POWERBI_PUSH_URL` en `.env`
+6. Validar: `python scripts/test_powerbi_push.py`
 
 ### Enviar desde Python
 

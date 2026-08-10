@@ -648,14 +648,60 @@ async def powerbi_export_status():
         "push_dataset": {
             "configured": powerbi_pipeline.push.enabled,
             "url_set": bool(powerbi_pipeline.push.push_url),
+            "schema_mode": powerbi_pipeline.push.schema_mode,
         },
         "recommended_powerbi_connection": {
             "production": "SQL DirectQuery/Import sobre DATABASE_URL",
             "dev_web": "GET /api/integrations/powerbi-data",
-            "realtime": "Push Dataset via POWERBI_PUSH_URL",
+            "realtime": "Push Dataset via POWERBI_PUSH_URL (app.powerbi.com streaming API)",
+            "setup_guide": "POWERBI_STREAMING_SETUP.md",
             "avoid": "Python script dentro de Power Query (requiere Personal Gateway)",
         },
     }
+
+
+@app.get("/api/integrations/powerbi/streaming-schema")
+async def powerbi_streaming_schema(mode: str = "full"):
+    """
+    Schema exacto a crear en Power BI Service
+    (Nuevo → Conjunto de datos de streaming → API).
+
+    Incluye payload de muestra (equivalente al que muestra Power BI)
+    y recuerda activar 'Análisis de datos históricos'.
+    """
+    schema_mode = mode if mode in ("full", "minimal") else "full"
+    return {
+        "dataset_name_suggested": "Predicciones_TensorFlow",
+        "source": "API",
+        "historic_data_analysis": "REQUIRED — activar interruptor antes de Crear",
+        "fields": [
+            {"name": name, "type": pbi_type}
+            for name, pbi_type in PowerBIPushClient.schema_definition(schema_mode).items()
+        ],
+        "sample_payload": PowerBIPushClient.sample_payload(schema_mode),
+        "env": {
+            "POWERBI_PUSH_URL": "Pegar URL de la pestaña Raw tras Crear",
+            "POWERBI_STREAMING_SCHEMA": schema_mode,
+        },
+        "test_command": "python scripts/test_powerbi_push.py",
+    }
+
+
+@app.post("/api/integrations/powerbi/test-push")
+async def powerbi_test_push():
+    """
+    Envía 1 fila de prueba a la Push URL configurada.
+    Útil justo después de crear el Streaming Dataset en app.powerbi.com.
+    """
+    if not powerbi_pipeline.push.enabled:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "POWERBI_PUSH_URL no configurada. "
+                "Crea el dataset en app.powerbi.com → copia URL Raw → .env"
+            ),
+        )
+    return powerbi_pipeline.push.test_connection()
 
 
 # ==================== MAIN ====================
