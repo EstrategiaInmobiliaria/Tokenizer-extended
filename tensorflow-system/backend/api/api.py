@@ -1,0 +1,371 @@
+"""
+API REST para el Sistema de Inteligencia TensorFlow
+FastAPI backend que expone endpoints para todos los modelos
+"""
+
+from fastapi import FastAPI, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict, Any
+import sys
+from pathlib import Path
+import uvicorn
+
+# Agregar path de modelos
+backend_path = Path(__file__).parent.parent
+sys.path.insert(0, str(backend_path))
+
+from models.real_estate_opportunity import RealEstateOpportunityDetector
+from models.social_media_optimizer import SocialMediaContentOptimizer
+from models.personal_decision_models import TCOCalculator, TennisOptimizer
+
+# Inicializar FastAPI
+app = FastAPI(
+    title="Sistema de Inteligencia TensorFlow",
+    description="API para predicciones de ML en Inmobiliario, Redes Sociales y Decisiones Personales",
+    version="1.0.0"
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Modelos globales (se cargan al inicio)
+re_detector = RealEstateOpportunityDetector()
+sm_optimizer = SocialMediaContentOptimizer()
+tco_calculator = TCOCalculator()
+tennis_optimizer = TennisOptimizer()
+
+
+# ==================== SCHEMAS ====================
+
+class RealEstateInput(BaseModel):
+    precio_m2: float = Field(..., description="Precio por metro cuadrado")
+    ubicacion: str = Field(..., description="Ubicación del desarrollo")
+    amenidades: int = Field(..., ge=0, le=20, description="Cantidad de amenidades")
+    velocidad_ventas: float = Field(..., ge=0, le=1, description="Velocidad de ventas (0-1)")
+    cap_rate: float = Field(..., description="Tasa de capitalización (%)")
+
+class RealEstateOutput(BaseModel):
+    probabilidad_venta_12m: float
+    precio_estimado: float
+    dias_estimados: int
+    recomendacion: str
+    certeza: str
+
+class SocialMediaPostInput(BaseModel):
+    tipo_contenido: str = Field(..., description="Carrusel, Reel, Story, Post")
+    hora: int = Field(..., ge=0, le=23)
+    dia_semana: int = Field(..., ge=0, le=6)
+    num_hashtags: int = Field(..., ge=0, le=30)
+    tema_categoria: str
+    longitud_caption: int = Field(..., ge=0)
+
+class SocialMediaPostOutput(BaseModel):
+    engagement_score: float
+    probabilidad_viral: float
+    alcance_estimado: int
+    recomendacion: str
+    confianza: str
+
+class WeeklyScheduleInput(BaseModel):
+    temas_disponibles: List[str] = Field(..., description="Lista de temas del Índice Maestro")
+
+class AutoTCOInput(BaseModel):
+    precio_inicial: float
+    gasolina_mensual: float
+    seguro_anual: float
+    mantenimiento_anual: float
+    depreciacion_anual: float
+    km_anuales: int
+    rendimiento_km_l: float
+    es_electrico: int = Field(..., ge=0, le=1)
+
+class AutoTCOOutput(BaseModel):
+    costo_operacion_3_anos: float
+    valor_residual_3_anos: float
+    tco_total_3_anos: float
+    costo_mensual_promedio: float
+    recomendacion: str
+
+class VehicleComparisonInput(BaseModel):
+    vehicle1: AutoTCOInput
+    vehicle2: AutoTCOInput
+    vehicle1_name: str
+    vehicle2_name: str
+
+class TennisConditionsInput(BaseModel):
+    temperatura: int = Field(..., ge=10, le=40)
+    rival_nivel: int = Field(..., ge=1, le=10)
+    dia_semana: int = Field(..., ge=0, le=6)
+    horas_descanso: int = Field(..., ge=0, le=3)
+
+class TennisSetupOutput(BaseModel):
+    tension_kg: int
+    pelota: str
+    probabilidad_victoria: float
+    mejora_vs_promedio: float
+
+
+# ==================== ENDPOINTS ====================
+
+@app.get("/")
+async def root():
+    """Health check"""
+    return {
+        "status": "online",
+        "service": "Sistema de Inteligencia TensorFlow",
+        "version": "1.0.0",
+        "modelos_disponibles": [
+            "real_estate_opportunity",
+            "social_content_optimizer",
+            "tco_calculator",
+            "tennis_optimizer"
+        ]
+    }
+
+
+@app.get("/health")
+async def health():
+    """Status de modelos"""
+    models_path = backend_path / "models"
+    
+    return {
+        "status": "healthy",
+        "models": {
+            "real_estate_opportunity": (models_path / "real_estate_opportunity.tflite").exists(),
+            "social_content_optimizer": (models_path / "social_content_optimizer.tflite").exists(),
+            "tco_calculator": (models_path / "tco_calculator.tflite").exists(),
+            "tennis_optimizer": (models_path / "tennis_optimizer.tflite").exists(),
+        }
+    }
+
+
+# ==================== INMOBILIARIO ====================
+
+@app.post("/api/predict/real-estate", response_model=RealEstateOutput)
+async def predict_real_estate(data: RealEstateInput):
+    """
+    Predice oportunidad de venta para un desarrollo inmobiliario
+    
+    Retorna:
+    - Probabilidad de venta en 12 meses
+    - Precio estimado de venta
+    - Días estimados para cerrar
+    - Recomendación (ALTA PRIORIDAD, ANALIZAR, BAJA PRIORIDAD)
+    """
+    try:
+        resultado = re_detector.predict(data.dict())
+        return RealEstateOutput(**resultado)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error en predicción: {str(e)}")
+
+
+@app.post("/api/analyze/real-estate-batch")
+async def analyze_real_estate_batch(desarrollos: List[RealEstateInput]):
+    """
+    Analiza múltiples desarrollos y retorna Top 3 oportunidades
+    Útil para el análisis semanal automatizado
+    """
+    try:
+        resultados = []
+        for desarrollo in desarrollos:
+            pred = re_detector.predict(desarrollo.dict())
+            resultados.append({
+                "desarrollo": desarrollo.dict(),
+                "prediccion": pred
+            })
+        
+        # Ordenar por probabilidad
+        resultados.sort(key=lambda x: x['prediccion']['probabilidad_venta_12m'], reverse=True)
+        
+        return {
+            "total_analizados": len(resultados),
+            "top_3_oportunidades": resultados[:3],
+            "resumen": f"De {len(resultados)} desarrollos, {sum(1 for r in resultados if r['prediccion']['probabilidad_venta_12m'] > 0.7)} son ALTA PRIORIDAD"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==================== REDES SOCIALES ====================
+
+@app.post("/api/predict/social-media-post", response_model=SocialMediaPostOutput)
+async def predict_social_media_post(data: SocialMediaPostInput):
+    """
+    Predice performance de un post específico
+    """
+    try:
+        resultado = sm_optimizer.predict(data.dict())
+        return SocialMediaPostOutput(**resultado)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error en predicción: {str(e)}")
+
+
+@app.post("/api/generate/weekly-content-schedule")
+async def generate_weekly_schedule(data: WeeklyScheduleInput):
+    """
+    Genera calendario semanal optimizado de contenido
+    
+    Retorna plan de 7 días con:
+    - Mejor horario de publicación
+    - Tipo de contenido recomendado
+    - Tema a cubrir
+    - Engagement esperado
+    """
+    try:
+        schedule = sm_optimizer.predict_week_schedule(data.temas_disponibles)
+        
+        return {
+            "semana": schedule,
+            "resumen": {
+                "total_posts_recomendados": sum(len(dia['posts']) for dia in schedule),
+                "mejor_dia": max(schedule, key=lambda d: d['posts'][0]['engagement_esperado'])['dia'],
+                "temas_cubiertos": len(set(post['tema'] for dia in schedule for post in dia['posts']))
+            },
+            "recomendacion_n8n": "Configurar workflow para publicar automáticamente estos posts"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==================== PERSONAL ====================
+
+@app.post("/api/calculate/tco", response_model=AutoTCOOutput)
+async def calculate_tco(data: AutoTCOInput):
+    """
+    Calcula Total Cost of Ownership para un vehículo
+    """
+    try:
+        resultado = tco_calculator.calculate_tco(data.dict())
+        return AutoTCOOutput(**resultado)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error en cálculo: {str(e)}")
+
+
+@app.post("/api/compare/vehicles")
+async def compare_vehicles(data: VehicleComparisonInput):
+    """
+    Compara TCO entre dos vehículos
+    Ejemplo: Geely EX5 EM-i vs Toyota RAV4
+    """
+    try:
+        comparacion = tco_calculator.compare_vehicles(
+            data.vehicle1.dict(),
+            data.vehicle2.dict(),
+            data.vehicle1_name,
+            data.vehicle2_name
+        )
+        return comparacion
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/optimize/tennis-setup", response_model=TennisSetupOutput)
+async def optimize_tennis_setup(data: TennisConditionsInput):
+    """
+    Encuentra la configuración óptima de cordaje y pelota
+    basado en condiciones del partido
+    """
+    try:
+        resultado = tennis_optimizer.optimize_setup(data.dict())
+        return TennisSetupOutput(**resultado)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error en optimización: {str(e)}")
+
+
+# ==================== INTEGRACIONES ====================
+
+@app.post("/api/integrations/whatsapp-report")
+async def generate_whatsapp_report(tipo: str = "inmobiliario"):
+    """
+    Genera reporte formateado para enviar por WhatsApp
+    Tipos: inmobiliario, social_media, personal
+    """
+    try:
+        if tipo == "inmobiliario":
+            # Ejemplo: analizar 3 desarrollos ficticios
+            desarrollos = [
+                {"precio_m2": 45000, "ubicacion": "Querétaro", "amenidades": 12, 
+                 "velocidad_ventas": 0.85, "cap_rate": 7.2},
+                {"precio_m2": 52000, "ubicacion": "CDMX", "amenidades": 15, 
+                 "velocidad_ventas": 0.72, "cap_rate": 6.8},
+                {"precio_m2": 38000, "ubicacion": "Monterrey", "amenidades": 10, 
+                 "velocidad_ventas": 0.90, "cap_rate": 7.5}
+            ]
+            
+            resultados = [re_detector.predict(d) for d in desarrollos]
+            mejor = max(resultados, key=lambda x: x['probabilidad_venta_12m'])
+            
+            mensaje = f"""🏗️ *REPORTE SEMANAL INMOBILIARIO*
+
+📊 Analizados: 3 nuevos desarrollos
+
+🎯 *OPORTUNIDAD DESTACADA*
+Probabilidad de venta: {mejor['certeza']}
+Precio estimado: ${mejor['precio_estimado']:,.0f}
+Días estimados: {mejor['dias_estimados']}
+*Recomendación: {mejor['recomendacion']}*
+
+¿Quieres el pitch completo?"""
+            
+            return {"mensaje_whatsapp": mensaje, "formato": "markdown"}
+        
+        else:
+            return {"error": "Tipo no soportado"}
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/integrations/powerbi-data")
+async def get_powerbi_data():
+    """
+    Endpoint para conectar Power BI
+    Retorna datos en formato compatible con Power BI
+    """
+    try:
+        # Datos de ejemplo para visualización
+        return {
+            "real_estate": {
+                "desarrollos_analizados": 50,
+                "oportunidades_alta_prioridad": 12,
+                "tasa_exito_predicciones": 0.89
+            },
+            "social_media": {
+                "posts_analizados": 200,
+                "engagement_promedio": 847,
+                "posts_virales_predichos": 15
+            },
+            "personal": {
+                "decisiones_optimizadas": 8,
+                "ahorro_total_estimado": 42000
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==================== MAIN ====================
+
+if __name__ == "__main__":
+    print("\n" + "=" * 60)
+    print("🚀 Iniciando API de Inteligencia TensorFlow")
+    print("=" * 60)
+    print("\n📡 Servidor: http://localhost:3001")
+    print("📚 Docs: http://localhost:3001/docs")
+    print("🔍 Health: http://localhost:3001/health")
+    print("\n" + "=" * 60 + "\n")
+    
+    uvicorn.run(
+        "api:app",
+        host="0.0.0.0",
+        port=3001,
+        reload=True,
+        log_level="info"
+    )
