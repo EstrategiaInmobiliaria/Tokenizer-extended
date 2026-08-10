@@ -5,6 +5,7 @@ FastAPI backend que expone endpoints para todos los modelos
 
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import sys
@@ -19,12 +20,21 @@ from models.real_estate_opportunity import RealEstateOpportunityDetector
 from models.social_media_optimizer import SocialMediaContentOptimizer
 from models.personal_decision_models import TCOCalculator, TennisOptimizer
 
+# Importar sistema de tracking
+sys.path.insert(0, str(backend_path / "monitoring"))
+from impact_tracker import ImpactTracker, MetricCategory, PredictionOutcome
+from alert_system import SmartAlertSystem, check_and_alert_prediction, check_and_alert_metrics
+
 # Inicializar FastAPI
 app = FastAPI(
     title="Sistema de Inteligencia TensorFlow",
     description="API para predicciones de ML en Inmobiliario, Redes Sociales y Decisiones Personales",
     version="1.0.0"
 )
+
+# Inicializar tracker de impacto
+impact_tracker = ImpactTracker()
+alert_system = SmartAlertSystem()
 
 # CORS
 app.add_middleware(
@@ -40,6 +50,11 @@ re_detector = RealEstateOpportunityDetector()
 sm_optimizer = SocialMediaContentOptimizer()
 tco_calculator = TCOCalculator()
 tennis_optimizer = TennisOptimizer()
+
+# Montar archivos estáticos (dashboard)
+static_path = Path(__file__).parent / "static"
+if static_path.exists():
+    app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
 
 
 # ==================== SCHEMAS ====================
@@ -112,6 +127,14 @@ class TennisSetupOutput(BaseModel):
     mejora_vs_promedio: float
 
 
+# Schemas para tracking
+class OutcomeUpdate(BaseModel):
+    prediction_id: str
+    actual_outcome: Dict[str, Any]
+    success: bool
+    notes: str = ""
+
+
 # ==================== ENDPOINTS ====================
 
 @app.get("/")
@@ -126,7 +149,9 @@ async def root():
             "social_content_optimizer",
             "tco_calculator",
             "tennis_optimizer"
-        ]
+        ],
+        "dashboard": "/static/dashboard.html",
+        "docs": "/docs"
     }
 
 
@@ -161,6 +186,22 @@ async def predict_real_estate(data: RealEstateInput):
     """
     try:
         resultado = re_detector.predict(data.dict())
+        
+        # Log predicción para tracking de impacto
+        pred_id = impact_tracker.log_prediction(
+            MetricCategory.REAL_ESTATE,
+            "real_estate_opportunity",
+            data.dict(),
+            resultado,
+            confidence_score=resultado['probabilidad_venta_12m']
+        )
+        
+        # Verificar alertas
+        check_and_alert_prediction(resultado, "real_estate")
+        
+        # Agregar ID a respuesta
+        resultado['prediction_id'] = pred_id
+        
         return RealEstateOutput(**resultado)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error en predicción: {str(e)}")
@@ -277,6 +318,121 @@ async def optimize_tennis_setup(data: TennisConditionsInput):
         return TennisSetupOutput(**resultado)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error en optimización: {str(e)}")
+
+
+# ==================== TRACKING & METRICS ====================
+
+@app.post("/api/tracking/update-outcome")
+async def update_prediction_outcome(data: OutcomeUpdate):
+    """
+    Actualiza el outcome real de una predicción para medir precisión y ROI
+    """
+    try:
+        status = PredictionOutcome.SUCCESS if data.success else PredictionOutcome.FAILURE
+        impact_tracker.update_outcome(
+            data.prediction_id,
+            data.actual_outcome,
+            status,
+            data.notes
+        )
+        return {"status": "ok", "message": "Outcome actualizado correctamente"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/metrics/impact-report")
+async def get_impact_report(days: int = 30):
+    """
+    Genera reporte de impacto con ROI, precisión, tiempo ahorrado
+    """
+    try:
+        report_text = impact_tracker.generate_impact_report(days)
+        metrics = impact_tracker.calculate_metrics()
+        
+        from dataclasses import asdict
+        return {
+            "report_text": report_text,
+            "metrics": asdict(metrics),
+            "period_days": days
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/metrics/roi-calculator")
+async def calculate_roi(days: int = 30):
+    """
+    Calcula ROI detallado del sistema
+    """
+    try:
+        metrics = impact_tracker.calculate_metrics()
+        
+        hourly_rate = 1000  # MXN/hora
+        cloud_ml_cost_monthly = 570  # USD/mes evitado
+        cloud_ml_cost_daily = cloud_ml_cost_monthly / 30
+        
+        time_value = metrics.time_saved_hours * hourly_rate
+        cloud_savings = cloud_ml_cost_daily * days * 20
+        total_value = time_value + metrics.money_saved + cloud_savings
+        
+        monthly_value = total_value * (30 / days) if days > 0 else 0
+        annual_value = monthly_value * 12
+        
+        return {
+            "period_days": days,
+            "breakdown": {
+                "time_saved_hours": metrics.time_saved_hours,
+                "time_value_mxn": time_value,
+                "direct_savings_mxn": metrics.money_saved,
+                "cloud_costs_avoided_mxn": cloud_savings,
+                "total_value_mxn": total_value
+            },
+            "projections": {
+                "monthly_value_mxn": monthly_value,
+                "annual_value_mxn": annual_value
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==================== ALERTAS ====================
+
+@app.get("/api/alerts/recent")
+async def get_recent_alerts(hours: int = 24):
+    """
+    Obtiene alertas recientes del sistema
+    """
+    try:
+        alerts = alert_system.get_recent_alerts(hours)
+        return {
+            "alerts": alerts,
+            "total": len(alerts),
+            "period_hours": hours
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/alerts/config")
+async def get_alert_config():
+    """
+    Obtiene configuración actual de alertas
+    """
+    return alert_system.config
+
+
+@app.post("/api/alerts/config")
+async def update_alert_config(config: Dict[str, Any]):
+    """
+    Actualiza configuración de alertas
+    """
+    try:
+        alert_system.config.update(config)
+        alert_system.save_config()
+        return {"status": "ok", "config": alert_system.config}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ==================== INTEGRACIONES ====================
