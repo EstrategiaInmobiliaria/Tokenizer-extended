@@ -4,6 +4,7 @@ import {
   type NextPage,
 } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Github, Twitter } from "lucide-react";
 
@@ -20,9 +21,7 @@ function useQueryParamsState() {
   const router = useRouter();
 
   const params = useMemo((): AllOptions => {
-    return isValidOption(router.query?.model)
-      ? router.query.model
-      : "gpt-4o";
+    return isValidOption(router.query?.model) ? router.query.model : "gpt-4o";
   }, [router.query]);
 
   const setParams = (model: AllOptions) => {
@@ -54,6 +53,19 @@ const Home: NextPage<
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="mx-auto flex min-h-screen max-w-[1200px] flex-col gap-4 p-8">
+        <Link
+          href="/tiempo-polinomico"
+          className="text-indigo-950 flex items-center justify-between gap-3 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 transition hover:bg-indigo-100"
+        >
+          <span>
+            <span className="font-semibold">
+              Laboratorio de tiempo polinómico.
+            </span>{" "}
+            Simulación con movimiento, gráficos y cronómetro real para explicar
+            complejidad en clase.
+          </span>
+          <span className="shrink-0 text-sm font-medium">Abrir →</span>
+        </Link>
         <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
           <h1 className="text-4xl font-bold">Tiktokenizer</h1>
 

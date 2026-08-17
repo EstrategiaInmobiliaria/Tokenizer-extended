@@ -1,3 +1,71 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes poly-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 0.85;
+  }
+}
+
+@keyframes poly-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes poly-dash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+@keyframes poly-formula {
+  0%,
+  100% {
+    text-shadow: 0 0 0 rgba(110, 231, 183, 0);
+  }
+  50% {
+    text-shadow: 0 0 18px rgba(110, 231, 183, 0.55);
+  }
+}
+
+.poly-pulse {
+  animation: poly-pulse 1.2s ease-in-out infinite;
+}
+
+.poly-bob {
+  animation: poly-bob 0.45s ease-in-out infinite;
+}
+
+.poly-dash-move {
+  stroke-dasharray: 8 10;
+  animation: poly-dash 0.8s linear infinite;
+}
+
+.poly-formula {
+  animation: poly-formula 2.4s ease-in-out infinite;
+}
+
+.poly-runner {
+  transition: left 80ms linear;
+}
+
+.poly-bar-fill {
+  transition: width 80ms linear;
+}
+
+.poly-line-draw {
+  stroke-dasharray: 240;
+  stroke-dashoffset: 0;
+}
