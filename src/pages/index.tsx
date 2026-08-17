@@ -4,6 +4,7 @@ import {
   type NextPage,
 } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Github, Twitter } from "lucide-react";
 
@@ -55,7 +56,15 @@ const Home: NextPage<
       </Head>
       <main className="mx-auto flex min-h-screen max-w-[1200px] flex-col gap-4 p-8">
         <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
-          <h1 className="text-4xl font-bold">Tiktokenizer</h1>
+          <div>
+            <h1 className="text-4xl font-bold">Tiktokenizer</h1>
+            <Link
+              href="/ingenieria-industrial"
+              className="text-sm text-teal-700 underline-offset-2 hover:underline"
+            >
+              Guía de estudio: Ingeniería Industrial
+            </Link>
+          </div>
 
           <EncoderSelect
             value={model}
