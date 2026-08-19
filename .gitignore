@@ -1,45 +1,98 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-
-# testing
-/coverage
-
-# database
-/prisma/db.sqlite
-/prisma/db.sqlite-journal
-
-# next.js
-/.next/
-/out/
-next-env.d.ts
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# local env files
-# do not commit any .env files to git, except for the .env.example file. https://create.t3.gg/en/usage/env-variables#using-environment-variables
+# Environment variables
 .env
-.env*.local
+*.env
+!.env.example
 
-# vercel
-.vercel
+# Data directories
+data/raw/*
+data/processed/*
+data/graph/kuzu_db/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/graph/.gitkeep
 
-# typescript
-*.tsbuildinfo
+# Logs
+*.log
+logs/
+n8n/
 
-# hf
-public/hf
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Supabase local
+.supabase/
+
+# n8n
+.n8n/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# Audio files (grandes)
+*.ogg
+*.mp3
+*.m4a
+*.wav
+
+# VCF exports (privados)
+*.vcf
+*.vcard
+
+# CSV exports (privados)
+*Connections*.csv
+*connections*.csv
+
+# Instagram exports (privados)
+instagram_data/
+instagram-*.zip
+
+# Backups
+backup/
+*.backup
+*.bak

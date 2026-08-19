@@ -1,0 +1,250 @@
+{
+  "name": "WhatsApp Voice Note Processing",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-voice",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-1",
+      "name": "Webhook: WhatsApp",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "whatsapp-voice-notes"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.body.type }}",
+              "operation": "equals",
+              "value2": "voice"
+            }
+          ]
+        }
+      },
+      "id": "filter-voice",
+      "name": "Filter: Voice Only",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.media_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "id": "download-audio",
+      "name": "Download Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "binaryToString",
+        "options": {
+          "fileName": "={{ $json.body.from }}_{{ $json.body.timestamp }}.ogg"
+        }
+      },
+      "id": "save-audio",
+      "name": "Save Audio File",
+      "type": "n8n-nodes-base.moveFile",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "notes": "Guarda audio en /data/raw/whatsapp/"
+    },
+    {
+      "parameters": {
+        "command": "python3 /workspace/backend/whatsapp_integration/whatsapp_processor.py {{ $json.file_path }} {{ $json.body.from }}"
+      },
+      "id": "process-voice",
+      "name": "Process Voice Note",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [1050, 300],
+      "notes": "Transcribe y analiza con Whisper + GPT"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = JSON.parse($input.first().json.stdout);\n\nreturn {\n  sender_phone: result.sender_phone,\n  transcript: result.transcript,\n  summary: result.summary,\n  sentiment: result.sentiment,\n  topics: result.topics,\n  mentioned_contacts: result.mentioned_contacts,\n  next_steps: result.next_steps,\n  embedding: result.embedding,\n  interaction_type: 'whatsapp_voice',\n  processed_at: new Date().toISOString()\n};"
+      },
+      "id": "parse-result",
+      "name": "Parse Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "table": "contacts",
+        "operation": "get",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "phone_primary",
+              "keyValue": "={{ $json.sender_phone }}"
+            }
+          ]
+        }
+      },
+      "id": "find-contact",
+      "name": "Find Contact in Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1450, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1",
+          "name": "Supabase Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.length }}",
+              "operation": "largerEqual",
+              "value2": 1
+            }
+          ]
+        }
+      },
+      "id": "check-contact",
+      "name": "Contact Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "table": "interactions",
+        "operation": "insert",
+        "data": {
+          "contact_id": "={{ $node['Find Contact in Supabase'].json[0].id }}",
+          "interaction_type": "={{ $node['Parse Result'].json.interaction_type }}",
+          "content": "={{ $node['Parse Result'].json.transcript }}",
+          "summary": "={{ $node['Parse Result'].json.summary }}",
+          "sentiment": "={{ $node['Parse Result'].json.sentiment }}",
+          "transcript_embedding": "={{ $node['Parse Result'].json.embedding }}"
+        }
+      },
+      "id": "save-interaction",
+      "name": "Save Interaction to Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1850, 250],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1",
+          "name": "Supabase Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:8000/api/graph/update",
+        "options": {
+          "bodyParametersJson": "={{ JSON.stringify({\n  contact_id: $node['Find Contact in Supabase'].json[0].id,\n  interaction: $node['Parse Result'].json\n}) }}"
+        },
+        "method": "POST"
+      },
+      "id": "update-graph",
+      "name": "Update Kùzu Graph",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [2050, 250],
+      "notes": "Actualiza grafo con nueva interacción"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({\n  success: true,\n  message: 'Voice note processed',\n  summary: $node['Parse Result'].json.summary\n}) }}"
+      },
+      "id": "response-success",
+      "name": "Response: Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2250, 250]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({\n  success: false,\n  message: 'Contact not found',\n  phone: $node['Parse Result'].json.sender_phone\n}) }}"
+      },
+      "id": "response-no-contact",
+      "name": "Response: Contact Not Found",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1850, 350]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({\n  success: false,\n  message: 'Not a voice message'\n}) }}"
+      },
+      "id": "response-not-voice",
+      "name": "Response: Not Voice",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 450]
+    }
+  ],
+  "connections": {
+    "Webhook: WhatsApp": {
+      "main": [[{ "node": "Filter: Voice Only", "type": "main", "index": 0 }]]
+    },
+    "Filter: Voice Only": {
+      "main": [
+        [{ "node": "Download Audio", "type": "main", "index": 0 }],
+        [{ "node": "Response: Not Voice", "type": "main", "index": 0 }]
+      ]
+    },
+    "Download Audio": {
+      "main": [[{ "node": "Save Audio File", "type": "main", "index": 0 }]]
+    },
+    "Save Audio File": {
+      "main": [[{ "node": "Process Voice Note", "type": "main", "index": 0 }]]
+    },
+    "Process Voice Note": {
+      "main": [[{ "node": "Parse Result", "type": "main", "index": 0 }]]
+    },
+    "Parse Result": {
+      "main": [[{ "node": "Find Contact in Supabase", "type": "main", "index": 0 }]]
+    },
+    "Find Contact in Supabase": {
+      "main": [[{ "node": "Contact Exists?", "type": "main", "index": 0 }]]
+    },
+    "Contact Exists?": {
+      "main": [
+        [{ "node": "Save Interaction to Supabase", "type": "main", "index": 0 }],
+        [{ "node": "Response: Contact Not Found", "type": "main", "index": 0 }]
+      ]
+    },
+    "Save Interaction to Supabase": {
+      "main": [[{ "node": "Update Kùzu Graph", "type": "main", "index": 0 }]]
+    },
+    "Update Kùzu Graph": {
+      "main": [[{ "node": "Response: Success", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "pinData": {},
+  "versionId": "1"
+}
