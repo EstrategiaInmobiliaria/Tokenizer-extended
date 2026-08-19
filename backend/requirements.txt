@@ -1,0 +1,38 @@
+# Core dependencies
+python-dotenv==1.0.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Data processing
+pandas==2.1.4
+numpy==1.26.2
+splink==3.9.10
+
+# Database
+supabase==2.3.0
+psycopg2-binary==2.9.9
+kuzu==0.1.0
+
+# AI/ML
+openai==1.6.1
+tiktoken==0.5.2
+
+# VCF parsing
+vobject==0.9.6.1
+
+# LinkedIn/Instagram parsing
+beautifulsoup4==4.12.2
+lxml==4.9.4
+
+# WhatsApp integration
+pydub==0.25.1
+openai-whisper==20231117
+
+# Graph analysis
+networkx==3.2.1
+python-louvain==0.16
+
+# Utilities
+requests==2.31.0
+tqdm==4.66.1
+rich==13.7.0
