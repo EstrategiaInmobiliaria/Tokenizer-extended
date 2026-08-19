@@ -1,0 +1,597 @@
+@prefix contact: <http://example.org/contact-graph#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+
+# ============================================
+# ONTOLOGÍA DE GRAFO DE CONTACTOS
+# GraphRAG para 45K+ Contactos
+# ============================================
+
+<http://example.org/contact-graph>
+    a owl:Ontology ;
+    dcterms:title "Contact Graph Knowledge Base - GraphRAG"@es ;
+    dcterms:description "Ontología para grafo de contactos de alto valor con scoring comercial, deduplicación y búsqueda semántica"@es ;
+    dcterms:creator "Jaime Wilk - Estrategia de Red" ;
+    dcterms:created "2026-08-19"^^xsd:date ;
+    owl:versionInfo "1.0.0" .
+
+# ============================================
+# JERARQUÍA DE CLASES - PERSONAS Y ORGANIZACIONES
+# ============================================
+
+contact:Persona
+    a owl:Class ;
+    rdfs:label "Persona"@es, "Person"@en ;
+    rdfs:comment "Individuo en la red de contactos con identidad unificada"@es .
+
+contact:DecidorCLevel
+    a owl:Class ;
+    rdfs:subClassOf contact:Persona ;
+    rdfs:label "Decidor C-Level"@es ;
+    rdfs:comment "CEO, CFO, Director General con poder de decisión de inversión"@es .
+
+contact:InfluencerEstratégico
+    a owl:Class ;
+    rdfs:subClassOf contact:Persona ;
+    rdfs:label "Influencer Estratégico"@es ;
+    rdfs:comment "Persona con alta centralidad (betweenness/PageRank) que conecta comunidades"@es .
+
+contact:Consultor
+    a owl:Class ;
+    rdfs:subClassOf contact:Persona ;
+    rdfs:label "Consultor"@es ;
+    rdfs:comment "Consultor estratégico, comercial o técnico"@es .
+
+contact:Académico
+    a owl:Class ;
+    rdfs:subClassOf contact:Persona ;
+    rdfs:label "Académico"@es ;
+    rdfs:comment "Profesor, investigador, líder de cátedra"@es .
+
+contact:Inversionista
+    a owl:Class ;
+    rdfs:subClassOf contact:Persona ;
+    rdfs:label "Inversionista"@es ;
+    rdfs:comment "Angel investor, VC, family office"@es .
+
+contact:Empresa
+    a owl:Class ;
+    rdfs:label "Empresa"@es, "Company"@en ;
+    rdfs:comment "Organización corporativa, startup, institución"@es .
+
+contact:EmpresaFortune500
+    a owl:Class ;
+    rdfs:subClassOf contact:Empresa ;
+    rdfs:label "Empresa Fortune 500"@es .
+
+contact:Startup
+    a owl:Class ;
+    rdfs:subClassOf contact:Empresa ;
+    rdfs:label "Startup"@es .
+
+contact:Universidad
+    a owl:Class ;
+    rdfs:subClassOf contact:Empresa ;
+    rdfs:label "Universidad"@es .
+
+# ============================================
+# CLASES - ECOSISTEMA PROFESIONAL
+# ============================================
+
+contact:IndustriaVertical
+    a owl:Class ;
+    rdfs:label "Industria Vertical"@es .
+
+contact:Automotriz
+    a owl:Class ;
+    rdfs:subClassOf contact:IndustriaVertical ;
+    rdfs:label "Automotriz"@es .
+
+contact:ReciclajeIndustrial
+    a owl:Class ;
+    rdfs:subClassOf contact:IndustriaVertical ;
+    rdfs:label "Reciclaje Industrial"@es .
+
+contact:CadenaSuministro
+    a owl:Class ;
+    rdfs:subClassOf contact:IndustriaVertical ;
+    rdfs:label "Cadena de Suministro"@es .
+
+contact:RealEstate
+    a owl:Class ;
+    rdfs:subClassOf contact:IndustriaVertical ;
+    rdfs:label "Real Estate"@es .
+
+contact:Consultoria
+    a owl:Class ;
+    rdfs:subClassOf contact:IndustriaVertical ;
+    rdfs:label "Consultoría Estratégica"@es .
+
+# ============================================
+# CLASES - RESPONSABILIDAD SOCIAL (CSR/ESG)
+# ============================================
+
+contact:TemaCSR
+    a owl:Class ;
+    rdfs:label "Tema de Responsabilidad Social"@es .
+
+contact:EconomiCircular
+    a owl:Class ;
+    rdfs:subClassOf contact:TemaCSR ;
+    rdfs:label "Economía Circular"@es .
+
+contact:Sustentabilidad
+    a owl:Class ;
+    rdfs:subClassOf contact:TemaCSR ;
+    rdfs:label "Sustentabilidad"@es .
+
+contact:GobernanzaCorporativa
+    a owl:Class ;
+    rdfs:subClassOf contact:TemaCSR ;
+    rdfs:label "Gobernanza Corporativa"@es .
+
+contact:EticaEmpresarial
+    a owl:Class ;
+    rdfs:subClassOf contact:TemaCSR ;
+    rdfs:label "Ética Empresarial"@es .
+
+contact:InclusionSocial
+    a owl:Class ;
+    rdfs:subClassOf contact:TemaCSR ;
+    rdfs:label "Inclusión Social"@es .
+
+# ============================================
+# CLASES - GEOGRAFÍA Y HUBS
+# ============================================
+
+contact:GeoHub
+    a owl:Class ;
+    rdfs:label "Geo-Hub"@es ;
+    rdfs:comment "Ciudad o región clave para activación de red en viajes"@es .
+
+contact:CiudadMexico
+    a owl:NamedIndividual, contact:GeoHub ;
+    rdfs:label "Ciudad de México"@es ;
+    geo:lat 19.4326 ;
+    geo:long -99.1332 .
+
+contact:Monterrey
+    a owl:NamedIndividual, contact:GeoHub ;
+    rdfs:label "Monterrey"@es ;
+    geo:lat 25.6866 ;
+    geo:long -100.3161 .
+
+contact:Santiago
+    a owl:NamedIndividual, contact:GeoHub ;
+    rdfs:label "Santiago de Chile"@es ;
+    geo:lat -33.4489 ;
+    geo:long -70.6693 .
+
+contact:Madrid
+    a owl:NamedIndividual, contact:GeoHub ;
+    rdfs:label "Madrid"@es ;
+    geo:lat 40.4168 ;
+    geo:long -3.7038 .
+
+contact:NuevaYork
+    a owl:NamedIndividual, contact:GeoHub ;
+    rdfs:label "Nueva York"@es ;
+    geo:lat 40.7128 ;
+    geo:long -74.0060 .
+
+# ============================================
+# CLASES - PROYECTOS Y OPORTUNIDADES
+# ============================================
+
+contact:Proyecto
+    a owl:Class ;
+    rdfs:label "Proyecto"@es ;
+    rdfs:comment "Proyecto de negocio, investigación o CSR"@es .
+
+contact:ProyectoCSR
+    a owl:Class ;
+    rdfs:subClassOf contact:Proyecto ;
+    rdfs:label "Proyecto de Responsabilidad Social"@es .
+
+contact:ProyectoComercial
+    a owl:Class ;
+    rdfs:subClassOf contact:Proyecto ;
+    rdfs:label "Proyecto Comercial"@es .
+
+contact:ProyectoInvestigacion
+    a owl:Class ;
+    rdfs:subClassOf contact:Proyecto ;
+    rdfs:label "Proyecto de Investigación"@es .
+
+contact:Oportunidad
+    a owl:Class ;
+    rdfs:label "Oportunidad de Negocio"@es ;
+    rdfs:comment "Deal potencial con valor económico estimado"@es .
+
+# ============================================
+# PROPIEDADES DE OBJETO - RELACIONES PROFESIONALES
+# ============================================
+
+contact:trabajaEn
+    a owl:ObjectProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:Empresa ;
+    rdfs:label "trabaja en"@es .
+
+contact:esDirectorDe
+    a owl:ObjectProperty ;
+    rdfs:subPropertyOf contact:trabajaEn ;
+    rdfs:domain contact:DecidorCLevel ;
+    rdfs:range contact:Empresa ;
+    rdfs:label "es director de"@es .
+
+contact:fundóEmpresa
+    a owl:ObjectProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:Empresa ;
+    rdfs:label "fundó empresa"@es .
+
+contact:perteneceAIndustria
+    a owl:ObjectProperty ;
+    rdfs:domain contact:Empresa ;
+    rdfs:range contact:IndustriaVertical ;
+    rdfs:label "pertenece a industria"@es .
+
+# ============================================
+# PROPIEDADES DE OBJETO - RED SOCIAL Y CONEXIONES
+# ============================================
+
+contact:conectaCon
+    a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:Persona ;
+    rdfs:label "conecta con"@es ;
+    rdfs:comment "Relación bidireccional de networking"@es .
+
+contact:esSocioDe
+    a owl:ObjectProperty ;
+    rdfs:subPropertyOf contact:conectaCon ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:Persona ;
+    rdfs:label "es socio de"@es .
+
+contact:esExalumnoDe
+    a owl:ObjectProperty ;
+    rdfs:subPropertyOf contact:conectaCon ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:Persona ;
+    rdfs:label "es exalumno de"@es ;
+    rdfs:comment "Comparte alma mater (red universitaria)"@es .
+
+contact:esClienteDe
+    a owl:ObjectProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:Persona ;
+    rdfs:label "es cliente de"@es .
+
+contact:refiereA
+    a owl:ObjectProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:Persona ;
+    rdfs:label "refiere a"@es ;
+    rdfs:comment "Ha hecho referido o introducción"@es .
+
+contact:conoceMedianteIntroducciónDe
+    a owl:ObjectProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:Persona ;
+    rdfs:label "conoce mediante introducción de"@es ;
+    rdfs:comment "Ruta de introducción (1-2 grados de separación)"@es .
+
+# ============================================
+# PROPIEDADES DE OBJETO - INTERESES Y TEMAS
+# ============================================
+
+contact:tieneInterésEn
+    a owl:ObjectProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:TemaCSR ;
+    rdfs:label "tiene interés en"@es .
+
+contact:expertoEn
+    a owl:ObjectProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:IndustriaVertical ;
+    rdfs:label "experto en"@es .
+
+contact:participaEnProyecto
+    a owl:ObjectProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:Proyecto ;
+    rdfs:label "participa en proyecto"@es .
+
+contact:lideraProyecto
+    a owl:ObjectProperty ;
+    rdfs:subPropertyOf contact:participaEnProyecto ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:Proyecto ;
+    rdfs:label "lidera proyecto"@es .
+
+contact:tienePoderDecisiónEn
+    a owl:ObjectProperty ;
+    rdfs:domain contact:DecidorCLevel ;
+    rdfs:range contact:Proyecto ;
+    rdfs:label "tiene poder de decisión en"@es .
+
+# ============================================
+# PROPIEDADES DE OBJETO - GEOGRAFÍA
+# ============================================
+
+contact:ubicadoEn
+    a owl:ObjectProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:GeoHub ;
+    rdfs:label "ubicado en"@es ;
+    rdfs:comment "Ciudad de residencia principal"@es .
+
+contact:viajaFrecuentementeA
+    a owl:ObjectProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:GeoHub ;
+    rdfs:label "viaja frecuentemente a"@es ;
+    rdfs:comment "Ciudad que visita regularmente por negocios"@es .
+
+contact:trabajaRemotoDesdeDe
+    a owl:ObjectProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range contact:GeoHub ;
+    rdfs:label "trabaja remoto desde"@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - SCORING Y MÉTRICAS
+# ============================================
+
+contact:scoreComercial
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "score comercial"@es ;
+    rdfs:comment "Puntuación de valor comercial potencial (0-100)"@es .
+
+contact:tier
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:integer ;
+    rdfs:label "tier de monetización"@es ;
+    rdfs:comment "1: Decisores C-Level, 2: Consultores/Partners, 3: Red General"@es .
+
+contact:pageRank
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "PageRank"@es ;
+    rdfs:comment "Influencia global en la red (0-1)"@es .
+
+contact:betweennessCentrality
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "Betweenness Centrality"@es ;
+    rdfs:comment "Capacidad de conectar comunidades (0-1)"@es .
+
+contact:eigenvectorCentrality
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "Eigenvector Centrality"@es ;
+    rdfs:comment "Calidad de conexiones (conectado a influencers)"@es .
+
+contact:gradoDeComunidad
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:integer ;
+    rdfs:label "ID de comunidad"@es ;
+    rdfs:comment "Clúster detectado por algoritmo Leiden/Louvain"@es .
+
+contact:valorDealEstimado
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Oportunidad ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "valor de deal estimado (USD)"@es .
+
+contact:probabilidadCierre
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Oportunidad ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "probabilidad de cierre"@es ;
+    rdfs:comment "Probabilidad de cerrar deal (0-1)"@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - INFORMACIÓN PERSONAL
+# ============================================
+
+contact:nombreCompleto
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:string ;
+    rdfs:label "nombre completo"@es .
+
+contact:email
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:string ;
+    rdfs:label "email"@es .
+
+contact:teléfono
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:string ;
+    rdfs:label "teléfono"@es .
+
+contact:linkedinURL
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:anyURI ;
+    rdfs:label "LinkedIn URL"@es .
+
+contact:twitterHandle
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:string ;
+    rdfs:label "Twitter/X handle"@es .
+
+contact:whatsappNumber
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:string ;
+    rdfs:label "WhatsApp number"@es .
+
+contact:puestoActual
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:string ;
+    rdfs:label "puesto actual"@es .
+
+contact:biografia
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:string ;
+    rdfs:label "biografía"@es ;
+    rdfs:comment "Bio de LinkedIn o resumen profesional"@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - INTERACCIONES
+# ============================================
+
+contact:fechaÚltimaInteracción
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:date ;
+    rdfs:label "fecha de última interacción"@es .
+
+contact:díasSinContacto
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:integer ;
+    rdfs:label "días sin contacto"@es .
+
+contact:frecuenciaInteracciónMes
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "frecuencia de interacción mensual"@es .
+
+contact:notasContexto
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:string ;
+    rdfs:label "notas de contexto"@es ;
+    rdfs:comment "Notas de voz transcritas, contexto de reuniones, etc."@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - EMBEDDINGS VECTORIALES
+# ============================================
+
+contact:vectorEmbedding
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:string ;
+    rdfs:label "vector embedding"@es ;
+    rdfs:comment "Representación vectorial de 768 dims (biografia + industria + intereses)"@es .
+
+contact:vectorBiografia
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:string ;
+    rdfs:label "vector de biografía"@es .
+
+contact:vectorIntereses
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:string ;
+    rdfs:label "vector de intereses"@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - DEDUPLICACIÓN
+# ============================================
+
+contact:entidadUnificadaID
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:string ;
+    rdfs:label "ID de entidad unificada"@es ;
+    rdfs:comment "UUID único post-deduplicación con Splink"@es .
+
+contact:fuenteOriginal
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:string ;
+    rdfs:label "fuente original"@es ;
+    rdfs:comment "vCard, LinkedIn, Twitter, WhatsApp, Manual"@es .
+
+contact:confianzaDeduplicación
+    a owl:DatatypeProperty ;
+    rdfs:domain contact:Persona ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "confianza de deduplicación"@es ;
+    rdfs:comment "Probabilidad de match correcto (0-1)"@es .
+
+# ============================================
+# AXIOMAS Y RESTRICCIONES
+# ============================================
+
+# Restricción: Toda persona debe tener nombre y al menos un contacto
+contact:Persona
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty contact:nombreCompleto ;
+        owl:minCardinality 1
+    ] .
+
+# Restricción: Decidores C-Level deben tener score comercial alto
+contact:DecidorCLevel
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty contact:scoreComercial ;
+        owl:minInclusive 70
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty contact:tier ;
+        owl:hasValue 1
+    ] .
+
+# Restricción: Tier debe estar entre 1 y 3
+contact:Persona
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty contact:tier ;
+        owl:minInclusive 1 ;
+        owl:maxInclusive 3
+    ] .
+
+# ============================================
+# CLASES ENUMERADAS
+# ============================================
+
+contact:TipoRelación
+    a owl:Class ;
+    owl:oneOf (contact:Socio contact:Cliente contact:Proveedor contact:Exalumno 
+               contact:Familiar contact:Mentor contact:Mentorado) .
+
+contact:Socio a owl:NamedIndividual, contact:TipoRelación ;
+    rdfs:label "Socio"@es .
+
+contact:Cliente a owl:NamedIndividual, contact:TipoRelación ;
+    rdfs:label "Cliente"@es .
+
+contact:Proveedor a owl:NamedIndividual, contact:TipoRelación ;
+    rdfs:label "Proveedor"@es .
+
+contact:Exalumno a owl:NamedIndividual, contact:TipoRelación ;
+    rdfs:label "Exalumno"@es .
+
+# ============================================
+# FIN DE LA ONTOLOGÍA
+# ============================================
