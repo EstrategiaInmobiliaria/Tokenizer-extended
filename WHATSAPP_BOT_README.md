@@ -275,6 +275,41 @@ curl http://localhost:5000/health
 curl http://localhost:5000/
 ```
 
+## Meta Business Agent Skills
+
+This bot can be enhanced with **Meta Business Agent Skills** for more sophisticated conversation handling.
+
+### What are Skills?
+Skills are behavioral instructions that tell Meta's agent how to respond in specific situations. They're separate from your Flask bot but can work alongside it.
+
+### Quick Setup
+```bash
+# Upload predefined RSI skills to Meta Business Agent
+python skills_manager.py --upload
+
+# List existing skills
+python skills_manager.py --list
+```
+
+### Documentation
+- **📖 Complete Guide:** `SKILLS_CONFIGURATION_GUIDE.md` - Full setup and usage
+- **📋 Templates:** `RSI_SKILLS_TEMPLATES.md` - 10 ready-to-use skills for RSI course
+- **⚡ Quick Reference:** `SKILLS_QUICK_REFERENCE.md` - Cheat sheet
+
+### Predefined Skills Included
+1. `greeting-skill` - First contact greeting
+2. `circular-economy-questions` - Economía circular topics
+3. `sustainability-questions` - Sustainability & ESG
+4. `csr-rsc-questions` - Corporate Social Responsibility
+5. `assignment-help` - Homework assistance
+6. `course-information` - Syllabus & schedule
+7. `exam-preparation` - Study tips
+8. `examples-case-studies` - Real company examples
+9. `unclear-or-offtopic` - Handling unclear messages
+10. `human-handoff` - Escalation to professor
+
+See `SKILLS_CONFIGURATION_GUIDE.md` for detailed setup instructions.
+
 ## Contributing
 
 Improvements welcome! Focus areas:
