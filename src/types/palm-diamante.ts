@@ -54,12 +54,12 @@ export interface TorreInfo {
 }
 
 export const TORRE_FINANCING_MONTHS: Record<TorreType, number> = {
-  "I-A": 5,
-  "I-B": 5,
-  "II-A": 9,
-  "II-B": 9,
-  "III-A": 24,
-  "III-B": 24,
+  "I-A": 21,
+  "I-B": 21,
+  "II-A": 26,
+  "II-B": 26,
+  "III-A": 42,
+  "III-B": 42,
 };
 
 export const APARTA_FIJO = 25000;

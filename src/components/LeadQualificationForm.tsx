@@ -92,10 +92,10 @@ export function LeadQualificationForm({ onSubmit }: LeadFormProps) {
         {/* Pregunta 2: Mensualidad sostenible */}
         <div className="flex flex-col gap-3 rounded-md border border-slate-200 bg-slate-50 p-4">
           <label className="text-sm font-semibold text-slate-900">
-            2. ¿Puedes sostener $27k - $67k mensuales por 24 meses?
+            2. ¿Puedes sostener $16k - $39k mensuales por 42 meses?
           </label>
           <p className="text-xs text-slate-600">
-            Dependiendo del modelo y la torre (5, 9 o 24 meses)
+            Dependiendo del modelo y la torre (21, 26 o 42 meses)
           </p>
           <div className="flex gap-4">
             <label className="flex cursor-pointer items-center gap-2">

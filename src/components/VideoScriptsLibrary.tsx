@@ -6,7 +6,7 @@ export function VideoScriptsLibrary() {
       duracion: "15 segundos",
       objetivo: "Filtrar curiosos vs inversionistas reales",
       audiencia: "Base de 41k contactos",
-      script: `"¿Cuánto necesitas para apartar un depa de $5M frente a Princess? No $5M. $25,000. Yo soy Jaime Wilk, con Diana Ondarza te llevamos paso a paso: 7% a la firma, 13% en 24 meses de $27k, y 80% con crédito hipotecario a la entrega. Torre III, 150 lugares. ¿Te armo tu corrida?"`,
+      script: `"¿Cuánto necesitas para apartar un depa de $5M frente a Princess? No $5M. $25,000. Yo soy Jaime Wilk, con Diana Ondarza te llevamos paso a paso: 7% a la firma, 13% en 42 meses de $16k, y 80% con crédito hipotecario a la entrega. Torre III, 150 lugares. ¿Te armo tu corrida?"`,
       cta: "WhatsApp / DM para corrida financiera",
       plataforma: "@palm.diamante Instagram/TikTok",
     },
@@ -26,17 +26,17 @@ export function VideoScriptsLibrary() {
       duracion: "15 segundos",
       objetivo: "Crear FOMO (Fear of Missing Out)",
       audiencia: "Leads tibios que están comparando opciones",
-      script: `"390 vendidos ya. Quedan 150 en Torre III con 24 meses para pagar. Torre I y II solo 5 y 9 meses. Si quieres mensualidad baja, es ahora. $25k aparta. Jaime Wilk + Diana Ondarza."`,
+      script: `"390 vendidos ya. Quedan 150 en Torre III con 42 meses para pagar. Torre I y II solo 21 y 26 meses. Si quieres mensualidad baja, es ahora. $25k aparta. Jaime Wilk + Diana Ondarza."`,
       cta: "Aparta ahora / Link en bio",
       plataforma: "@palm.diamante Instagram/TikTok/Facebook",
     },
   ];
 
   const emailTemplates = [
-    {
-      tipo: "Lead Calificado",
-      asunto: "Tu corrida financiera Palm Diamante está lista",
-      cuerpo: `Hola [NOMBRE],
+      {
+        tipo: "Lead Calificado",
+        asunto: "Tu corrida financiera Palm Diamante está lista",
+        cuerpo: `Hola [NOMBRE],
 
 Gracias por tu interés en Palm Diamante. Basado en tu perfil, aquí está tu corrida financiera personalizada:
 
@@ -46,7 +46,7 @@ Gracias por tu interés en Palm Diamante. Basado en tu perfil, aquí está tu co
 📋 Estructura de Pago:
 1. Aparta hoy: $25,000
 2. Firma contrato (7%): [7%] - Pagas [RESTA] adicional
-3. Mensualidades 24m (13%): [MENSUALIDAD]/mes
+3. Mensualidades 42m (13%): [MENSUALIDAD]/mes
 4. Crédito hipotecario (80%): [80%] - Lo gestionamos nosotros
 
 📞 Siguiente paso:
@@ -56,7 +56,7 @@ Agendar llamada con Jaime Wilk + Diana Ondarza para pre-aprobar tu crédito hipo
 
 Jaime Wilk - Estrategia Inmobiliaria
 Diana Ondarza - Agartha Bienes Raíces`,
-    },
+      },
     {
       tipo: "Lead para Nurturing",
       asunto: "Guía completa de inversión en Palm Diamante",
@@ -82,10 +82,10 @@ Jaime Wilk - Estrategia Inmobiliaria`,
       formato: "Carousel (4 cards)",
       copy: `Aparta desde $25k. No $5M completos.
 
-🏠 B1 Entry: $27k/mes x 24m
-🏠 A1 Intermedio: $34k/mes x 24m  
-🏠 Garden House: $53k/mes x 24m + ROI $95k/mes
-🏠 Penthouse: $67k/mes x 24m frente a Princess
+🏠 B1 Entry: $16k/mes x 42m
+🏠 A1 Intermedio: $19k/mes x 42m  
+🏠 Garden House: $30k/mes x 42m + ROI $95k/mes
+🏠 Penthouse: $38k/mes x 42m frente a Princess
 
 El banco pone el 80%. Tú solo la firma.
 
@@ -98,7 +98,7 @@ El banco pone el 80%. Tú solo la firma.
       copy: `390 vendidos. 150 lugares Torre III.
 
 ¿Por qué Torre III?
-✅ 24 meses para pagar (vs 5 o 9 meses)
+✅ 42 meses para pagar (vs 21 o 26 meses)
 ✅ Mensualidad más baja
 ✅ 80% hipotecable a entrega
 
@@ -254,12 +254,12 @@ Aparta: $25,000
         <ul className="space-y-2 text-xs text-blue-800">
           <li>
             ✅ <strong>$25k es tu barrera anti-curioso:</strong> El que sí
-            tiene comportamiento de inversionista entiende que $27k/mes por 24
+            tiene comportamiento de inversionista entiende que $16k/mes por 42
             meses es negocio.
           </li>
           <li>
             ✅ <strong>Torre III es tu máquina de volumen:</strong> 150
-            unidades con 24 meses. Enfócate ahí.
+            unidades con 42 meses. Enfócate ahí.
           </li>
           <li>
             ✅ <strong>Pre-aprueba el crédito desde ahora:</strong> Tú y Diana

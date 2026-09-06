@@ -297,8 +297,8 @@ export const INVENTORY_STATS = {
   reservados: 12,
   apartados: 10,
   torres: {
-    "I": { disponibles: 22, meses: 5 },
-    "II": { disponibles: 38, meses: 9 },
-    "III": { disponibles: 150, meses: 24 }, // AQUÍ ESTÁ TU VOLUMEN
+    "I": { disponibles: 22, meses: 21 },
+    "II": { disponibles: 38, meses: 26 },
+    "III": { disponibles: 150, meses: 42 }, // AQUÍ ESTÁ TU VOLUMEN - 42 MESES!
   },
 };

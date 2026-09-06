@@ -46,7 +46,7 @@ const PalmDiamantePage: NextPage = () => {
                 <div className="text-3xl font-bold text-yellow-300">
                   {INVENTORY_STATS.torres["III"].disponibles}
                 </div>
-                <div className="text-sm">Torre III - 24 Meses</div>
+                <div className="text-sm">Torre III - 42 Meses</div>
               </div>
             </div>
             <p className="mt-6 text-sm">

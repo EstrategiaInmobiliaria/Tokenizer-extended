@@ -92,25 +92,25 @@ export function PalmDiamanteCalculator({ onResultChange }: CalculatorProps) {
             <ResultRow
               label="3. Mensualidades (13% total)"
               value={formatCurrency(result.percent13Total)}
-              description="Pagadero en 5, 9 o 24 meses según torre"
+              description="Pagadero en 21, 26 o 42 meses según torre"
             />
             <div className="ml-4 mt-2 space-y-1 text-sm">
               <div className="flex justify-between text-slate-600">
-                <span>24 meses (Torre III):</span>
+                <span>42 meses (Torre III):</span>
                 <span className="font-semibold text-green-700">
-                  {formatCurrency(result.mensualidad24Meses)}/mes
+                  {formatCurrency(result.percent13Total / 42)}/mes
                 </span>
               </div>
               <div className="flex justify-between text-slate-600">
-                <span>9 meses (Torre II):</span>
+                <span>26 meses (Torre II):</span>
                 <span className="font-semibold">
-                  {formatCurrency(result.percent13Total / 9)}/mes
+                  {formatCurrency(result.percent13Total / 26)}/mes
                 </span>
               </div>
               <div className="flex justify-between text-slate-600">
-                <span>5 meses (Torre I):</span>
+                <span>21 meses (Torre I):</span>
                 <span className="font-semibold">
-                  {formatCurrency(result.percent13Total / 5)}/mes
+                  {formatCurrency(result.percent13Total / 21)}/mes
                 </span>
               </div>
             </div>

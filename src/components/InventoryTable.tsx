@@ -88,20 +88,20 @@ export function InventoryTable() {
               {INVENTORY_STATS.torres["III"].disponibles}
             </div>
             <div className="text-xs text-slate-600">
-              Torre III - 24 meses (VOLUMEN)
+              Torre III - 42 meses (VOLUMEN)
             </div>
           </div>
           <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
             <div className="text-2xl font-bold text-blue-600">
               {INVENTORY_STATS.torres["II"].disponibles}
             </div>
-            <div className="text-xs text-slate-600">Torre II - 9 meses</div>
+            <div className="text-xs text-slate-600">Torre II - 26 meses</div>
           </div>
           <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
             <div className="text-2xl font-bold text-amber-600">
               {INVENTORY_STATS.torres["I"].disponibles}
             </div>
-            <div className="text-xs text-slate-600">Torre I - 5 meses</div>
+            <div className="text-xs text-slate-600">Torre I - 21 meses</div>
           </div>
         </div>
       </div>
@@ -118,12 +118,12 @@ export function InventoryTable() {
             className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">Todas las Torres</option>
-            <option value="I-A">Torre I-A (5 meses)</option>
-            <option value="I-B">Torre I-B (5 meses)</option>
-            <option value="II-A">Torre II-A (9 meses)</option>
-            <option value="II-B">Torre II-B (9 meses)</option>
-            <option value="III-A">Torre III-A (24 meses) ⭐</option>
-            <option value="III-B">Torre III-B (24 meses) ⭐</option>
+            <option value="I-A">Torre I-A (21 meses)</option>
+            <option value="I-B">Torre I-B (21 meses)</option>
+            <option value="II-A">Torre II-A (26 meses)</option>
+            <option value="II-B">Torre II-B (26 meses)</option>
+            <option value="III-A">Torre III-A (42 meses) ⭐</option>
+            <option value="III-B">Torre III-B (42 meses) ⭐</option>
           </select>
         </div>
 
@@ -241,7 +241,7 @@ export function InventoryTable() {
       </div>
 
       <p className="text-xs text-slate-500">
-        Mostrando {filteredUnits.length} unidades. Torre III (⭐) tiene 24 meses de financiamiento.
+        Mostrando {filteredUnits.length} unidades. Torre III (⭐) tiene 42 meses de financiamiento.
       </p>
     </div>
   );
