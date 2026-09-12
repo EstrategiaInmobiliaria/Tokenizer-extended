@@ -2,31 +2,64 @@
 Operations Optimizer - Optimización de Mix de Productos y Operaciones
 Módulo de Optimización Matemática con Restricciones
 
-Este módulo implementa algoritmos de optimización multivariable para determinar
-el mix óptimo de productos/unidades que maximiza el beneficio operativo bajo
-restricciones de recursos, capacidad y mercado.
+Este módulo implementa dos enfoques complementarios:
+1. Solución analítica determinista para el modelo cuadrático cerrado
+2. Optimización numérica con restricciones para casos generales
 
-Fundamentos Matemáticos:
-------------------------
-Función Objetivo (maximizar):
-f(x, y) = Px * x + Py * y - Cx * x - Cy * y
+═══════════════════════════════════════════════════════════════════════════
+MODELO MATEMÁTICO CERRADO (Capítulo 3 de Tesis)
+═══════════════════════════════════════════════════════════════════════════
 
-Donde:
-- x, y = Cantidades de productos A y B
-- Px, Py = Precios de venta unitarios
-- Cx, Cy = Costos variables unitarios
+Función Objetivo Cuadrática con Rendimientos Marginales Decrecientes:
+    f(x, y) = 152x + 80y - 2x² - y² - xy
+
+Interpretación de Coeficientes:
+- 152x, 80y: Margen de contribución bruto
+- -2x², -y²: Rendimientos marginales decrecientes (saturación)
+- -xy: Efecto de canibalización entre tipos
+
+Condiciones de Primer Orden (∇f = 0):
+    ∂f/∂x = 152 - 4x - y = 0  →  4x + y = 152
+    ∂f/∂y = 80 - 2y - x = 0   →  x + 2y = 80
+
+Sistema Lineal: Ax = b
+    [4  1] [x]   [152]
+    [1  2] [y] = [80]
+
+Solución Analítica:
+    x* = 32 unidades comerciales
+    y* = 24 unidades residenciales
+    f(x*, y*) = 3,392 (beneficio máximo)
+
+Matriz Hessiana (Condiciones de Segundo Orden):
+    H = [-4  -1]
+        [-1  -2]
+    
+    det(H) = 7 > 0, H₁ = -4 < 0  →  H es negativa definida
+    ∴ (32, 24) es un MÁXIMO GLOBAL ESTRICTO
+
+Eigenvalores de H: λ₁ ≈ -5.236, λ₂ ≈ -0.764 (ambos negativos)
+
+═══════════════════════════════════════════════════════════════════════════
+MODELO GENERAL CON RESTRICCIONES
+═══════════════════════════════════════════════════════════════════════════
+
+Función Objetivo (forma general):
+    f(x, y) = Px·x + Py·y - Cx·x - Cy·y
 
 Restricciones:
-g1(x, y) = a1*x + b1*y ≤ R1  (Restricción de recurso 1)
-g2(x, y) = a2*x + b2*y ≤ R2  (Restricción de recurso 2)
-x ≥ 0, y ≥ 0  (No negatividad)
+    g₁(x, y) = a₁x + b₁y ≤ R₁  (Recurso 1)
+    g₂(x, y) = a₂x + b₂y ≤ R₂  (Recurso 2)
+    x ≥ 0, y ≥ 0  (No negatividad)
 
-Condiciones de Optimalidad (Método Lagrange):
-∇f(x,y) = λ∇g(x,y)
+Condiciones KKT:
+    ∇f(x*) + Σ λᵢ∇gᵢ(x*) = 0     (Estacionariedad)
+    gᵢ(x*) ≤ 0, ∀i               (Factibilidad primal)
+    λᵢ ≥ 0, ∀i                   (Factibilidad dual)
+    λᵢ·gᵢ(x*) = 0, ∀i            (Holgura complementaria)
 
-Para restricciones activas en el óptimo:
-∂f/∂x = λ(∂g/∂x)
-∂f/∂y = λ(∂g/∂y)
+Interpretación de λᵢ (Precio Sombra):
+    λᵢ = ∂f*/∂bᵢ = Incremento en f* por relajar restricción i en 1 unidad
 """
 
 from dataclasses import dataclass, field
@@ -34,6 +67,234 @@ from typing import List, Dict, Tuple, Optional, Callable
 import numpy as np
 from scipy.optimize import minimize, linprog, NonlinearConstraint
 import matplotlib.pyplot as plt
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CLASE 1: SOLUCIÓN ANALÍTICA DETERMINISTA (Modelo Matemático Cerrado)
+# ═══════════════════════════════════════════════════════════════════════════
+
+class MathematicalOptimizerCore:
+    """
+    Implementación determinista del problema de optimización cuadrático cerrado.
+    
+    Función objetivo:
+        f(x, y) = 152x + 80y - 2x² - y² - xy
+    
+    Solución analítica mediante resolución del sistema lineal derivado de ∇f = 0:
+        Sistema: Ax = b
+        Donde: A = [[4, 1], [1, 2]], b = [152, 80]
+        Solución: (x*, y*) = (32, 24)
+    
+    Este enfoque garantiza:
+    - Solución exacta (no iterativa)
+    - Tiempo constante O(1) para problema 2x2
+    - Reproducibilidad perfecta
+    - Validez matemática verificable
+    """
+    
+    def __init__(self):
+        # Matriz del sistema Ax = b derivada del gradiente ∇f = 0
+        self.A = np.array([
+            [4.0, 1.0],   # Coeficientes de ∂f/∂x = 152 - 4x - y = 0
+            [1.0, 2.0]    # Coeficientes de ∂f/∂y = 80 - 2y - x = 0
+        ], dtype=np.float64)
+        
+        self.b = np.array([152.0, 80.0], dtype=np.float64)
+        
+        # Matriz Hessiana (constante para función cuadrática)
+        self.H = np.array([
+            [-4.0, -1.0],
+            [-1.0, -2.0]
+        ], dtype=np.float64)
+        
+        # Coeficientes de la función objetivo f(x, y) = c₁x + c₂y + c₃x² + c₄y² + c₅xy
+        self.coef = {
+            'linear_x': 152.0,
+            'linear_y': 80.0,
+            'quadratic_x': -2.0,
+            'quadratic_y': -1.0,
+            'interaction': -1.0
+        }
+    
+    def solve_analytical(self) -> Tuple[float, float]:
+        """
+        Resuelve el sistema lineal Ax = b para obtener el punto crítico.
+        
+        Método: Eliminación Gaussiana (np.linalg.solve)
+        Complejidad: O(n³) → O(1) para n=2
+        
+        Returns:
+            (x*, y*): Punto crítico (candidato a óptimo)
+        """
+        try:
+            solution = np.linalg.solve(self.A, self.b)
+            return float(solution[0]), float(solution[1])
+        except np.linalg.LinAlgError as e:
+            raise ValueError(f"Sistema singular o mal condicionado: {e}")
+    
+    def objective_function(self, x: float, y: float) -> float:
+        """
+        Evalúa la función objetivo en (x, y).
+        
+        f(x, y) = 152x + 80y - 2x² - y² - xy
+        
+        Args:
+            x: Cantidad de unidades comerciales
+            y: Cantidad de unidades residenciales
+        
+        Returns:
+            Valor de la función objetivo (beneficio operativo)
+        """
+        c = self.coef
+        return (c['linear_x'] * x + 
+                c['linear_y'] * y + 
+                c['quadratic_x'] * x**2 + 
+                c['quadratic_y'] * y**2 + 
+                c['interaction'] * x * y)
+    
+    def gradient(self, x: float, y: float) -> np.ndarray:
+        """
+        Calcula el gradiente ∇f en (x, y).
+        
+        ∇f = [∂f/∂x, ∂f/∂y]
+        
+        ∂f/∂x = 152 - 4x - y
+        ∂f/∂y = 80 - 2y - x
+        
+        Args:
+            x, y: Punto de evaluación
+        
+        Returns:
+            Vector gradiente [grad_x, grad_y]
+        """
+        grad_x = self.coef['linear_x'] + 2 * self.coef['quadratic_x'] * x + self.coef['interaction'] * y
+        grad_y = self.coef['linear_y'] + 2 * self.coef['quadratic_y'] * y + self.coef['interaction'] * x
+        return np.array([grad_x, grad_y])
+    
+    def check_optimality(self) -> Dict[str, any]:
+        """
+        Verifica condiciones de optimalidad de segundo orden mediante análisis de Hessiana.
+        
+        Criterio de Sylvester para Máximo:
+        - H₁ = H[0,0] < 0
+        - det(H) > 0
+        
+        Returns:
+            Dict con análisis completo de la matriz Hessiana
+        """
+        # Menores principales
+        H1 = self.H[0, 0]  # Primer menor principal
+        det_H = np.linalg.det(self.H)  # Determinante
+        
+        # Eigenvalores (verificación alternativa de definitud)
+        eigenvalues = np.linalg.eigvals(self.H)
+        
+        # Clasificación según criterio de Sylvester
+        is_negative_definite = (H1 < 0) and (det_H > 0)
+        
+        # Verificación adicional: todos los eigenvalores negativos
+        all_eigenvalues_negative = np.all(eigenvalues < 0)
+        
+        return {
+            "first_principal_minor_H1": float(H1),
+            "determinant": float(det_H),
+            "eigenvalues": eigenvalues.tolist(),
+            "is_negative_definite": bool(is_negative_definite),
+            "all_eigenvalues_negative": bool(all_eigenvalues_negative),
+            "classification": "MÁXIMO GLOBAL" if is_negative_definite else "NO ES MÁXIMO",
+            "curvature": {
+                "along_x": float(self.H[0, 0]),  # Curvatura en dirección x
+                "along_y": float(self.H[1, 1]),  # Curvatura en dirección y
+                "interaction": float(self.H[0, 1])  # Curvatura mixta
+            }
+        }
+    
+    def get_complete_solution(self) -> Dict[str, any]:
+        """
+        Retorna solución completa con verificación de optimalidad.
+        
+        Este método encapsula todo el análisis matemático:
+        1. Resolución del sistema (punto crítico)
+        2. Evaluación de la función objetivo
+        3. Verificación del gradiente (debe ser ~0)
+        4. Análisis de la Hessiana (condiciones de segundo orden)
+        5. Interpretación en lenguaje natural
+        
+        Returns:
+            Dict con solución completa y análisis
+        """
+        # Paso 1: Resolver sistema lineal ∇f = 0
+        x_opt, y_opt = self.solve_analytical()
+        
+        # Paso 2: Evaluar función objetivo en el punto crítico
+        f_opt = self.objective_function(x_opt, y_opt)
+        
+        # Paso 3: Verificar que el gradiente es nulo (condición necesaria)
+        grad_at_opt = self.gradient(x_opt, y_opt)
+        grad_norm = np.linalg.norm(grad_at_opt)
+        
+        # Paso 4: Análisis de Hessiana (condición suficiente)
+        optimality = self.check_optimality()
+        
+        # Paso 5: Construcción del resultado
+        return {
+            "status": "success",
+            "method": "Analytical (Direct Linear System Solution)",
+            "optimal_solution": {
+                "x_commercial_units": round(x_opt, 4),
+                "y_residential_units": round(y_opt, 4),
+                "total_units": round(x_opt + y_opt, 4)
+            },
+            "optimal_objective_value": round(f_opt, 4),
+            "first_order_conditions": {
+                "gradient_at_optimum": {
+                    "partial_x": round(grad_at_opt[0], 8),
+                    "partial_y": round(grad_at_opt[1], 8),
+                    "norm": round(grad_norm, 8)
+                },
+                "satisfies_FOC": grad_norm < 1e-6,
+                "interpretation": "∇f = 0 verificado" if grad_norm < 1e-6 else "⚠️ Gradiente no nulo"
+            },
+            "second_order_conditions": optimality,
+            "mathematical_guarantee": (
+                "Máximo global estricto garantizado por Hessiana negativa definida"
+                if optimality["is_negative_definite"]
+                else "El punto crítico no es un máximo"
+            ),
+            "interpretation": self._generate_interpretation(x_opt, y_opt, f_opt, optimality)
+        }
+    
+    def _generate_interpretation(self, x: float, y: float, f_val: float, opt_analysis: Dict) -> str:
+        """
+        Genera interpretación en lenguaje natural del resultado.
+        
+        Args:
+            x, y: Coordenadas del óptimo
+            f_val: Valor de la función objetivo
+            opt_analysis: Análisis de optimalidad
+        
+        Returns:
+            String con interpretación para stakeholders no técnicos
+        """
+        if opt_analysis["is_negative_definite"]:
+            return (
+                f"✅ SOLUCIÓN ÓPTIMA VERIFICADA MATEMÁTICAMENTE:\n"
+                f"   • Mix óptimo: {x:.0f} unidades comerciales + {y:.0f} unidades residenciales\n"
+                f"   • Beneficio operativo máximo: ${f_val:,.2f}\n"
+                f"   • Garantía: La matriz Hessiana negativa definida (det H = {opt_analysis['determinant']:.2f}) "
+                f"asegura que este es un máximo global estricto.\n"
+                f"   • Interpretación: Cualquier desviación del mix ({x:.0f}, {y:.0f}) reduce el beneficio."
+            )
+        else:
+            return (
+                f"⚠️ ADVERTENCIA: El punto crítico ({x:.0f}, {y:.0f}) NO es un máximo.\n"
+                f"   • Revisar la formulación del problema o las restricciones."
+            )
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CLASE 2: DEFINICIONES DE DATOS (para modelo general con restricciones)
+# ═══════════════════════════════════════════════════════════════════════════
 
 
 @dataclass
@@ -481,9 +742,58 @@ class OperationsOptimizer:
 
 
 if __name__ == "__main__":
-    print("=" * 70)
-    print("OPERATIONS OPTIMIZER - Ejemplo de Optimización")
-    print("=" * 70)
+    print("=" * 80)
+    print("OPERATIONS OPTIMIZER - Dos Enfoques de Solución")
+    print("=" * 80)
+    
+    # =========================================================================
+    # ENFOQUE 1: SOLUCIÓN ANALÍTICA DETERMINISTA (Modelo Matemático Cerrado)
+    # =========================================================================
+    print("\n" + "─" * 80)
+    print("ENFOQUE 1: SOLUCIÓN ANALÍTICA DETERMINISTA")
+    print("Modelo: f(x, y) = 152x + 80y - 2x² - y² - xy")
+    print("─" * 80)
+    
+    math_optimizer = MathematicalOptimizerCore()
+    solution_analytical = math_optimizer.get_complete_solution()
+    
+    print(f"\n📊 SOLUCIÓN ÓPTIMA:")
+    opt_sol = solution_analytical['optimal_solution']
+    print(f"   x* (Comerciales):  {opt_sol['x_commercial_units']} unidades")
+    print(f"   y* (Residenciales): {opt_sol['y_residential_units']} unidades")
+    print(f"   Total:             {opt_sol['total_units']} unidades")
+    print(f"   Beneficio Máximo:  ${solution_analytical['optimal_objective_value']:,.2f}")
+    
+    print(f"\n∇f VERIFICACIÓN (Condiciones de Primer Orden):")
+    foc = solution_analytical['first_order_conditions']
+    print(f"   ∂f/∂x = {foc['gradient_at_optimum']['partial_x']}")
+    print(f"   ∂f/∂y = {foc['gradient_at_optimum']['partial_y']}")
+    print(f"   ||∇f|| = {foc['gradient_at_optimum']['norm']}")
+    print(f"   ✓ {foc['interpretation']}")
+    
+    print(f"\n🔍 ANÁLISIS DE SEGUNDO ORDEN (Matriz Hessiana):")
+    hess = solution_analytical['second_order_conditions']
+    print(f"   Matriz H = [[-4, -1], [-1, -2]]")
+    print(f"   H₁ (Primer menor):  {hess['first_principal_minor_H1']}")
+    print(f"   det(H):             {hess['determinant']}")
+    print(f"   Eigenvalores:       {[f'{ev:.4f}' for ev in hess['eigenvalues']]}")
+    print(f"   Negativa Definida:  {hess['is_negative_definite']}")
+    print(f"   → {hess['classification']}")
+    
+    print(f"\n💡 INTERPRETACIÓN:")
+    for line in solution_analytical['interpretation'].split('\n'):
+        print(f"   {line}")
+    
+    print(f"\n🎓 GARANTÍA MATEMÁTICA:")
+    print(f"   {solution_analytical['mathematical_guarantee']}")
+    
+    # =========================================================================
+    # ENFOQUE 2: OPTIMIZACIÓN CON RESTRICCIONES (Caso General)
+    # =========================================================================
+    print("\n" + "─" * 80)
+    print("ENFOQUE 2: OPTIMIZACIÓN CON RESTRICCIONES (Programación Lineal)")
+    print("Caso: Mix con restricciones de área y presupuesto")
+    print("─" * 80)
     
     # Definir productos
     producto_a = Product(
@@ -526,7 +836,6 @@ if __name__ == "__main__":
     )
     
     # Optimizar
-    print("\n🔍 Optimizando mix de productos...")
     solution = optimizer.optimize_linear_programming()
     
     if solution["success"]:
@@ -547,10 +856,17 @@ if __name__ == "__main__":
         
         print(f"\n🔧 Análisis de Restricciones:")
         for constraint in breakdown["constraints"]:
-            status = "🔴 ACTIVA" if constraint["is_binding"] else "🟢 Holgura"
-            print(f"   {constraint['constraint']}: {constraint['utilization_percentage']:.1f}% usado {status}")
+            status = "🔴 ACTIVA (Limitante)" if constraint["is_binding"] else "🟢 Con holgura"
+            print(f"   {constraint['constraint']}:")
+            print(f"      Utilización: {constraint['utilization_percentage']:.1f}% - {status}")
+            if constraint["is_binding"]:
+                print(f"      → Esta restricción limita la solución (precio sombra > 0)")
         
-        # Visualizar
-        optimizer.plot_2d_optimization(save_path="optimization_plot.png")
+        # Visualizar (solo para 2 productos)
+        print(f"\n📊 Generando visualización...")
+        optimizer.plot_2d_optimization(save_path="/workspace/master_blueprint/optimization_2d.png")
     
-    print("\n" + "=" * 70)
+    print("\n" + "=" * 80)
+    print("Nota: El Enfoque 1 (analítico) es exacto y eficiente para el modelo cerrado.")
+    print("      El Enfoque 2 (numérico) es flexible y maneja restricciones complejas.")
+    print("=" * 80)

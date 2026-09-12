@@ -11,6 +11,7 @@ from .real_estate_dcf import (
     scenario_analysis
 )
 from .ops_optimizer import (
+    MathematicalOptimizerCore,
     OperationsOptimizer,
     Product,
     ResourceConstraint,
@@ -35,6 +36,7 @@ __all__ = [
     "scenario_analysis",
     
     # Operations Optimizer
+    "MathematicalOptimizerCore",  # Nuevo: Solución analítica determinista
     "OperationsOptimizer",
     "Product",
     "ResourceConstraint",
