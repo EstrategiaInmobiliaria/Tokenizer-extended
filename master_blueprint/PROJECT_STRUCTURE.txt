@@ -1,0 +1,189 @@
+MASTER BLUEPRINT - ESTRUCTURA DEL PROYECTO
+═══════════════════════════════════════════════════════════════════════════
+
+master_blueprint/
+│
+├── 📋 CONFIGURACIÓN Y DOCUMENTACIÓN
+│   ├── README.md                     # Guía principal del proyecto
+│   ├── .gitignore                    # Exclusiones de Git
+│   ├── .env.example                  # Template de variables de entorno
+│   ├── requirements.txt              # Dependencias Python
+│   ├── Dockerfile                    # Imagen Docker
+│   ├── docker-compose.yml            # Orquestación de servicios
+│   └── example_workflow.py           # Demo end-to-end completo
+│
+├── 🧠 CORE MODULES (Lógica de Negocio)
+│   └── core/
+│       ├── __init__.py
+│       │
+│       ├── wacc_engine.py            [483 líneas]
+│       │   ├── MarketParameters      # Parámetros macroeconómicos
+│       │   ├── CapitalStructure      # Estructura de capital (E, D)
+│       │   ├── WACCEngine            # Motor de cálculo
+│       │   │   ├── calculate_cost_of_equity()        # CAPM: Re = Rf + β(Rm-Rf)
+│       │   │   ├── calculate_after_tax_cost_of_debt()# Rd(1-Tc)
+│       │   │   ├── calculate_wacc()                  # WACC formula completa
+│       │   │   ├── get_detailed_breakdown()          # Desglose detallado
+│       │   │   └── sensitivity_analysis()            # Análisis de sensibilidad
+│       │   └── quick_wacc_calculation()  # Helper function
+│       │
+│       ├── real_estate_dcf.py        [618 líneas]
+│       │   ├── ProjectAssumptions            # Supuestos del proyecto
+│       │   ├── RealEstateCashFlows          # Flujos de caja estructurados
+│       │   ├── TerminalValueAssumptions     # Métodos de valor residual
+│       │   ├── RealEstateDCF                # Motor DCF
+│       │   │   ├── calculate_npv()                   # VPN
+│       │   │   ├── calculate_irr()                   # TIR
+│       │   │   ├── calculate_profitability_index()   # IR
+│       │   │   ├── calculate_payback_period()        # Payback
+│       │   │   ├── get_year_by_year_analysis()       # Análisis anual
+│       │   │   └── get_comprehensive_analysis()      # Análisis completo
+│       │   └── scenario_analysis()           # Escenarios (opt/base/pes)
+│       │
+│       └── ops_optimizer.py          [668 líneas]
+│           ├── Product                       # Definición de producto
+│           ├── ResourceConstraint            # Restricción de recurso
+│           ├── DemandConstraint             # Restricción de demanda
+│           └── OperationsOptimizer          # Motor de optimización
+│               ├── objective_function()              # Función a maximizar
+│               ├── gradient()                        # ∇f
+│               ├── optimize_linear_programming()     # Simplex
+│               ├── optimize_nonlinear()              # SLSQP/trust-constr
+│               ├── _get_detailed_breakdown()         # Desglose detallado
+│               ├── _calculate_shadow_prices()        # λ (precios sombra)
+│               ├── _sensitivity_ranges()             # Rangos de sensibilidad
+│               └── plot_2d_optimization()            # Visualización 2D
+│
+├── 🌐 API REST (FastAPI)
+│   └── api/
+│       └── main.py                   [422 líneas]
+│           ├── FastAPI app configuration
+│           ├── CORS middleware
+│           │
+│           ├── 📥 REQUEST MODELS (Pydantic)
+│           │   ├── WACCRequest
+│           │   ├── DCFRequest
+│           │   └── OptimizationRequest
+│           │
+│           ├── 📤 RESPONSE MODELS (Pydantic)
+│           │   ├── WACCResponse
+│           │   ├── DCFResponse
+│           │   └── OptimizationResponse
+│           │
+│           └── 🔗 ENDPOINTS
+│               ├── GET  /                           # Root info
+│               ├── GET  /health                     # Health check
+│               ├── POST /api/v1/wacc/calculate      # WACC calculation
+│               ├── POST /api/v1/dcf/analyze         # DCF analysis
+│               └── POST /api/v1/optimize/mix        # Optimization
+│
+├── 💾 DATABASE (Persistencia)
+│   └── database/
+│       ├── __init__.py
+│       │
+│       ├── models.py                 [102 líneas]
+│       │   ├── Project               # Modelo de proyecto
+│       │   ├── WACCAnalysis         # Análisis WACC guardado
+│       │   ├── DCFAnalysis          # Análisis DCF guardado
+│       │   └── OptimizationAnalysis # Optimización guardada
+│       │
+│       └── database.py               [56 líneas]
+│           ├── engine                # SQLAlchemy engine
+│           ├── SessionLocal          # Session factory
+│           ├── get_db()             # Dependency injection
+│           ├── init_db()            # Inicializar tablas
+│           └── drop_db()            # Drop tablas
+│
+├── ✅ TESTS (Testing Suite)
+│   └── tests/
+│       ├── __init__.py
+│       │
+│       ├── test_wacc.py              [147 líneas]
+│       │   ├── TestMarketParameters          # Tests de parámetros
+│       │   ├── TestCapitalStructure          # Tests de estructura
+│       │   ├── TestWACCEngine                # Tests de WACC engine
+│       │   └── TestQuickWACCCalculation      # Tests de helper
+│       │
+│       └── test_api.py               [218 líneas]
+│           ├── TestHealthEndpoints           # Tests de health
+│           ├── TestWACCEndpoint              # Tests de /wacc
+│           ├── TestDCFEndpoint               # Tests de /dcf
+│           └── TestOptimizationEndpoint      # Tests de /optimize
+│
+└── 📚 DOCUMENTACIÓN
+    └── docs/
+        └── MASTER_BLUEPRINT.md       [12,800+ caracteres]
+            ├── 1. Visión General
+            ├── 2. Arquitectura en Tres Capas
+            │   ├── Capa Teórico-Financiera
+            │   │   ├── CAPM (Re = Rf + β(Rm-Rf))
+            │   │   ├── WACC (E/V·Re + D/V·Rd(1-Tc))
+            │   │   └── DCF (VPN, TIR, IR, Payback)
+            │   ├── Capa Analítico-Operativa
+            │   │   ├── Optimización con restricciones
+            │   │   ├── Programación lineal (Simplex)
+            │   │   ├── Condiciones KKT
+            │   │   └── Precios sombra
+            │   └── Capa Tecnológica
+            │       ├── Stack (Python, FastAPI, Docker)
+            │       ├── Arquitectura de microservicios
+            │       └── Flujo de datos
+            ├── 3. Marco Teórico para Tesis
+            │   ├── Problema de investigación
+            │   ├── Hipótesis
+            │   ├── Objetivos
+            │   ├── Metodología
+            │   └── Contribución esperada
+            ├── 4. Casos de Uso
+            ├── 5. Diagramas de Arquitectura
+            ├── 6. Guía de Desarrollo (PyCharm)
+            └── 7. Referencias Bibliográficas
+
+
+═══════════════════════════════════════════════════════════════════════════
+ESTADÍSTICAS DEL PROYECTO
+═══════════════════════════════════════════════════════════════════════════
+
+📊 Código Python:              2,623 líneas
+📄 Documentación:              1,300+ líneas
+📁 Archivos totales:           19 archivos
+🧪 Tests implementados:        20+ tests
+🌐 Endpoints API:              5 endpoints REST
+🐳 Servicios Docker:           3 servicios (API, DB, pgAdmin)
+📚 Módulos core:               3 módulos principales
+
+═══════════════════════════════════════════════════════════════════════════
+TECNOLOGÍAS UTILIZADAS
+═══════════════════════════════════════════════════════════════════════════
+
+🐍 Python 3.11+                # Lenguaje base
+⚡ FastAPI + Uvicorn           # Web framework
+🔢 NumPy + SciPy               # Cálculos numéricos y optimización
+💾 PostgreSQL + SQLAlchemy     # Base de datos y ORM
+🐳 Docker + Docker Compose     # Containerización
+✅ Pytest + Coverage           # Testing
+📊 Matplotlib                  # Visualizaciones
+🔐 Pydantic                    # Validación de datos
+📖 OpenAPI (Swagger)           # Documentación automática
+
+═══════════════════════════════════════════════════════════════════════════
+COMANDOS RÁPIDOS
+═══════════════════════════════════════════════════════════════════════════
+
+# Docker (Recomendado)
+docker-compose up -d                    # Iniciar servicios
+docker-compose logs -f api              # Ver logs
+docker-compose down                     # Detener
+
+# Local
+pip install -r requirements.txt         # Instalar dependencias
+uvicorn api.main:app --reload           # Iniciar API
+python example_workflow.py              # Ejecutar demo
+pytest -v --cov                         # Ejecutar tests
+
+# Acceso Web
+http://localhost:8000/docs              # Swagger UI
+http://localhost:8000/redoc             # ReDoc
+http://localhost:5050                   # pgAdmin
+
+═══════════════════════════════════════════════════════════════════════════
