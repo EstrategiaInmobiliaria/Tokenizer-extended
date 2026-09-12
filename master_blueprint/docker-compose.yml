@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # API Service
+  api:
+    build: .
+    container_name: master_blueprint_api
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=postgresql://blueprint:blueprint_pass@db:5432/master_blueprint
+      - API_CORS_ORIGINS=["*"]
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - blueprint_network
+    volumes:
+      - ./logs:/app/logs
+
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: master_blueprint_db
+    environment:
+      - POSTGRES_USER=blueprint
+      - POSTGRES_PASSWORD=blueprint_pass
+      - POSTGRES_DB=master_blueprint
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - blueprint_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U blueprint"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # pgAdmin (Database Management UI)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: master_blueprint_pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@masterblueprint.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - blueprint_network
+
+# Networks
+networks:
+  blueprint_network:
+    driver: bridge
+
+# Volumes
+volumes:
+  postgres_data:
