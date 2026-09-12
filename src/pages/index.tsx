@@ -4,6 +4,7 @@ import {
   type NextPage,
 } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Github, Twitter } from "lucide-react";
 
@@ -54,6 +55,24 @@ const Home: NextPage<
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="mx-auto flex min-h-screen max-w-[1200px] flex-col gap-4 p-8">
+        {/* Palm Diamante Banner */}
+        <Link
+          href="/palm-diamante"
+          className="rounded-lg border-2 border-blue-500 bg-gradient-to-r from-blue-600 to-blue-800 p-4 text-white shadow-lg transition-transform hover:scale-[1.02]"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold">🏢 Palm Diamante Calculator</h2>
+              <p className="text-sm">
+                Aparta con $25k • 7% firma + 13% mensualidades + 80% hipoteca
+              </p>
+            </div>
+            <div className="rounded-md bg-yellow-400 px-4 py-2 font-bold text-blue-900">
+              Abrir →
+            </div>
+          </div>
+        </Link>
+
         <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
           <h1 className="text-4xl font-bold">Tiktokenizer</h1>
 
