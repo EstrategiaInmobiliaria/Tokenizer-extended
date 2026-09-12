@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard TensorFlow Intelligence - Métricas en Tiempo Real</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+        }
+        
+        .metric-title {
+            font-size: 0.875rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+        
+        .metric-subtitle {
+            font-size: 0.875rem;
+            color: #999;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-online {
+            background: #10b981;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .refresh-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .last-update {
+            color: white;
+            text-align: center;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+        
+        .roi-highlight {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .roi-highlight .metric-value {
+            color: white;
+        }
+        
+        .prediction-list {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .prediction-item {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .prediction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-failure {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 TensorFlow Intelligence Dashboard</h1>
+            <p>
+                <span class="status-indicator status-online"></span>
+                Sistema Operacional - Métricas en Tiempo Real
+            </p>
+            <button class="refresh-btn" onclick="loadDashboard()">🔄 Actualizar Datos</button>
+            <div class="last-update" id="lastUpdate"></div>
+        </div>
+        
+        <div class="metrics-grid">
+            <div class="metric-card roi-highlight">
+                <div class="metric-title">💰 ROI Total</div>
+                <div class="metric-value" id="roiTotal">$0</div>
+                <div class="metric-subtitle" id="roiPeriod">Últimos 30 días</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-title">🎯 Precisión del Sistema</div>
+                <div class="metric-value" id="accuracy">0%</div>
+                <div class="metric-subtitle" id="accuracySubtitle">0 predicciones verificadas</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-title">⏱️ Tiempo Ahorrado</div>
+                <div class="metric-value" id="timeSaved">0h</div>
+                <div class="metric-subtitle" id="timeValue">Valor: $0</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-title">📊 Predicciones Totales</div>
+                <div class="metric-value" id="totalPredictions">0</div>
+                <div class="metric-subtitle">En los últimos 30 días</div>
+            </div>
+        </div>
+        
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-title">🏗️ Inmobiliario</div>
+                <div class="metric-value" id="reDealsPredicted">0</div>
+                <div class="metric-subtitle" id="reDealText">Desarrollos analizados</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-title">📱 Redes Sociales</div>
+                <div class="metric-value" id="smEngagement">0</div>
+                <div class="metric-subtitle">Engagement promedio</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-title">🎯 Decisiones Personales</div>
+                <div class="metric-value" id="personalDecisions">0</div>
+                <div class="metric-subtitle" id="personalValue">Decisiones optimizadas</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">📈 Tendencia de ROI Mensual</div>
+            <canvas id="roiChart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <div class="chart-title">🎯 Precisión por Categoría</div>
+            <canvas id="accuracyChart"></canvas>
+        </div>
+        
+        <div class="prediction-list">
+            <div class="chart-title">📋 Últimas Predicciones</div>
+            <div id="predictionsList"></div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = 'http://localhost:3001';
+        let roiChart, accuracyChart;
+        
+        async function loadDashboard() {
+            try {
+                // Cargar ROI
+                const roiData = await fetch(`${API_BASE}/api/metrics/roi-calculator?days=30`).then(r => r.json());
+                updateROIMetrics(roiData);
+                
+                // Cargar reporte de impacto
+                const impactData = await fetch(`${API_BASE}/api/metrics/impact-report?days=30`).then(r => r.json());
+                updateImpactMetrics(impactData);
+                
+                // Actualizar timestamp
+                document.getElementById('lastUpdate').textContent = `Última actualización: ${new Date().toLocaleString('es-MX')}`;
+                
+            } catch (error) {
+                console.error('Error cargando dashboard:', error);
+                alert('Error conectando con la API. Asegúrate de que esté corriendo en http://localhost:3001');
+            }
+        }
+        
+        function updateROIMetrics(data) {
+            const total = data.breakdown.total_value_mxn;
+            document.getElementById('roiTotal').textContent = `$${formatNumber(total)}`;
+            document.getElementById('roiPeriod').textContent = `Últimos ${data.period_days} días`;
+            
+            document.getElementById('timeSaved').textContent = `${data.breakdown.time_saved_hours.toFixed(1)}h`;
+            document.getElementById('timeValue').textContent = `Valor: $${formatNumber(data.breakdown.time_value_mxn)}`;
+            
+            // Actualizar gráfico de ROI
+            updateROIChart(data);
+        }
+        
+        function updateImpactMetrics(data) {
+            const metrics = data.metrics;
+            
+            document.getElementById('accuracy').textContent = `${(metrics.accuracy * 100).toFixed(1)}%`;
+            document.getElementById('accuracySubtitle').textContent = `${metrics.correct_predictions} de ${metrics.total_predictions} correctas`;
+            
+            document.getElementById('totalPredictions').textContent = metrics.total_predictions;
+            
+            document.getElementById('reDealsPredicted').textContent = metrics.deals_predicted_success;
+            document.getElementById('reDealText').textContent = `${metrics.deals_actual_success} vendidos realmente`;
+            
+            document.getElementById('smEngagement').textContent = metrics.actual_engagement.toFixed(1);
+            
+            document.getElementById('personalDecisions').textContent = metrics.decisions_optimized;
+            document.getElementById('personalValue').textContent = `$${formatNumber(metrics.money_saved)} ahorrados`;
+            
+            // Actualizar gráfico de precisión
+            updateAccuracyChart(metrics);
+        }
+        
+        function updateROIChart(data) {
+            const ctx = document.getElementById('roiChart').getContext('2d');
+            
+            if (roiChart) roiChart.destroy();
+            
+            roiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Valor Tiempo', 'Ahorros Directos', 'Cloud Evitado', 'Total'],
+                    datasets: [{
+                        label: 'ROI (MXN)',
+                        data: [
+                            data.breakdown.time_value_mxn,
+                            data.breakdown.direct_savings_mxn,
+                            data.breakdown.cloud_costs_avoided_mxn,
+                            data.breakdown.total_value_mxn
+                        ],
+                        backgroundColor: [
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(139, 92, 246, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + formatNumber(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateAccuracyChart(metrics) {
+            const ctx = document.getElementById('accuracyChart').getContext('2d');
+            
+            if (accuracyChart) accuracyChart.destroy();
+            
+            accuracyChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Correctas', 'Incorrectas', 'Pendientes'],
+                    datasets: [{
+                        data: [
+                            metrics.correct_predictions,
+                            metrics.total_predictions - metrics.correct_predictions,
+                            0  // Simplificado
+                        ],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(156, 163, 175, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function formatNumber(num) {
+            return new Intl.NumberFormat('es-MX').format(Math.round(num));
+        }
+        
+        // Cargar al inicio
+        loadDashboard();
+        
+        // Auto-refresh cada 60 segundos
+        setInterval(loadDashboard, 60000);
+    </script>
+</body>
+</html>

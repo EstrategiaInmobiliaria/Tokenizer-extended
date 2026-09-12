@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tensorflow-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-tensorflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tensorflow}
+      POSTGRES_DB: ${POSTGRES_DB:-tensorflow_bi}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tensorflow}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  tensorflow-api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tensorflow-api
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend/models:/app/models
+      - ./backend/data:/app/data
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=info
+      - API_HOST=0.0.0.0
+      - API_PORT=3001
+      # Repositorio central para Power BI (DirectQuery / Import)
+      - DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER:-tensorflow}:${POSTGRES_PASSWORD:-tensorflow}@postgres:5432/${POSTGRES_DB:-tensorflow_bi}
+      - POWERBI_EXPORT_MODE=${POWERBI_EXPORT_MODE:-hybrid}
+      - POWERBI_PUSH_URL=${POWERBI_PUSH_URL:-}
+      - POWERBI_AUTO_EXPORT_ON_PREDICT=${POWERBI_AUTO_EXPORT_ON_PREDICT:-true}
+      - POWERBI_SQL_TABLE=predicciones_tensorflow
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n-automation
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-changeme}
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=America/Mexico_City
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./workflows:/workflows:ro
+    restart: unless-stopped
+    depends_on:
+      - tensorflow-api
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+volumes:
+  n8n_data:
+  redis_data:
+  postgres_data:
+
+networks:
+  default:
+    name: tensorflow-network

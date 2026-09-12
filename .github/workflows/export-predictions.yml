@@ -1,0 +1,94 @@
+# Orquestación automática: TensorFlow → Power BI (repositorio central)
+# Corre diario sin Personal Gateway ni Power Query ejecutando Python.
+
+name: Export Predictions to Power BI
+
+on:
+  schedule:
+    # Diario 13:00 UTC ≈ 7:00 AM Ciudad de México
+    - cron: "0 13 * * *"
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "tracker | live"
+        required: true
+        default: "live"
+      mode:
+        description: "repository | streaming | hybrid"
+        required: true
+        default: "hybrid"
+      write_mode:
+        description: "append | replace | upsert"
+        required: true
+        default: "append"
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tensorflow-system/backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: tensorflow-system/backend/requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Dependencias mínimas para export (sin TensorFlow completo en CI ligero)
+          pip install pandas==2.1.1 sqlalchemy==2.0.23 requests==2.31.0 python-dotenv==1.0.0
+          # Si source=live necesita modelos, instalar TF (más lento)
+          if [ "${{ github.event.inputs.source || 'live' }}" = "live" ]; then
+            pip install -r requirements.txt || pip install tensorflow==2.14.0 scikit-learn==1.3.1 joblib==1.3.2 numpy==1.24.3
+          fi
+
+      - name: Train models if missing (live only)
+        if: ${{ (github.event.inputs.source || 'live') == 'live' }}
+        run: |
+          if [ ! -f models/real_estate_opportunity.tflite ]; then
+            python scripts/train_all_models.py || true
+          fi
+
+      - name: Export to Power BI repository / Push Dataset
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          POWERBI_PUSH_URL: ${{ secrets.POWERBI_PUSH_URL }}
+          POWERBI_API_KEY: ${{ secrets.POWERBI_API_KEY }}
+          POWERBI_EXPORT_MODE: ${{ github.event.inputs.mode || 'hybrid' }}
+          POWERBI_SQL_TABLE: predicciones_tensorflow
+        run: |
+          SOURCE="${{ github.event.inputs.source || 'live' }}"
+          WRITE_MODE="${{ github.event.inputs.write_mode || 'append' }}"
+          MODE="${{ github.event.inputs.mode || 'hybrid' }}"
+
+          # Si no hay DATABASE_URL en secrets, usar SQLite artifact
+          if [ -z "$DATABASE_URL" ]; then
+            mkdir -p data/powerbi
+            export DATABASE_URL="sqlite:///$(pwd)/data/powerbi/predicciones.db"
+            echo "Using local SQLite fallback: $DATABASE_URL"
+          fi
+
+          python scripts/export_to_powerbi.py \
+            --source "$SOURCE" \
+            --mode "$MODE" \
+            --write-mode "$WRITE_MODE" \
+            --json
+
+      - name: Upload SQLite artifact (fallback / audit)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: predicciones-powerbi-${{ github.run_id }}
+          path: |
+            tensorflow-system/backend/data/powerbi/*.db
+            tensorflow-system/backend/data/metrics/*.jsonl
+          if-no-files-found: ignore
+          retention-days: 14
