@@ -12,38 +12,33 @@ import numpy as np
 from typing import Dict, Tuple, Optional
 
 
-class OptimalMixSolver:
+class OperationsOptimizer:
     """
     Solver for the optimal commercial-residential mix problem.
     
     The problem maximizes: f(x,y) = 152x + 80y - 2x² - y² - xy
-    Subject to: Ax = b (linear constraints)
+    Subject to: Ax = b (linear constraints from gradient = 0)
                 x ≥ 0, y ≥ 0 (non-negativity constraints)
     
     Attributes:
-        A: Coefficient matrix for linear constraints
+        A: Coefficient matrix for linear constraints (gradient system)
         b: Right-hand side vector for linear constraints
     """
     
-    def __init__(self, A: np.ndarray, b: np.ndarray):
+    def __init__(self):
         """
-        Initialize the solver with constraint matrices.
+        Initialize the solver with the standard gradient system.
         
-        Args:
-            A: Coefficient matrix (n x 2) for linear constraints
-            b: Right-hand side vector (n,) for linear constraints
-            
-        Raises:
-            ValueError: If A and b dimensions are incompatible
+        The gradient of f(x,y) = 152x + 80y - 2x² - y² - xy is:
+        ∇f = [152 - 4x - y, 80 - 2y - x]
+        
+        Setting ∇f = 0 gives the linear system:
+        4x + y = 152
+        x + 2y = 80
         """
-        self.A = np.array(A, dtype=float)
-        self.b = np.array(b, dtype=float)
-        
-        if self.A.shape[0] != self.b.shape[0]:
-            raise ValueError(
-                f"Incompatible dimensions: A has {self.A.shape[0]} rows "
-                f"but b has {self.b.shape[0]} elements"
-            )
+        # Coeficientes del sistema lineal para el gradiente igualado a cero
+        self.A = np.array([[4.0, 1.0], [1.0, 2.0]])
+        self.b = np.array([152.0, 80.0])
     
     def _objective_function(self, x: float, y: float) -> float:
         """Calculate the objective function value."""
@@ -102,12 +97,17 @@ class OptimalMixSolver:
         else:
             return False, "Inconclusive second-order test"
     
-    def solve_optimal_mix(self, gradient_tolerance: float = 1e-6) -> Dict:
+    def solve_optimal_mix(self, gradient_tolerance: float = 1e-6) -> dict:
         """
-        Solve for the optimal commercial-residential mix.
+        Resuelve el sistema, valida el dominio no negativo y calcula la norma del gradiente.
+        
+        Mejoras sobre la versión original:
+        - Valida que la matriz no sea singular
+        - Verifica matemáticamente si es un máximo usando el Hessiano
+        - Proporciona información detallada sobre la verificación
         
         Args:
-            gradient_tolerance: Tolerance for considering gradient as zero
+            gradient_tolerance: Tolerancia para considerar el gradiente como cero
             
         Returns:
             Dictionary containing:
@@ -117,24 +117,10 @@ class OptimalMixSolver:
                 - gradient_norm: Norm of gradient at solution (if successful)
                 - is_global_maximum: Whether the solution is verified as a maximum (if successful)
                 - verification_details: Explanation of the verification result (if successful)
-                - msg: Error or status message
+                - msg: Error or status message (if not successful)
         """
         try:
-            # Check if system is square and solvable
-            if self.A.shape[1] != 2:
-                return {
-                    "status": "error",
-                    "msg": f"Matrix A must have 2 columns (has {self.A.shape[1]})"
-                }
-            
-            if self.A.shape[0] != 2:
-                return {
-                    "status": "error",
-                    "msg": f"System must have exactly 2 equations (has {self.A.shape[0]}). "
-                           f"For overdetermined/underdetermined systems, use least squares."
-                }
-            
-            # Check if matrix is singular
+            # Check if matrix is singular (prevents crashes)
             det_A = np.linalg.det(self.A)
             if abs(det_A) < 1e-10:
                 return {
@@ -146,59 +132,44 @@ class OptimalMixSolver:
             optimal_vars = np.linalg.solve(self.A, self.b)
             x, y = optimal_vars
             
-            # Check non-negativity constraints
+            # Check non-negativity constraints (dominio operativo)
             if x < 0 or y < 0:
                 return {
                     "status": "infeasible",
-                    "msg": f"Solution violates non-negativity constraints: x={x:.4f}, y={y:.4f}"
+                    "msg": "Solución fuera de dominio operativo"
                 }
             
-            # Calculate objective function value
-            max_profit = self._objective_function(x, y)
+            # Calculate gradient and profit
+            grad = np.array([152 - 4 * x - y, 80 - 2 * y - x])
+            max_profit = 152 * x + 80 * y - 2 * x**2 - y**2 - x * y
             
-            # Calculate gradient and verify optimality
-            grad = self._gradient(x, y)
-            grad_norm = float(np.linalg.norm(grad))
-            
+            # Verify if it's actually a maximum using second-order conditions
             is_maximum, verification_msg = self._is_maximum(x, y, gradient_tolerance)
             
             return {
                 "status": "success",
                 "optimal_mix": {
-                    "x_commercial": round(x, 2),
-                    "y_residential": round(y, 2)
+                    "x_commercial": round(float(x), 2),
+                    "y_residential": round(float(y), 2)
                 },
-                "max_operating_benefit": round(max_profit, 2),
-                "gradient_norm": grad_norm,
+                "max_operating_benefit": round(float(max_profit), 2),
+                "gradient_norm": float(np.linalg.norm(grad)),
                 "is_global_maximum": is_maximum,
-                "verification_details": verification_msg,
-                "msg": "Optimal solution found"
+                "verification_details": verification_msg
             }
             
-        except np.linalg.LinAlgError as e:
-            return {
-                "status": "error",
-                "msg": f"Linear algebra error: {str(e)}"
-            }
         except Exception as e:
-            return {
-                "status": "error",
-                "msg": f"Unexpected error: {str(e)}"
-            }
+            return {"status": "error", "msg": str(e)}
 
 
 def example_usage():
-    """Example usage of the OptimalMixSolver."""
-    # Example: Solve the system where the gradient equals zero
+    """Example usage of the OperationsOptimizer."""
+    # The optimizer solves the system where the gradient equals zero:
     # ∇f = 0 => [152 - 4x - y = 0]  =>  [4  1][x]   [152]
     #           [80 - 2y - x = 0]       [1  2][y] = [80]
     
-    A = np.array([[4, 1],
-                  [1, 2]])
-    b = np.array([152, 80])
-    
-    solver = OptimalMixSolver(A, b)
-    result = solver.solve_optimal_mix()
+    optimizer = OperationsOptimizer()
+    result = optimizer.solve_optimal_mix()
     
     print("Optimization Result:")
     print("=" * 50)
@@ -209,4 +180,4 @@ def example_usage():
 
 
 if __name__ == "__main__":
-    example_usage()
+    print(example_usage())

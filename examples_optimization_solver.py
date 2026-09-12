@@ -2,11 +2,11 @@
 Practical Examples for the Optimization Solver
 
 This file demonstrates various real-world scenarios and use cases
-for the OptimalMixSolver class.
+for the OperationsOptimizer class.
 """
 
 import numpy as np
-from optimization_solver import OptimalMixSolver
+from optimization_solver import OperationsOptimizer
 
 
 def example_1_standard_optimization():
@@ -24,11 +24,8 @@ def example_1_standard_optimization():
     print("EXAMPLE 1: Standard Optimization - Finding Critical Point")
     print("=" * 70)
     
-    A = np.array([[4, 1], [1, 2]])
-    b = np.array([152, 80])
-    
-    solver = OptimalMixSolver(A, b)
-    result = solver.solve_optimal_mix()
+    optimizer = OperationsOptimizer()
+    result = optimizer.solve_optimal_mix()
     
     print(f"\nConstraint System:")
     print(f"  4x + y = 152")
@@ -49,27 +46,22 @@ def example_1_standard_optimization():
 
 def example_2_resource_constraints():
     """
-    Example 2: Resource allocation with different constraints
+    Example 2: Modified resource allocation with different constraints
     
-    Scenario: A company has:
-    - 200 labor hours available
-    - 100 units of material available
-    
-    Constraints:
-    - Each commercial unit needs 5 hours and 1 unit of material
-    - Each residential unit needs 2 hours and 1 unit of material
+    Scenario: A company adjusts their constraint system.
+    Testing with a different linear system.
     """
     print("=" * 70)
-    print("EXAMPLE 2: Resource Allocation Problem")
+    print("EXAMPLE 2: Modified Resource Allocation")
     print("=" * 70)
     
     # 5x + 2y = 200 (labor)
     # x + y = 100 (material)
-    A = np.array([[5, 2], [1, 1]])
-    b = np.array([200, 100])
+    optimizer = OperationsOptimizer()
+    optimizer.A = np.array([[5, 2], [1, 1]])
+    optimizer.b = np.array([200, 100])
     
-    solver = OptimalMixSolver(A, b)
-    result = solver.solve_optimal_mix()
+    result = optimizer.solve_optimal_mix()
     
     print(f"\nConstraints:")
     print(f"  Labor:    5x + 2y ≤ 200 hours")
@@ -105,11 +97,11 @@ def example_3_infeasible_solution():
     print("=" * 70)
     
     # System that yields negative x value
-    A = np.array([[1, 0], [0, 1]])
-    b = np.array([-10, 40])
+    optimizer = OperationsOptimizer()
+    optimizer.A = np.array([[1, 0], [0, 1]])
+    optimizer.b = np.array([-10, 40])
     
-    solver = OptimalMixSolver(A, b)
-    result = solver.solve_optimal_mix()
+    result = optimizer.solve_optimal_mix()
     
     print(f"\nConstraint System:")
     print(f"  x = -10")
@@ -135,11 +127,11 @@ def example_4_boundary_case():
     print("=" * 70)
     
     # Solution where x = 0
-    A = np.array([[1, 0], [0, 1]])
-    b = np.array([0, 30])
+    optimizer = OperationsOptimizer()
+    optimizer.A = np.array([[1, 0], [0, 1]])
+    optimizer.b = np.array([0, 30])
     
-    solver = OptimalMixSolver(A, b)
-    result = solver.solve_optimal_mix()
+    result = optimizer.solve_optimal_mix()
     
     print(f"\nConstraint System:")
     print(f"  x = 0")
@@ -167,11 +159,11 @@ def example_5_singular_matrix_error():
     print("=" * 70)
     
     # Singular matrix (second row is twice the first)
-    A = np.array([[1, 2], [2, 4]])
-    b = np.array([10, 20])
+    optimizer = OperationsOptimizer()
+    optimizer.A = np.array([[1, 2], [2, 4]])
+    optimizer.b = np.array([10, 20])
     
-    solver = OptimalMixSolver(A, b)
-    result = solver.solve_optimal_mix()
+    result = optimizer.solve_optimal_mix()
     
     print(f"\nConstraint System:")
     print(f"  x + 2y = 10")
@@ -203,7 +195,7 @@ def example_6_comparing_scenarios():
             "b": np.array([90, 50])
         },
         {
-            "name": "Moderate (Medium resources)",
+            "name": "Moderate (Standard gradient system)",
             "A": np.array([[4, 1], [1, 2]]),
             "b": np.array([152, 80])
         },
@@ -217,8 +209,10 @@ def example_6_comparing_scenarios():
     results = []
     
     for scenario in scenarios:
-        solver = OptimalMixSolver(scenario["A"], scenario["b"])
-        result = solver.solve_optimal_mix()
+        optimizer = OperationsOptimizer()
+        optimizer.A = scenario["A"]
+        optimizer.b = scenario["b"]
+        result = optimizer.solve_optimal_mix()
         results.append({
             "name": scenario["name"],
             "result": result
@@ -264,8 +258,8 @@ def example_7_sensitivity_analysis():
     base_b = np.array([152, 80])
     
     print("\nBase case:")
-    solver = OptimalMixSolver(base_A, base_b)
-    base_result = solver.solve_optimal_mix()
+    optimizer = OperationsOptimizer()
+    base_result = optimizer.solve_optimal_mix()
     
     if base_result['status'] == 'success':
         base_profit = base_result['max_operating_benefit']
@@ -279,8 +273,11 @@ def example_7_sensitivity_analysis():
         b_test = base_b.copy()
         b_test[0] += delta
         
-        solver = OptimalMixSolver(base_A, b_test)
-        result = solver.solve_optimal_mix()
+        optimizer = OperationsOptimizer()
+        optimizer.A = base_A
+        optimizer.b = b_test
+        
+        result = optimizer.solve_optimal_mix()
         
         if result['status'] == 'success':
             profit = result['max_operating_benefit']

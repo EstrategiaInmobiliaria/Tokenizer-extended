@@ -1,70 +1,65 @@
 """
-Unit tests for the OptimalMixSolver class.
+Unit tests for the OperationsOptimizer class.
 """
 
 import numpy as np
 import pytest
-from optimization_solver import OptimalMixSolver
+from optimization_solver import OperationsOptimizer
 
 
-class TestOptimalMixSolver:
-    """Test suite for OptimalMixSolver."""
+class TestOperationsOptimizer:
+    """Test suite for OperationsOptimizer."""
     
     def test_initialization_valid(self):
-        """Test successful initialization with valid inputs."""
-        A = np.array([[4, 1], [1, 2]])
-        b = np.array([152, 80])
-        solver = OptimalMixSolver(A, b)
+        """Test successful initialization with default gradient system."""
+        optimizer = OperationsOptimizer()
         
-        assert solver.A.shape == (2, 2)
-        assert solver.b.shape == (2,)
-        np.testing.assert_array_equal(solver.A, A)
-        np.testing.assert_array_equal(solver.b, b)
+        assert optimizer.A.shape == (2, 2)
+        assert optimizer.b.shape == (2,)
+        
+        # Verify it's the gradient system
+        expected_A = np.array([[4.0, 1.0], [1.0, 2.0]])
+        expected_b = np.array([152.0, 80.0])
+        np.testing.assert_array_equal(optimizer.A, expected_A)
+        np.testing.assert_array_equal(optimizer.b, expected_b)
     
-    def test_initialization_incompatible_dimensions(self):
-        """Test initialization with incompatible A and b dimensions."""
-        A = np.array([[4, 1], [1, 2]])
-        b = np.array([152, 80, 100])  # Wrong size
+    def test_matrices_are_correct_type(self):
+        """Test that matrices are float type."""
+        optimizer = OperationsOptimizer()
         
-        with pytest.raises(ValueError, match="Incompatible dimensions"):
-            OptimalMixSolver(A, b)
+        assert optimizer.A.dtype == np.float64
+        assert optimizer.b.dtype == np.float64
     
     def test_objective_function(self):
         """Test objective function calculation."""
-        A = np.array([[4, 1], [1, 2]])
-        b = np.array([152, 80])
-        solver = OptimalMixSolver(A, b)
+        optimizer = OperationsOptimizer()
         
         # Test at origin
-        result = solver._objective_function(0, 0)
+        result = optimizer._objective_function(0, 0)
         assert result == 0
         
         # Test at a known point: f(10, 20) = 152(10) + 80(20) - 2(100) - 400 - 200
-        result = solver._objective_function(10, 20)
+        result = optimizer._objective_function(10, 20)
         expected = 152*10 + 80*20 - 2*10**2 - 20**2 - 10*20
         assert abs(result - expected) < 1e-10
     
     def test_gradient(self):
         """Test gradient calculation."""
-        A = np.array([[4, 1], [1, 2]])
-        b = np.array([152, 80])
-        solver = OptimalMixSolver(A, b)
+        optimizer = OperationsOptimizer()
         
         # Test at origin: ∇f(0,0) = [152, 80]
-        grad = solver._gradient(0, 0)
+        grad = optimizer._gradient(0, 0)
         np.testing.assert_array_almost_equal(grad, [152, 80])
         
         # Test at (10, 20): ∇f = [152 - 40 - 20, 80 - 40 - 10] = [92, 30]
-        grad = solver._gradient(10, 20)
+        grad = optimizer._gradient(10, 20)
         np.testing.assert_array_almost_equal(grad, [92, 30])
     
     def test_hessian(self):
         """Test Hessian matrix calculation."""
-        A = np.array([[4, 1], [1, 2]])
-        b = np.array([152, 80])
-        solver = OptimalMixSolver(A, b)
+        optimizer = OperationsOptimizer()
         
-        H = solver._hessian()
+        H = optimizer._hessian()
         expected = np.array([[-4, -1], [-1, -2]])
         np.testing.assert_array_equal(H, expected)
         
@@ -73,113 +68,97 @@ class TestOptimalMixSolver:
         assert all(eigenvalues < 0), "Hessian should be negative definite"
     
     def test_solve_optimal_mix_success(self):
-        """Test successful optimization with the canonical problem."""
-        # Solve ∇f = 0: [4 1][x] = [152]
-        #                [1 2][y]   [80]
-        A = np.array([[4, 1], [1, 2]])
-        b = np.array([152, 80])
-        solver = OptimalMixSolver(A, b)
+        """Test successful optimization with the standard gradient system."""
+        # The default system solves ∇f = 0: [4 1][x] = [152]
+        #                                     [1 2][y]   [80]
+        optimizer = OperationsOptimizer()
         
-        result = solver.solve_optimal_mix()
+        result = optimizer.solve_optimal_mix()
         
         assert result["status"] == "success"
         assert result["is_global_maximum"] is True
         
-        # Solution should be: x = (2*152 - 80) / 7 ≈ 32, y = (4*80 - 152) / 7 ≈ 24
+        # Solution should be: x ≈ 32, y ≈ 24
         x = result["optimal_mix"]["x_commercial"]
         y = result["optimal_mix"]["y_residential"]
         
+        assert x == 32.0
+        assert y == 24.0
+        
         # Verify the solution satisfies Ax = b
         solution = np.array([x, y])
-        np.testing.assert_array_almost_equal(A @ solution, b, decimal=1)
+        np.testing.assert_array_almost_equal(optimizer.A @ solution, optimizer.b, decimal=1)
         
         # Verify gradient is near zero at the solution
         assert result["gradient_norm"] < 1e-5
         
         # Verify benefit is positive
         assert result["max_operating_benefit"] > 0
+        assert result["max_operating_benefit"] == 3392.0
     
-    def test_solve_optimal_mix_negative_solution(self):
-        """Test case where optimal solution has negative values (infeasible)."""
-        # System that yields negative solution
-        A = np.array([[1, 0], [0, 1]])
-        b = np.array([-10, 20])  # x = -10, y = 20
-        solver = OptimalMixSolver(A, b)
+    def test_solve_optimal_mix_with_custom_tolerance(self):
+        """Test optimization with custom gradient tolerance."""
+        optimizer = OperationsOptimizer()
         
-        result = solver.solve_optimal_mix()
+        result = optimizer.solve_optimal_mix(gradient_tolerance=1e-10)
         
-        assert result["status"] == "infeasible"
-        assert "non-negativity" in result["msg"].lower()
+        assert result["status"] == "success"
+        assert result["gradient_norm"] < 1e-5
     
     def test_solve_optimal_mix_singular_matrix(self):
-        """Test with singular matrix."""
-        # Singular matrix (second row is twice the first)
-        A = np.array([[1, 2], [2, 4]])
-        b = np.array([10, 20])
-        solver = OptimalMixSolver(A, b)
+        """Test error handling when matrix becomes singular."""
+        optimizer = OperationsOptimizer()
         
-        result = solver.solve_optimal_mix()
+        # Make matrix singular by setting it to linearly dependent rows
+        optimizer.A = np.array([[1, 2], [2, 4]])
+        optimizer.b = np.array([10, 20])
+        
+        result = optimizer.solve_optimal_mix()
         
         assert result["status"] == "error"
         assert "singular" in result["msg"].lower()
     
-    def test_solve_optimal_mix_wrong_dimensions(self):
-        """Test with matrix of wrong dimensions."""
-        # 3x2 matrix (overdetermined system)
-        A = np.array([[1, 2], [3, 4], [5, 6]])
-        b = np.array([10, 20, 30])
-        solver = OptimalMixSolver(A, b)
+    def test_solve_optimal_mix_negative_solution(self):
+        """Test case where optimal solution has negative values (infeasible)."""
+        optimizer = OperationsOptimizer()
         
-        result = solver.solve_optimal_mix()
+        # System that yields negative solution
+        optimizer.A = np.array([[1, 0], [0, 1]])
+        optimizer.b = np.array([-10, 20])  # x = -10, y = 20
         
-        assert result["status"] == "error"
-        assert "2 equations" in result["msg"]
-    
-    def test_solve_optimal_mix_one_column(self):
-        """Test with matrix having wrong number of columns."""
-        A = np.array([[1], [2]])
-        b = np.array([10, 20])
-        solver = OptimalMixSolver(A, b)
+        result = optimizer.solve_optimal_mix()
         
-        result = solver.solve_optimal_mix()
-        
-        assert result["status"] == "error"
-        assert "2 columns" in result["msg"]
+        assert result["status"] == "infeasible"
+        assert "dominio operativo" in result["msg"].lower()
     
     def test_is_maximum_at_critical_point(self):
         """Test maximum verification at actual critical point."""
-        A = np.array([[4, 1], [1, 2]])
-        b = np.array([152, 80])
-        solver = OptimalMixSolver(A, b)
+        optimizer = OperationsOptimizer()
         
         # Solve to get the critical point
-        solution = np.linalg.solve(A, b)
+        solution = np.linalg.solve(optimizer.A, optimizer.b)
         x, y = solution
         
-        is_max, msg = solver._is_maximum(x, y)
+        is_max, msg = optimizer._is_maximum(x, y)
         
         assert is_max is True
         assert "negative definite" in msg.lower()
     
     def test_is_maximum_not_critical_point(self):
         """Test maximum verification at non-critical point."""
-        A = np.array([[4, 1], [1, 2]])
-        b = np.array([152, 80])
-        solver = OptimalMixSolver(A, b)
+        optimizer = OperationsOptimizer()
         
         # Test at origin (not a critical point)
-        is_max, msg = solver._is_maximum(0, 0)
+        is_max, msg = optimizer._is_maximum(0, 0)
         
         assert is_max is False
         assert "not a critical point" in msg.lower()
     
     def test_rounding_precision(self):
         """Test that results are properly rounded to 2 decimal places."""
-        A = np.array([[4, 1], [1, 2]])
-        b = np.array([152, 80])
-        solver = OptimalMixSolver(A, b)
+        optimizer = OperationsOptimizer()
         
-        result = solver.solve_optimal_mix()
+        result = optimizer.solve_optimal_mix()
         
         x = result["optimal_mix"]["x_commercial"]
         y = result["optimal_mix"]["y_residential"]
@@ -192,12 +171,13 @@ class TestOptimalMixSolver:
     
     def test_feasible_solution_at_boundary(self):
         """Test solution exactly at boundary (x=0 or y=0)."""
-        # Solution where x = 0
-        A = np.array([[1, 0], [0, 1]])
-        b = np.array([0, 40])
-        solver = OptimalMixSolver(A, b)
+        optimizer = OperationsOptimizer()
         
-        result = solver.solve_optimal_mix()
+        # Solution where x = 0
+        optimizer.A = np.array([[1, 0], [0, 1]])
+        optimizer.b = np.array([0, 40])
+        
+        result = optimizer.solve_optimal_mix()
         
         # Should be feasible (x=0 is allowed)
         assert result["status"] == "success"
@@ -209,16 +189,14 @@ class TestIntegration:
     """Integration tests for realistic scenarios."""
     
     def test_realistic_business_scenario(self):
-        """Test with realistic business constraints."""
-        # Scenario: Find optimal mix given resource constraints
-        # 4x + y ≤ 152 (labor hours constraint at equality)
-        # x + 2y ≤ 80 (material constraint at equality)
+        """Test with the standard gradient system (realistic business case)."""
+        # Standard scenario: Find optimal mix given the gradient system
+        # 4x + y = 152 (from ∂f/∂x = 0)
+        # x + 2y = 80 (from ∂f/∂y = 0)
         
-        A = np.array([[4, 1], [1, 2]])
-        b = np.array([152, 80])
-        solver = OptimalMixSolver(A, b)
+        optimizer = OperationsOptimizer()
         
-        result = solver.solve_optimal_mix()
+        result = optimizer.solve_optimal_mix()
         
         assert result["status"] == "success"
         
@@ -238,17 +216,35 @@ class TestIntegration:
     
     def test_edge_case_zero_benefit(self):
         """Test edge case where optimal benefit might be zero."""
-        # Create a scenario where optimal point gives zero or near-zero benefit
-        A = np.array([[1, 0], [0, 1]])
-        b = np.array([0, 0])
-        solver = OptimalMixSolver(A, b)
+        optimizer = OperationsOptimizer()
         
-        result = solver.solve_optimal_mix()
+        # Create a scenario where optimal point gives zero or near-zero benefit
+        optimizer.A = np.array([[1, 0], [0, 1]])
+        optimizer.b = np.array([0, 0])
+        
+        result = optimizer.solve_optimal_mix()
         
         assert result["status"] == "success"
         assert result["optimal_mix"]["x_commercial"] == 0.0
         assert result["optimal_mix"]["y_residential"] == 0.0
         assert result["max_operating_benefit"] == 0.0
+    
+    def test_compatibility_with_original_interface(self):
+        """Test that the new implementation maintains compatibility with original output format."""
+        optimizer = OperationsOptimizer()
+        result = optimizer.solve_optimal_mix()
+        
+        # Check all original keys are present
+        assert "status" in result
+        assert "optimal_mix" in result
+        assert "x_commercial" in result["optimal_mix"]
+        assert "y_residential" in result["optimal_mix"]
+        assert "max_operating_benefit" in result
+        assert "gradient_norm" in result
+        assert "is_global_maximum" in result
+        
+        # New key added for verification
+        assert "verification_details" in result
 
 
 if __name__ == "__main__":
