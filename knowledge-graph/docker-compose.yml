@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # Apache Jena Fuseki - Triplestore with SPARQL endpoint
+  fuseki:
+    image: stain/jena-fuseki:latest
+    container_name: automotive-fuseki
+    ports:
+      - "3030:3030"
+    volumes:
+      - ./config/fuseki-config.ttl:/fuseki/configuration/automotive.ttl
+      - ./ontology:/fuseki/ontology:ro
+      - ./data:/fuseki/data:ro
+      - fuseki-data:/fuseki/databases
+    environment:
+      - ADMIN_PASSWORD=admin123
+      - JVM_ARGS=-Xmx4g -Xms2g
+      - TDB=2
+      - FUSEKI_DATASET_1=automotive
+    command: --config=/fuseki/configuration/automotive.ttl
+    restart: unless-stopped
+    networks:
+      - kg-network
+
+  # GraphDB Free Edition (Alternative triplestore option)
+  # Uncomment to use GraphDB instead of Fuseki
+  # graphdb:
+  #   image: ontotext/graphdb:10.5.0-free
+  #   container_name: automotive-graphdb
+  #   ports:
+  #     - "7200:7200"
+  #   volumes:
+  #     - graphdb-home:/opt/graphdb/home
+  #     - graphdb-data:/opt/graphdb/data
+  #     - ./ontology:/ontology:ro
+  #     - ./data:/data:ro
+  #   environment:
+  #     - GDB_HEAP_SIZE=4g
+  #     - GDB_MIN_MEM=2g
+  #     - GDB_MAX_MEM=4g
+  #   restart: unless-stopped
+  #   networks:
+  #     - kg-network
+
+  # YASGUI - SPARQL query interface
+  yasgui:
+    image: erikap/yasgui:latest
+    container_name: automotive-yasgui
+    ports:
+      - "8080:80"
+    environment:
+      - DEFAULT_SPARQL_ENDPOINT=http://fuseki:3030/automotive/query
+    depends_on:
+      - fuseki
+    restart: unless-stopped
+    networks:
+      - kg-network
+
+  # Jupyter Notebook for Python RDFLib experimentation
+  jupyter:
+    image: jupyter/scipy-notebook:latest
+    container_name: automotive-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./queries:/home/jovyan/queries:ro
+      - ./ontology:/home/jovyan/ontology:ro
+      - ./data:/home/jovyan/data:ro
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - GRANT_SUDO=yes
+    command: start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
+    restart: unless-stopped
+    networks:
+      - kg-network
+
+networks:
+  kg-network:
+    driver: bridge
+
+volumes:
+  fuseki-data:
+    driver: local
+  # graphdb-home:
+  #   driver: local
+  # graphdb-data:
+  #   driver: local

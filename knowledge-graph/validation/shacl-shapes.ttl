@@ -1,0 +1,396 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix auto: <http://example.org/automotive#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================
+# SHACL SHAPES - VALIDACIÓN DE INTEGRIDAD
+# Automotive Knowledge Graph
+# ============================================
+
+# ============================================
+# SHAPE 1: Validación de Vehículos
+# ============================================
+
+auto:VehiculoShape
+    a sh:NodeShape ;
+    sh:targetClass auto:Vehiculo ;
+    sh:property [
+        sh:path auto:nombreComercial ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:minLength 1 ;
+        sh:message "Todo vehículo debe tener un nombre comercial único (string no vacío)"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:fabricadoPor ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:class auto:Fabricante ;
+        sh:message "Todo vehículo debe ser fabricado por exactamente un fabricante"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:añoLanzamiento ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 1900 ;
+        sh:maxInclusive 2030 ;
+        sh:message "Año de lanzamiento debe ser entre 1900 y 2030"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:añoDescontinuacion ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:message "Año de discontinuación debe ser un entero"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:potenciaHP ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ;
+        sh:maxInclusive 2000 ;
+        sh:message "Potencia debe ser un número positivo menor a 2000 HP"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:pesoKg ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 500 ;
+        sh:maxInclusive 5000 ;
+        sh:message "Peso debe estar entre 500 kg y 5000 kg"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:numeroPlazas ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 1 ;
+        sh:maxInclusive 12 ;
+        sh:message "Número de plazas debe estar entre 1 y 12"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:precioBase ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ;
+        sh:message "Precio base debe ser un número positivo (USD)"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:tienePropulsion ;
+        sh:minCount 1 ;
+        sh:class auto:TipoPropulsion ;
+        sh:message "Todo vehículo debe tener al menos un tipo de propulsión"@es ;
+    ] ;
+    sh:sparql [
+        sh:message "Año de discontinuación debe ser posterior al año de lanzamiento"@es ;
+        sh:prefixes auto: ;
+        sh:select """
+            PREFIX auto: <http://example.org/automotive#>
+            SELECT $this
+            WHERE {
+                $this auto:añoLanzamiento ?lanzamiento ;
+                      auto:añoDescontinuacion ?discontinuacion .
+                FILTER(?discontinuacion <= ?lanzamiento)
+            }
+        """ ;
+    ] .
+
+# ============================================
+# SHAPE 2: Validación de Vehículos Eléctricos
+# ============================================
+
+auto:VehiculoElectricoShape
+    a sh:NodeShape ;
+    sh:targetClass auto:VehiculoElectrico ;
+    sh:property [
+        sh:path auto:autonomiaKm ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ;
+        sh:maxInclusive 1500 ;
+        sh:message "Vehículos eléctricos deben especificar autonomía (0-1500 km)"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:capacidadBateriaKWh ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 10 ;
+        sh:maxInclusive 250 ;
+        sh:message "Capacidad de batería debe estar entre 10 y 250 kWh"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:tienePropulsion ;
+        sh:hasValue auto:PropulsionElectrica ;
+        sh:message "Vehículos eléctricos deben tener propulsión eléctrica"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:emisionesCO2 ;
+        sh:maxCount 1 ;
+        sh:hasValue 0 ;
+        sh:message "Vehículos eléctricos puros deben tener emisiones CO2 = 0"@es ;
+    ] .
+
+# ============================================
+# SHAPE 3: Validación de Vehículos Híbridos
+# ============================================
+
+auto:VehiculoHibridoShape
+    a sh:NodeShape ;
+    sh:targetClass auto:VehiculoHibrido ;
+    sh:property [
+        sh:path auto:tienePropulsion ;
+        sh:hasValue auto:PropulsionHibrida ;
+        sh:message "Vehículos híbridos deben tener propulsión híbrida"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:emisionesCO2 ;
+        sh:minCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:message "Vehículos híbridos deben especificar emisiones CO2"@es ;
+    ] .
+
+# ============================================
+# SHAPE 4: Validación de Organizaciones
+# ============================================
+
+auto:OrganizacionShape
+    a sh:NodeShape ;
+    sh:targetClass auto:Organizacion ;
+    sh:property [
+        sh:path auto:nombreComercial ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:minLength 1 ;
+        sh:message "Toda organización debe tener un nombre comercial"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:paisOrigen ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "País de origen debe ser un string"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:añoFundacion ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 1800 ;
+        sh:maxInclusive 2030 ;
+        sh:message "Año de fundación debe estar entre 1800 y 2030"@es ;
+    ] .
+
+# ============================================
+# SHAPE 5: Validación de Marcas
+# ============================================
+
+auto:MarcaShape
+    a sh:NodeShape ;
+    sh:targetClass auto:Marca ;
+    sh:property [
+        sh:path auto:perteneceA ;
+        sh:maxCount 1 ;
+        sh:class auto:GrupoCorporativo ;
+        sh:message "Una marca puede pertenecer a máximo un grupo corporativo"@es ;
+    ] .
+
+# ============================================
+# SHAPE 6: Validación de Componentes
+# ============================================
+
+auto:ComponenteShape
+    a sh:NodeShape ;
+    sh:targetClass auto:Componente ;
+    sh:property [
+        sh:path auto:nombreComercial ;
+        sh:minCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "Todo componente debe tener un nombre comercial"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:suministradoPor ;
+        sh:maxCount 1 ;
+        sh:class auto:Proveedor ;
+        sh:message "Un componente debe ser suministrado por un proveedor"@es ;
+    ] .
+
+# ============================================
+# SHAPE 7: Validación de Baterías
+# ============================================
+
+auto:BateriaShape
+    a sh:NodeShape ;
+    sh:targetClass auto:Bateria ;
+    sh:property [
+        sh:path auto:capacidadBateriaKWh ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ;
+        sh:maxInclusive 300 ;
+        sh:message "Baterías deben especificar capacidad (0-300 kWh)"@es ;
+    ] .
+
+# ============================================
+# SHAPE 8: Validación de Motores de Combustión
+# ============================================
+
+auto:MotorCombustionShape
+    a sh:NodeShape ;
+    sh:targetClass auto:MotorCombustion ;
+    sh:property [
+        sh:path auto:cilindrada ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ;
+        sh:maxInclusive 10 ;
+        sh:message "Cilindrada debe estar entre 0 y 10 litros"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:potenciaHP ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ;
+        sh:message "Potencia del motor debe ser positiva"@es ;
+    ] .
+
+# ============================================
+# SHAPE 9: Validación de Plataformas Técnicas
+# ============================================
+
+auto:PlataformaTecnicaShape
+    a sh:NodeShape ;
+    sh:targetClass auto:PlataformaTecnica ;
+    sh:property [
+        sh:path auto:nombreComercial ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:message "Toda plataforma técnica debe tener un nombre comercial"@es ;
+    ] ;
+    sh:sparql [
+        sh:message "Una plataforma técnica debe ser usada por al menos un vehículo"@es ;
+        sh:prefixes auto: ;
+        sh:select """
+            PREFIX auto: <http://example.org/automotive#>
+            SELECT $this
+            WHERE {
+                $this a auto:PlataformaTecnica .
+                FILTER NOT EXISTS {
+                    ?vehiculo auto:compartePlataforma $this .
+                }
+            }
+        """ ;
+    ] .
+
+# ============================================
+# SHAPE 10: Validaciones de Consistencia Lógica
+# ============================================
+
+auto:ConsistenciaVehiculoShape
+    a sh:NodeShape ;
+    sh:targetClass auto:Vehiculo ;
+    sh:sparql [
+        sh:message "Relación peso/potencia inválida: peso debe ser mayor a potencia"@es ;
+        sh:prefixes auto: ;
+        sh:select """
+            PREFIX auto: <http://example.org/automotive#>
+            SELECT $this
+            WHERE {
+                $this auto:pesoKg ?peso ;
+                      auto:potenciaHP ?potencia .
+                FILTER(?peso < ?potencia)
+            }
+        """ ;
+    ] ;
+    sh:sparql [
+        sh:message "Vehículo no puede ser simultáneamente eléctrico y tener emisiones > 0"@es ;
+        sh:prefixes auto: ;
+        sh:select """
+            PREFIX auto: <http://example.org/automotive#>
+            SELECT $this
+            WHERE {
+                $this a auto:VehiculoElectrico ;
+                      auto:emisionesCO2 ?emisiones .
+                FILTER(?emisiones > 0)
+            }
+        """ ;
+    ] .
+
+# ============================================
+# SHAPE 11: Validación de Precio
+# ============================================
+
+auto:PrecioVehiculoShape
+    a sh:NodeShape ;
+    sh:targetClass auto:Vehiculo ;
+    sh:sparql [
+        sh:message "Vehículos eléctricos premium (>50k USD) deben tener autonomía > 300 km"@es ;
+        sh:prefixes auto: ;
+        sh:severity sh:Warning ;
+        sh:select """
+            PREFIX auto: <http://example.org/automotive#>
+            SELECT $this
+            WHERE {
+                $this a auto:VehiculoElectrico ;
+                      auto:precioBase ?precio ;
+                      auto:autonomiaKm ?autonomia .
+                FILTER(?precio > 50000 && ?autonomia < 300)
+            }
+        """ ;
+    ] .
+
+# ============================================
+# SHAPE 12: Validación de Rango de Valores
+# ============================================
+
+auto:EspecificacionesTecnicasShape
+    a sh:NodeShape ;
+    sh:targetClass auto:Vehiculo ;
+    sh:property [
+        sh:path auto:aceleracion0a100 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ;
+        sh:maxInclusive 30 ;
+        sh:message "Aceleración 0-100 km/h debe estar entre 0 y 30 segundos"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:velocidadMaxima ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minExclusive 0 ;
+        sh:maxInclusive 500 ;
+        sh:message "Velocidad máxima debe estar entre 0 y 500 km/h"@es ;
+    ] ;
+    sh:property [
+        sh:path auto:emisionesCO2 ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ;
+        sh:maxInclusive 400 ;
+        sh:message "Emisiones CO2 deben estar entre 0 y 400 g/km"@es ;
+    ] .
+
+# ============================================
+# SHAPE 13: Código de Modelo
+# ============================================
+
+auto:CodigoModeloShape
+    a sh:NodeShape ;
+    sh:targetClass auto:Vehiculo ;
+    sh:property [
+        sh:path auto:codigoModelo ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[A-Z0-9_\\-]+$" ;
+        sh:message "Código de modelo debe contener solo letras mayúsculas, números, guiones y guiones bajos"@es ;
+    ] .
+
+# ============================================
+# FIN DE LAS REGLAS SHACL
+# ============================================

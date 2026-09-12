@@ -1,0 +1,504 @@
+@prefix : <http://example.org/automotive#> .
+@prefix auto: <http://example.org/automotive#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# ============================================
+# METADATOS DE LA ONTOLOGÍA
+# ============================================
+
+<http://example.org/automotive>
+    a owl:Ontology ;
+    dcterms:title "Automotive Industry Knowledge Graph Ontology"@es ;
+    dcterms:description "Ontología formal para modelar la industria automotriz: fabricantes, vehículos, componentes y relaciones comerciales"@es ;
+    dcterms:creator "Knowledge Graph Engineering Team" ;
+    dcterms:created "2026-08-19"^^xsd:date ;
+    owl:versionInfo "1.0.0" ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> .
+
+# ============================================
+# JERARQUÍA DE CLASES - EMPRESAS
+# ============================================
+
+auto:Organizacion
+    a owl:Class ;
+    rdfs:label "Organización"@es, "Organization"@en ;
+    rdfs:comment "Entidad corporativa en la industria automotriz"@es .
+
+auto:GrupoCorporativo
+    a owl:Class ;
+    rdfs:subClassOf auto:Organizacion ;
+    rdfs:label "Grupo Corporativo"@es, "Corporate Group"@en ;
+    rdfs:comment "Conglomerado que posee múltiples marcas automotrices"@es .
+
+auto:Marca
+    a owl:Class ;
+    rdfs:subClassOf auto:Organizacion ;
+    rdfs:label "Marca"@es, "Brand"@en ;
+    rdfs:comment "Marca comercial de vehículos (ej. Toyota, BMW, Ford)"@es .
+
+auto:Fabricante
+    a owl:Class ;
+    rdfs:subClassOf auto:Organizacion ;
+    rdfs:label "Fabricante"@es, "Manufacturer"@en ;
+    rdfs:comment "Empresa que manufactura vehículos"@es .
+
+auto:Proveedor
+    a owl:Class ;
+    rdfs:subClassOf auto:Organizacion ;
+    rdfs:label "Proveedor"@es, "Supplier"@en ;
+    rdfs:comment "Proveedor de componentes automotrices (Tier 1, Tier 2)"@es .
+
+# ============================================
+# JERARQUÍA DE CLASES - VEHÍCULOS
+# ============================================
+
+auto:Vehiculo
+    a owl:Class ;
+    rdfs:label "Vehículo"@es, "Vehicle"@en ;
+    rdfs:comment "Cualquier tipo de vehículo motorizado"@es .
+
+auto:VehiculoPasajeros
+    a owl:Class ;
+    rdfs:subClassOf auto:Vehiculo ;
+    rdfs:label "Vehículo de Pasajeros"@es, "Passenger Vehicle"@en .
+
+auto:SUV
+    a owl:Class ;
+    rdfs:subClassOf auto:VehiculoPasajeros ;
+    rdfs:label "SUV"@es, "Sport Utility Vehicle"@en ;
+    skos:altLabel "Vehículo Utilitario Deportivo"@es .
+
+auto:Sedan
+    a owl:Class ;
+    rdfs:subClassOf auto:VehiculoPasajeros ;
+    rdfs:label "Sedán"@es, "Sedan"@en .
+
+auto:Hatchback
+    a owl:Class ;
+    rdfs:subClassOf auto:VehiculoPasajeros ;
+    rdfs:label "Hatchback"@es .
+
+auto:Coupe
+    a owl:Class ;
+    rdfs:subClassOf auto:VehiculoPasajeros ;
+    rdfs:label "Coupé"@es, "Coupe"@en .
+
+auto:Pickup
+    a owl:Class ;
+    rdfs:subClassOf auto:Vehiculo ;
+    rdfs:label "Pickup"@es, "Pickup Truck"@en ;
+    rdfs:comment "Camioneta con cabina y área de carga abierta"@es .
+
+auto:VehiculoComercial
+    a owl:Class ;
+    rdfs:subClassOf auto:Vehiculo ;
+    rdfs:label "Vehículo Comercial"@es, "Commercial Vehicle"@en .
+
+auto:VehiculoElectrico
+    a owl:Class ;
+    rdfs:subClassOf auto:Vehiculo ;
+    rdfs:label "Vehículo Eléctrico"@es, "Electric Vehicle"@en ;
+    rdfs:comment "Vehículo propulsado exclusivamente por electricidad"@es .
+
+auto:VehiculoHibrido
+    a owl:Class ;
+    rdfs:subClassOf auto:Vehiculo ;
+    rdfs:label "Vehículo Híbrido"@es, "Hybrid Vehicle"@en ;
+    rdfs:comment "Vehículo con motor de combustión y motor eléctrico"@es .
+
+auto:VehiculoLargaAutonomia
+    a owl:Class ;
+    rdfs:subClassOf auto:VehiculoElectrico ;
+    rdfs:label "Vehículo de Larga Autonomía"@es, "Long Range Vehicle"@en ;
+    rdfs:comment "Vehículo eléctrico con autonomía superior a 500 km"@es .
+
+# ============================================
+# CLASES - COMPONENTES Y SISTEMAS
+# ============================================
+
+auto:Componente
+    a owl:Class ;
+    rdfs:label "Componente"@es, "Component"@en ;
+    rdfs:comment "Parte o sistema de un vehículo"@es .
+
+auto:Motor
+    a owl:Class ;
+    rdfs:subClassOf auto:Componente ;
+    rdfs:label "Motor"@es, "Engine"@en .
+
+auto:MotorCombustion
+    a owl:Class ;
+    rdfs:subClassOf auto:Motor ;
+    rdfs:label "Motor de Combustión"@es, "Combustion Engine"@en .
+
+auto:MotorElectrico
+    a owl:Class ;
+    rdfs:subClassOf auto:Motor ;
+    rdfs:label "Motor Eléctrico"@es, "Electric Motor"@en .
+
+auto:Bateria
+    a owl:Class ;
+    rdfs:subClassOf auto:Componente ;
+    rdfs:label "Batería"@es, "Battery"@en .
+
+auto:BateriaLitioIon
+    a owl:Class ;
+    rdfs:subClassOf auto:Bateria ;
+    rdfs:label "Batería de Litio-Ion"@es, "Lithium-Ion Battery"@en .
+
+auto:Transmision
+    a owl:Class ;
+    rdfs:subClassOf auto:Componente ;
+    rdfs:label "Transmisión"@es, "Transmission"@en .
+
+auto:SistemaInfoentretenimiento
+    a owl:Class ;
+    rdfs:subClassOf auto:Componente ;
+    rdfs:label "Sistema de Infoentretenimiento"@es, "Infotainment System"@en .
+
+auto:SistemaAsistenciaConduccion
+    a owl:Class ;
+    rdfs:subClassOf auto:Componente ;
+    rdfs:label "Sistema de Asistencia a la Conducción"@es, "Driver Assistance System"@en ;
+    skos:altLabel "ADAS"@en .
+
+auto:PlataformaTecnica
+    a owl:Class ;
+    rdfs:label "Plataforma Técnica"@es, "Technical Platform"@en ;
+    rdfs:comment "Arquitectura base compartida entre modelos (ej. MQB, TNGA)"@es .
+
+# ============================================
+# CLASES - TIPOS DE PROPULSIÓN
+# ============================================
+
+auto:TipoPropulsion
+    a owl:Class ;
+    rdfs:label "Tipo de Propulsión"@es, "Propulsion Type"@en .
+
+auto:PropulsionGasolina
+    a owl:Class ;
+    rdfs:subClassOf auto:TipoPropulsion ;
+    rdfs:label "Gasolina"@es, "Gasoline"@en .
+
+auto:PropulsionDiesel
+    a owl:Class ;
+    rdfs:subClassOf auto:TipoPropulsion ;
+    rdfs:label "Diésel"@es, "Diesel"@en .
+
+auto:PropulsionHibrida
+    a owl:Class ;
+    rdfs:subClassOf auto:TipoPropulsion ;
+    rdfs:label "Híbrida"@es, "Hybrid"@en .
+
+auto:PropulsionElectrica
+    a owl:Class ;
+    rdfs:subClassOf auto:TipoPropulsion ;
+    rdfs:label "Eléctrica"@es, "Electric"@en .
+
+auto:PropulsionHidrogeno
+    a owl:Class ;
+    rdfs:subClassOf auto:TipoPropulsion ;
+    rdfs:label "Hidrógeno"@es, "Hydrogen"@en ;
+    rdfs:comment "Celda de combustible de hidrógeno"@es .
+
+# ============================================
+# PROPIEDADES DE OBJETO - RELACIONES CORPORATIVAS
+# ============================================
+
+auto:perteneceA
+    a owl:ObjectProperty ;
+    rdfs:domain auto:Marca ;
+    rdfs:range auto:GrupoCorporativo ;
+    rdfs:label "pertenece a"@es, "belongs to"@en ;
+    rdfs:comment "Una marca pertenece a un grupo corporativo"@es .
+
+auto:posee
+    a owl:ObjectProperty ;
+    owl:inverseOf auto:perteneceA ;
+    rdfs:domain auto:GrupoCorporativo ;
+    rdfs:range auto:Marca ;
+    rdfs:label "posee"@es, "owns"@en .
+
+auto:tieneJointVenture
+    a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:domain auto:Organizacion ;
+    rdfs:range auto:Organizacion ;
+    rdfs:label "tiene joint venture con"@es, "has joint venture with"@en ;
+    rdfs:comment "Relación de colaboración empresarial"@es .
+
+auto:esSubsidiariaDE
+    a owl:ObjectProperty, owl:TransitiveProperty ;
+    rdfs:domain auto:Organizacion ;
+    rdfs:range auto:Organizacion ;
+    rdfs:label "es subsidiaria de"@es, "is subsidiary of"@en .
+
+# ============================================
+# PROPIEDADES DE OBJETO - VEHÍCULOS Y FABRICACIÓN
+# ============================================
+
+auto:fabricadoPor
+    a owl:ObjectProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range auto:Fabricante ;
+    rdfs:label "fabricado por"@es, "manufactured by"@en ;
+    rdfs:comment "Indica qué empresa fabrica el vehículo"@es .
+
+auto:produceModelo
+    a owl:ObjectProperty ;
+    owl:inverseOf auto:fabricadoPor ;
+    rdfs:domain auto:Fabricante ;
+    rdfs:range auto:Vehiculo ;
+    rdfs:label "produce modelo"@es, "produces model"@en .
+
+auto:comercializadoBajo
+    a owl:ObjectProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range auto:Marca ;
+    rdfs:label "comercializado bajo"@es, "marketed under"@en ;
+    rdfs:comment "Marca comercial bajo la cual se vende el vehículo"@es .
+
+auto:compartePlataforma
+    a owl:ObjectProperty, owl:TransitiveProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range auto:PlataformaTecnica ;
+    rdfs:label "comparte plataforma"@es, "shares platform"@en .
+
+auto:tienePropulsion
+    a owl:ObjectProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range auto:TipoPropulsion ;
+    rdfs:label "tiene propulsión"@es, "has propulsion"@en .
+
+# ============================================
+# PROPIEDADES DE OBJETO - COMPONENTES
+# ============================================
+
+auto:usaComponente
+    a owl:ObjectProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range auto:Componente ;
+    rdfs:label "usa componente"@es, "uses component"@en .
+
+auto:suministradoPor
+    a owl:ObjectProperty ;
+    rdfs:domain auto:Componente ;
+    rdfs:range auto:Proveedor ;
+    rdfs:label "suministrado por"@es, "supplied by"@en .
+
+auto:suministraComponente
+    a owl:ObjectProperty ;
+    owl:inverseOf auto:suministradoPor ;
+    rdfs:domain auto:Proveedor ;
+    rdfs:range auto:Componente ;
+    rdfs:label "suministra componente"@es, "supplies component"@en .
+
+auto:compatibleCon
+    a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:domain auto:Componente ;
+    rdfs:range auto:Componente ;
+    rdfs:label "compatible con"@es, "compatible with"@en ;
+    rdfs:comment "Componentes intercambiables o compatibles"@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - ESPECIFICACIONES TÉCNICAS
+# ============================================
+
+auto:añoLanzamiento
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range xsd:integer ;
+    rdfs:label "año de lanzamiento"@es, "launch year"@en ;
+    rdfs:comment "Año en que el modelo fue introducido al mercado"@es .
+
+auto:añoDescontinuacion
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range xsd:integer ;
+    rdfs:label "año de discontinuación"@es, "discontinuation year"@en ;
+    rdfs:comment "Año en que el modelo dejó de producirse"@es .
+
+auto:potenciaHP
+    a owl:DatatypeProperty ;
+    rdfs:domain [ owl:unionOf (auto:Vehiculo auto:Motor) ] ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "potencia (HP)"@es, "horsepower"@en ;
+    rdfs:comment "Potencia en caballos de fuerza"@es .
+
+auto:pesoKg
+    a owl:DatatypeProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "peso (kg)"@es, "weight (kg)"@en ;
+    rdfs:comment "Peso del vehículo en kilogramos (vacío)"@es .
+
+auto:autonomiaKm
+    a owl:DatatypeProperty ;
+    rdfs:domain auto:VehiculoElectrico ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "autonomía (km)"@es, "range (km)"@en ;
+    rdfs:comment "Autonomía eléctrica en kilómetros (ciclo WLTP)"@es .
+
+auto:capacidadBateriaKWh
+    a owl:DatatypeProperty ;
+    rdfs:domain [ owl:unionOf (auto:VehiculoElectrico auto:Bateria) ] ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "capacidad de batería (kWh)"@es, "battery capacity (kWh)"@en .
+
+auto:numeroPlazas
+    a owl:DatatypeProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range xsd:integer ;
+    rdfs:label "número de plazas"@es, "number of seats"@en .
+
+auto:precioBase
+    a owl:DatatypeProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "precio base"@es, "base price"@en ;
+    rdfs:comment "Precio base en USD"@es .
+
+auto:cilindrada
+    a owl:DatatypeProperty ;
+    rdfs:domain auto:MotorCombustion ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "cilindrada (L)"@es, "displacement (L)"@en .
+
+auto:emisionesCO2
+    a owl:DatatypeProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "emisiones CO2 (g/km)"@es, "CO2 emissions (g/km)"@en .
+
+auto:aceleracion0a100
+    a owl:DatatypeProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "aceleración 0-100 km/h (s)"@es, "0-100 km/h acceleration (s)"@en .
+
+auto:velocidadMaxima
+    a owl:DatatypeProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "velocidad máxima (km/h)"@es, "top speed (km/h)"@en .
+
+# ============================================
+# PROPIEDADES DE DATOS - INFORMACIÓN ORGANIZACIONAL
+# ============================================
+
+auto:nombreComercial
+    a owl:DatatypeProperty ;
+    rdfs:domain auto:Organizacion ;
+    rdfs:range xsd:string ;
+    rdfs:label "nombre comercial"@es, "trade name"@en .
+
+auto:codigoModelo
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range xsd:string ;
+    rdfs:label "código de modelo"@es, "model code"@en ;
+    rdfs:comment "Código interno del fabricante (ej. W213 para Mercedes E-Class)"@es .
+
+auto:paisOrigen
+    a owl:DatatypeProperty ;
+    rdfs:domain auto:Organizacion ;
+    rdfs:range xsd:string ;
+    rdfs:label "país de origen"@es, "country of origin"@en .
+
+auto:añoFundacion
+    a owl:DatatypeProperty ;
+    rdfs:domain auto:Organizacion ;
+    rdfs:range xsd:integer ;
+    rdfs:label "año de fundación"@es, "founding year"@en .
+
+auto:urlOficial
+    a owl:DatatypeProperty ;
+    rdfs:domain auto:Organizacion ;
+    rdfs:range xsd:anyURI ;
+    rdfs:label "URL oficial"@es, "official URL"@en .
+
+# ============================================
+# AXIOMAS Y REGLAS DE RESTRICCIÓN
+# ============================================
+
+# Restricción: Un vehículo debe tener al menos un tipo de propulsión
+auto:Vehiculo
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty auto:tienePropulsion ;
+        owl:minCardinality 1
+    ] .
+
+# Restricción: Un vehículo debe ser fabricado por exactamente un fabricante
+auto:Vehiculo
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty auto:fabricadoPor ;
+        owl:cardinality 1
+    ] .
+
+# Restricción: Vehículos eléctricos deben tener autonomía especificada
+auto:VehiculoElectrico
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty auto:autonomiaKm ;
+        owl:minCardinality 1
+    ] .
+
+# Restricción: Vehículos con autonomía >= 500 km son de larga autonomía
+# (Esta regla requiere un reasoner con soporte SWRL o SHACL)
+
+# Propiedad disjunta: Un vehículo no puede ser simultáneamente eléctrico e híbrido
+# (a nivel de instancia, las clases pueden solaparse pero las instancias deben ser únicas)
+
+# ============================================
+# CLASES ENUMERADAS (PARA VALIDACIÓN)
+# ============================================
+
+auto:SistemaTraccion
+    a owl:Class ;
+    owl:oneOf (auto:TraccionDelantera auto:TraccionTrasera auto:TraccionIntegral) ;
+    rdfs:label "Sistema de Tracción"@es, "Drivetrain System"@en .
+
+auto:TraccionDelantera a owl:NamedIndividual, auto:SistemaTraccion ;
+    rdfs:label "Tracción Delantera (FWD)"@es .
+
+auto:TraccionTrasera a owl:NamedIndividual, auto:SistemaTraccion ;
+    rdfs:label "Tracción Trasera (RWD)"@es .
+
+auto:TraccionIntegral a owl:NamedIndividual, auto:SistemaTraccion ;
+    rdfs:label "Tracción Integral (AWD/4WD)"@es .
+
+auto:tieneSistemaTraccion
+    a owl:ObjectProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range auto:SistemaTraccion ;
+    rdfs:label "tiene sistema de tracción"@es .
+
+# ============================================
+# ANOTACIONES ADICIONALES
+# ============================================
+
+# Propiedad para marcar versiones de modelos
+auto:esVarianteDE
+    a owl:ObjectProperty, owl:TransitiveProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range auto:Vehiculo ;
+    rdfs:label "es variante de"@es, "is variant of"@en ;
+    rdfs:comment "Relaciona variantes de un modelo (ej. RAV4 Prime es variante de RAV4)"@es .
+
+# Propiedad para certificaciones y normativas
+auto:cumpleNormativa
+    a owl:DatatypeProperty ;
+    rdfs:domain auto:Vehiculo ;
+    rdfs:range xsd:string ;
+    rdfs:label "cumple normativa"@es, "complies with regulation"@en ;
+    rdfs:comment "Ej: Euro 6d, EPA Tier 3, China 6"@es .
+
+# ============================================
+# FIN DE LA ONTOLOGÍA
+# ============================================
