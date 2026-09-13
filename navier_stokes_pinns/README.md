@@ -100,6 +100,15 @@ Donde:
 | **Casos validados** | Investigación | Industria certificada |
 | **Hardware** | GPU (Google Colab gratis) | CPU clusters caros |
 
+## 📖 Documentación Completa
+
+- **[🚀 Quick Start](QUICK_START.md)** - Guía de inicio en 60 segundos
+- **[📋 Executive Summary](EXECUTIVE_SUMMARY.md)** - Resumen ejecutivo del proyecto
+- **[🔧 Installation Guide](docs/INSTALL.md)** - Instalación paso a paso
+- **[📐 Mathematical Theory](docs/THEORY.md)** - Fundamentos de N-S y PINNs
+- **[⚖️ PINN vs CFD Comparison](docs/COMPARISON.md)** - Comparación detallada
+- **[🏗️ Project Structure](docs/PROJECT_STRUCTURE.md)** - Arquitectura del código
+
 ## 🎓 Para Aprender Más
 
 - [Paper original de PINNs](https://www.sciencedirect.com/science/article/pii/S0021999118307125) (Raissi et al., 2019)
