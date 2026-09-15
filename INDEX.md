@@ -13,6 +13,7 @@ Este repositorio proporciona un entorno completo de análisis y visualización f
 - ✅ Plantillas personalizables para casos de uso comunes
 - ✅ Documentación completa en español
 - ✅ Guías de solución de problemas
+- ✅ **NUEVO:** MVP de Análisis Lean Manufacturing en Streamlit
 
 ---
 
@@ -40,6 +41,8 @@ python3 test_plot.py
 | `test_plot.py` | Script de prueba básico (plantilla inicial) | 1 |
 | `ejemplos_graficos.py` | Ejemplos intermedios de visualización | 5 |
 | `ejemplos_avanzados.py` | Análisis financieros avanzados completos | 5 |
+| **`lean_streamlit_mvp.py`** | **MVP de Análisis Lean Manufacturing interactivo** | Web App |
+| **`lean_colab_notebook.py`** | **Versión para Google Colab (sin instalación)** | Web App |
 
 ### 📖 Documentación
 | Archivo | Contenido |
@@ -47,7 +50,10 @@ python3 test_plot.py
 | `INICIO_RAPIDO.md` | Guía de instalación y primeros pasos (léelo primero) |
 | `GRAFICOS_README.md` | Documentación completa con ejemplos de código |
 | `INDEX.md` | Este archivo (índice general) |
+| **`LEAN_MVP_README.md`** | **Documentación completa del MVP Lean** |
+| **`QUICKSTART_LEAN.md`** | **Inicio rápido Lean (30 segundos)** |
 | `requirements.txt` | Dependencias del proyecto |
+| `requirements_lean.txt` | Dependencias para el MVP Lean |
 
 ### 📊 Gráficos Generados
 
@@ -119,6 +125,7 @@ Estudia casos de uso reales de ingeniería económica.
 - ✅ Análisis de regresión lineal
 - ✅ Composición de costos
 - ✅ Dashboards ejecutivos
+- ✅ **Análisis Lean Manufacturing interactivo** (Lead Time, MUDA, VSM)
 
 ---
 
@@ -208,12 +215,20 @@ Consulta la sección de solución de problemas en `GRAFICOS_README.md`
 
 ## 🎯 Próximos Pasos
 
+### Para Análisis Estático (Gráficos)
 1. ✅ Lee `INICIO_RAPIDO.md` para comenzar
 2. ✅ Ejecuta `verificar_entorno.py` para validar tu instalación
 3. ✅ Genera tus primeros gráficos con los scripts incluidos
 4. ✅ Estudia el código en los archivos `.py`
 5. ✅ Personaliza las plantillas con tus propios datos
 6. ✅ Consulta `GRAFICOS_README.md` para técnicas avanzadas
+
+### Para Análisis Lean Interactivo (Streamlit)
+1. ✅ Lee `QUICKSTART_LEAN.md` (30 segundos)
+2. ✅ **Opción Rápida (sin instalar)**: Google Colab → `lean_colab_notebook.py`
+3. ✅ **Opción Local**: `streamlit run lean_streamlit_mvp.py`
+4. ✅ Consulta `LEAN_MVP_README.md` para documentación completa
+5. ✅ Aprende la diferencia entre **Lead Time** y **Complejidad Computacional**
 
 ---
 
