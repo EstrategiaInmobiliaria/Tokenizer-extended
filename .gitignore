@@ -42,4 +42,5 @@ yarn-error.log*
 *.tsbuildinfo
 
 # hf
-public/hf
+public/hf*.pyc
+__pycache__/
