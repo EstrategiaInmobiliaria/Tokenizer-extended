@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototipo Inmobiliario: Conexión & Leads</title>
+    <!-- Variante visual (maqueta estática). Requiere internet: Tailwind y Alpine se cargan por CDN. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .sparkle { animation: sparkle .5s ease; }
+        @keyframes sparkle { 0% { transform: scale(1); } 40% { transform: scale(1.06); box-shadow: 0 0 24px rgba(16,185,129,.6); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white" x-data="realEstateApp()">
+
+    <header class="w-full border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span class="font-bold tracking-wider text-sm uppercase text-slate-300">Agartha / Estrategia Inmobiliaria <span class="text-emerald-400 font-normal">| Test Lab</span></span>
+        </div>
+        <div class="flex space-x-2">
+            <template x-for="(phase, index) in phases" :key="index">
+                <button @click="currentPhase = index"
+                    :class="currentPhase === index ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/30' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'"
+                    class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-300"
+                    x-text="phase.name">
+                </button>
+            </template>
+        </div>
+    </header>
+
+    <main class="max-w-4xl w-full mx-auto p-6 my-auto">
+
+        <!-- FASE 1: DELIGHT -->
+        <section x-show="currentPhase === 0" x-transition.opacity.duration.300ms class="space-y-8 text-center py-10">
+            <div class="inline-block px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold tracking-wide uppercase mb-2">
+                ✨ Fase 1: Delight Experience
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-white">
+                El pulso visual del mercado <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-200">en tiempo real</span>.
+            </h1>
+            <p class="text-slate-400 max-w-xl mx-auto text-base">
+                Una bienvenida inmersiva que rompe con los portales aburridos. Selecciona tu perfil y descubre la propiedad ideal con animaciones fluidas y atractivas.
+            </p>
+
+            <div class="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-left space-y-4" :class="sparkling && 'sparkle'">
+                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">¿Qué buscas hoy?</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <button @click="selectedVibe = 'residencial'; triggerSparkle()" :class="selectedVibe === 'residencial' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300' : 'border-slate-800 bg-slate-800/50 text-slate-400'" class="p-3 rounded-xl border text-sm font-medium transition text-center">🏡 Residencial Premium</button>
+                    <button @click="selectedVibe = 'inversion'; triggerSparkle()" :class="selectedVibe === 'inversion' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300' : 'border-slate-800 bg-slate-800/50 text-slate-400'" class="p-3 rounded-xl border text-sm font-medium transition text-center">📈 Alta Rentabilidad</button>
+                </div>
+                <div class="pt-2">
+                    <button @click="currentPhase = 1" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold rounded-xl transition shadow-lg shadow-emerald-500/20 flex items-center justify-center space-x-2">
+                        <span>Iniciar Match Inteligente</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- FASE 2: BREAKTHROUGH -->
+        <section x-show="currentPhase === 1" x-transition.opacity.duration.300ms class="space-y-6">
+            <div class="flex justify-between items-end">
+                <div>
+                    <span class="text-xs font-semibold text-teal-400 tracking-wide uppercase">🚀 Fase 2: Breakthrough Operativo</span>
+                    <h2 class="text-2xl font-bold text-white mt-1">Motor de Conexión & Matching de Leads</h2>
+                </div>
+                <span class="text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full border border-slate-700">Filtro Activo</span>
+            </div>
+
+            <p class="text-slate-400 text-sm">
+                Este es el núcleo que antes no podías estructurar de forma ágil: captura al lead, evalúa su intención de compra y lo pre-asigna automáticamente al corredor o comunidad de WhatsApp idónea.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="text-xs font-bold text-emerald-400 uppercase">1. Atracción de Lead</div>
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800/60 space-y-1">
+                        <p class="text-xs font-semibold text-white">Cliente: Carlos Mendoza</p>
+                        <p class="text-xs text-slate-400">Interés: Preventa Palm Diamante</p>
+                        <span class="inline-block px-2 py-0.5 bg-blue-500/10 text-blue-400 text-[10px] rounded">Canal: Redes / Web</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="text-xs font-bold text-teal-400 uppercase">2. Matching Automatizado</div>
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800/60 space-y-2">
+                        <div class="flex justify-between text-xs"><span class="text-slate-400">Compatibilidad:</span> <span class="text-emerald-400 font-bold">96%</span></div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div class="bg-emerald-500 h-full w-[96%]"></div>
+                        </div>
+                        <p class="text-[11px] text-slate-400">Perfil apto para inversión patrimonial de alta gama.</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="text-xs font-bold text-indigo-400 uppercase">3. Agente Asignado</div>
+                    <div class="bg-slate-950 p-3 rounded-lg border border-slate-800/60 space-y-1">
+                        <p class="text-xs font-semibold text-white">Broker: Diana Ondarza</p>
+                        <p class="text-xs text-slate-400">Especialidad: Zona Poniente / Costa</p>
+                        <span class="inline-block px-2 py-0.5 bg-emerald-500/10 text-emerald-400 text-[10px] rounded">Listo para interacción</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button @click="currentPhase = 2" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm rounded-xl transition shadow-md">
+                    Continuar a Lanzamiento WhatsApp Business &rarr;
+                </button>
+            </div>
+        </section>
+
+        <!-- FASE 3: WHATSAPP BUSINESS -->
+        <section x-show="currentPhase === 2" x-transition.opacity.duration.300ms class="space-y-6">
+            <div>
+                <span class="text-xs font-semibold text-emerald-400 tracking-wide uppercase">📱 Fase 3: Activación Comercial</span>
+                <h2 class="text-2xl font-bold text-white mt-1">Conexión Directa con WhatsApp Business</h2>
+            </div>
+            <p class="text-slate-400 text-sm">
+                Automatiza el puente entre el sistema de leads y tus grupos/chats de WhatsApp Business para disparar interacciones inmediatas con corredores y comunidades.
+            </p>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6">
+                <div class="space-y-3">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Plantilla de Mensaje para WhatsApp Business (API Ready)</label>
+                    <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl font-mono text-xs text-slate-300 space-y-2 relative">
+                        <div class="absolute top-3 right-3 text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">Plantilla Verificada</div>
+                        <p class="text-emerald-400 font-bold">Hola Carlos, soy Diana de Estrategia Inmobiliaria / Agartha.</p>
+                        <p>He visto tu interés en nuestras opciones exclusivas. Nuestro sistema de match indicó que el modelo en Palm Diamante encaja perfecto con lo que buscas. ¿Te agendaría una breve llamada o prefieres que te comparta el Masterplan directo por aquí?</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                    <a href="https://wa.me/?text=Hola%2C%20estoy%20listo%20para%20activar%20el%20flujo%20de%20leads%20inmobiliarios" target="_blank" rel="noopener" class="py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold rounded-xl text-center transition flex items-center justify-center space-x-2 shadow-lg shadow-emerald-900/30">
+                        <span>📲 Probar Enlace WhatsApp Business</span>
+                    </a>
+                    <a href="index.html" class="py-3 px-4 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl text-center transition border border-slate-700">
+                        Ir a la versión funcional (match real + pipeline) &rarr;
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="w-full border-t border-slate-800/80 bg-slate-900/30 py-4 text-center text-xs text-slate-500">
+        Maqueta visual · Tailwind + Alpine por CDN · la lógica de match y el pipeline viven en <a href="index.html" class="text-emerald-400">index.html</a>.
+    </footer>
+
+    <script>
+        function realEstateApp() {
+            return {
+                currentPhase: 0,
+                selectedVibe: 'residencial',
+                sparkling: false,
+                phases: [
+                    { name: '1. Delight' },
+                    { name: '2. Breakthrough' },
+                    { name: '3. WhatsApp Launch' }
+                ],
+                triggerSparkle() {
+                    this.sparkling = false;
+                    requestAnimationFrame(() => { this.sparkling = true; setTimeout(() => this.sparkling = false, 500); });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
