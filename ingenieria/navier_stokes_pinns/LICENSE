@@ -1,0 +1,58 @@
+MIT License
+
+Copyright (c) 2026 Navier-Stokes PINNs Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Atribuciones
+
+Este proyecto utiliza las siguientes librerías de código abierto:
+
+- **DeepXDE** - Lu Lu et al. (MIT License)
+  https://github.com/lululxvi/deepxde
+
+- **TensorFlow** - Google (Apache 2.0 License)
+  https://www.tensorflow.org/
+
+- **NumPy** - NumPy Developers (BSD License)
+  https://numpy.org/
+
+- **Matplotlib** - Matplotlib Development Team (PSF License)
+  https://matplotlib.org/
+
+## Referencias Académicas
+
+Si usas este código para investigación, por favor cita:
+
+1. **PINNs Original Paper:**
+   Raissi, M., Perdikaris, P., & Karniadakis, G. E. (2019).
+   Physics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations.
+   Journal of Computational Physics, 378, 686-707.
+
+2. **DeepXDE:**
+   Lu, L., Meng, X., Mao, Z., & Karniadakis, G. E. (2021).
+   DeepXDE: A deep learning library for solving differential equations.
+   SIAM Review, 63(1), 208-228.
+
+3. **Lid-Driven Cavity Benchmark:**
+   Ghia, U., Ghia, K. N., & Shin, C. T. (1982).
+   High-Re solutions for incompressible flow using the Navier-Stokes equations and a multigrid method.
+   Journal of Computational Physics, 48(3), 387-411.
