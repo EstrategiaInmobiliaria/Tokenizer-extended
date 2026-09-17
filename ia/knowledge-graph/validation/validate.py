@@ -79,7 +79,7 @@ def validate_data(data_graph: Graph, shapes_graph: Graph, ontology_graph: Graph 
             print(f"   Warnings: {len(warnings)}")
             
             # Save violations to JSON
-            with open('/workspace/knowledge-graph/validation/validation-results.json', 'w') as f:
+            with open('/workspace/ia/knowledge-graph/validation/validation-results.json', 'w') as f:
                 json.dump({
                     "conforms": conforms,
                     "total_violations": len(violations),
@@ -102,7 +102,7 @@ def main():
     print("="*80 + "\n")
     
     # Paths
-    base_path = "/workspace/knowledge-graph"
+    base_path = "/workspace/ia/knowledge-graph"
     ontology_path = f"{base_path}/ontology/automotive-ontology.ttl"
     data_path = f"{base_path}/data/automotive-instances.ttl"
     shapes_path = f"{base_path}/validation/shacl-shapes.ttl"

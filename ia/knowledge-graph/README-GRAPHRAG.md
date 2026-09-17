@@ -255,7 +255,7 @@ response = whatsapp.process_query(
 ### 1. Instalar Dependencias
 
 ```bash
-cd /workspace/knowledge-graph
+cd /workspace/ia/knowledge-graph
 pip install -r requirements-graphrag.txt
 ```
 
@@ -286,7 +286,7 @@ EOF
 ```bash
 # Opción A: Cargar desde Turtle (requiere n10s plugin)
 CALL n10s.rdf.import.fetch(
-  "file:///workspace/knowledge-graph/ontology/contact-network-graphrag.ttl",
+  "file:///workspace/ia/knowledge-graph/ontology/contact-network-graphrag.ttl",
   "Turtle"
 );
 
@@ -690,7 +690,7 @@ Este sistema maneja datos personales sensibles. **Cumplimiento obligatorio**:
 - `docs/01-competency-questions.md` - Preguntas de competencia
 - `docs/walkthrough.md` - Tutorial completo
 
-**Repositorio**: `/workspace/knowledge-graph/`
+**Repositorio**: `/workspace/ia/knowledge-graph/`
 
 ---
 

@@ -9,7 +9,7 @@ from pathlib import Path
 import sys
 
 # Agregar path del proyecto
-sys.path.append('/workspace/knowledge-graph')
+sys.path.append('/workspace/ia/knowledge-graph')
 
 from queries.graphrag_contact_system import ContactDeduplicator
 
@@ -26,7 +26,7 @@ def main():
     parser.add_argument(
         '--output',
         type=str,
-        default='/workspace/knowledge-graph/data/contacts/contacts_unified.csv',
+        default='/workspace/ia/knowledge-graph/data/contacts/contacts_unified.csv',
         help='Ruta de salida para contactos unificados'
     )
     parser.add_argument(

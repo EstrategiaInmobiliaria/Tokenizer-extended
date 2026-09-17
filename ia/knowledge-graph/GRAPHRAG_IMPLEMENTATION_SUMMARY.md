@@ -788,7 +788,7 @@ This system can serve as foundation for:
 - Sentence-BERT (paraphrase-multilingual-mpnet-base-v2)
 - Splink 3.9+
 
-**Repository**: `/workspace/knowledge-graph/`
+**Repository**: `/workspace/ia/knowledge-graph/`
 
 **Key Files**:
 - Implementation: `queries/graphrag_contact_system.py`

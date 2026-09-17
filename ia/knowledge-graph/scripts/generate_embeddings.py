@@ -12,7 +12,7 @@ import pickle
 from tqdm import tqdm
 import sys
 
-sys.path.append('/workspace/knowledge-graph')
+sys.path.append('/workspace/ia/knowledge-graph')
 from queries.graphrag_contact_system import ContactVectorSearch
 
 
@@ -185,13 +185,13 @@ def main():
     parser.add_argument(
         '--input',
         type=str,
-        default='/workspace/knowledge-graph/data/contacts/contacts_unified.csv',
+        default='/workspace/ia/knowledge-graph/data/contacts/contacts_unified.csv',
         help='CSV de contactos unificados'
     )
     parser.add_argument(
         '--output',
         type=str,
-        default='/workspace/knowledge-graph/data/embeddings',
+        default='/workspace/ia/knowledge-graph/data/embeddings',
         help='Directorio de salida para embeddings'
     )
     parser.add_argument(

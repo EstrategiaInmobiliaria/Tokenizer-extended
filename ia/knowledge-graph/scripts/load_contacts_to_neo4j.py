@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from tqdm import tqdm
 import sys
 
-sys.path.append('/workspace/knowledge-graph')
+sys.path.append('/workspace/ia/knowledge-graph')
 from queries.graphrag_contact_system import CommercialScoringEngine
 
 load_dotenv()

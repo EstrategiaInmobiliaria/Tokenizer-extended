@@ -286,7 +286,7 @@ class ContactETLPipeline:
     Pipeline maestro para ingesta de 45K contactos desde todas las fuentes
     """
     
-    def __init__(self, output_dir: str = '/workspace/knowledge-graph/data/contacts'):
+    def __init__(self, output_dir: str = '/workspace/ia/knowledge-graph/data/contacts'):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         
@@ -387,10 +387,10 @@ if __name__ == "__main__":
     
     # Configurar rutas a archivos fuente
     source_files = {
-        'vcard': '/workspace/knowledge-graph/data/sources/contacts.vcf',
-        'linkedin': '/workspace/knowledge-graph/data/sources/Connections.csv',
-        'twitter': '/workspace/knowledge-graph/data/sources/following.json',
-        'whatsapp': '/workspace/knowledge-graph/data/sources/whatsapp_contacts.csv'
+        'vcard': '/workspace/ia/knowledge-graph/data/sources/contacts.vcf',
+        'linkedin': '/workspace/ia/knowledge-graph/data/sources/Connections.csv',
+        'twitter': '/workspace/ia/knowledge-graph/data/sources/following.json',
+        'whatsapp': '/workspace/ia/knowledge-graph/data/sources/whatsapp_contacts.csv'
     }
     
     # Ejecutar pipeline

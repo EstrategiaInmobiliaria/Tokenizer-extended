@@ -197,7 +197,7 @@ auto:compartePlataforma a owl:TransitiveProperty .
 
 ```bash
 # 1. Clonar o navegar al directorio del proyecto
-cd /workspace/knowledge-graph
+cd /workspace/ia/knowledge-graph
 
 # 2. Iniciar servicios con Docker Compose
 docker-compose up -d
@@ -240,7 +240,7 @@ Deberías ver aproximadamente **800+ tripletas** cargadas.
 ### 2. Línea de Comandos (Python)
 
 ```bash
-cd /workspace/knowledge-graph/queries
+cd /workspace/ia/knowledge-graph/queries
 python3 execute-queries.py
 ```
 
@@ -432,7 +432,7 @@ Ambos patrones son equivalentes gracias a `owl:inverseOf`.
 ### Ejecutar Validación
 
 ```bash
-cd /workspace/knowledge-graph/validation
+cd /workspace/ia/knowledge-graph/validation
 python3 validate.py
 ```
 

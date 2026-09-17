@@ -159,7 +159,7 @@
 
 ```bash
 # 1. Navigate to project
-cd /workspace/knowledge-graph
+cd /workspace/ia/knowledge-graph
 
 # 2. Start services
 docker-compose up -d

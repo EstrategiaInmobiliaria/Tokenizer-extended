@@ -21,7 +21,7 @@ netstat -tulpn | grep -E '3030|8080|8888'
 ### Paso 2: Desplegar Sistema
 
 ```bash
-cd /workspace/knowledge-graph
+cd /workspace/ia/knowledge-graph
 
 # Iniciar contenedores (toma ~30 segundos)
 docker-compose up -d
@@ -108,7 +108,7 @@ ORDER BY DESC(?autonomia)"
 ## 📊 Ejecutar Todas las Consultas
 
 ```bash
-cd /workspace/knowledge-graph/queries
+cd /workspace/ia/knowledge-graph/queries
 
 # Instalar dependencias (primera vez)
 pip3 install -r ../requirements.txt
@@ -146,7 +146,7 @@ Average query time: 38.27ms
 ## ✅ Validar Datos con SHACL
 
 ```bash
-cd /workspace/knowledge-graph/validation
+cd /workspace/ia/knowledge-graph/validation
 
 # Instalar pyshacl (primera vez)
 pip3 install pyshacl rdflib

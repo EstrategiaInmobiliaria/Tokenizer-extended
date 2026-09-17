@@ -198,7 +198,7 @@ class NetworkMetricsCalculator:
                 print(f"   {i}. {record['nombre']} ({record['empresa']}) - "
                       f"{record['conexiones']} conexiones (Tier {record['tier']})")
     
-    def export_metrics(self, output_path='/workspace/knowledge-graph/data/network_metrics.csv'):
+    def export_metrics(self, output_path='/workspace/ia/knowledge-graph/data/network_metrics.csv'):
         """Exporta métricas a CSV para análisis"""
         
         print(f"\n💾 Exportando métricas a {output_path}...")
@@ -279,7 +279,7 @@ def main():
     parser.add_argument(
         '--export',
         type=str,
-        default='/workspace/knowledge-graph/data/network_metrics.csv',
+        default='/workspace/ia/knowledge-graph/data/network_metrics.csv',
         help='Ruta para exportar métricas'
     )
     
