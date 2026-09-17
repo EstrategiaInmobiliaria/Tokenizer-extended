@@ -20,7 +20,26 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict
 import uvicorn
+import numpy as np
 from datetime import datetime
+
+
+def _to_native(obj):
+    """Recursively convert numpy scalar/array types to native Python types.
+
+    The core financial/optimization modules return values backed by NumPy
+    (e.g. ``numpy.bool_``/``numpy.float64``), which Pydantic v2 cannot serialize
+    to JSON. Normalizing here keeps the API responses JSON-safe.
+    """
+    if isinstance(obj, dict):
+        return {key: _to_native(value) for key, value in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_to_native(item) for item in obj]
+    if isinstance(obj, np.ndarray):
+        return _to_native(obj.tolist())
+    if isinstance(obj, np.generic):
+        return obj.item()
+    return obj
 
 # Importar módulos core
 import sys
@@ -110,7 +129,7 @@ class DCFRequest(BaseModel):
     operating_costs: List[float]
     capex: List[float]
     taxes: List[float]
-    terminal_value_method: str = Field("perpetuity", regex="^(perpetuity|exit_multiple)$")
+    terminal_value_method: str = Field("perpetuity", pattern="^(perpetuity|exit_multiple)$")
     perpetual_growth_rate: float = Field(0.02, ge=0, le=0.1)
     exit_cap_rate: float = Field(0.08, ge=0, le=1)
     include_scenarios: bool = Field(False, description="Incluir análisis de escenarios")
@@ -290,7 +309,7 @@ async def calculate_wacc(request: WACCRequest):
         
         # Calcular WACC
         engine = WACCEngine(market, capital)
-        breakdown = engine.get_detailed_breakdown()
+        breakdown = _to_native(engine.get_detailed_breakdown())
         
         return WACCResponse(
             wacc=breakdown["wacc"],
@@ -353,12 +372,12 @@ async def analyze_dcf(request: DCFRequest):
         
         # Análisis DCF
         dcf = RealEstateDCF(assumptions, cash_flows, terminal_assumptions)
-        analysis = dcf.get_comprehensive_analysis()
+        analysis = _to_native(dcf.get_comprehensive_analysis())
         
         # Análisis de escenarios (opcional)
         scenarios_result = None
         if request.include_scenarios:
-            scenarios_result = scenario_analysis(dcf)
+            scenarios_result = _to_native(scenario_analysis(dcf))
         
         return DCFResponse(
             project_name=analysis["project_name"],
@@ -436,7 +455,7 @@ async def optimize_product_mix(request: OptimizationRequest):
             fixed_costs=request.fixed_costs
         )
         
-        result = optimizer.optimize_linear_programming()
+        result = _to_native(optimizer.optimize_linear_programming())
         
         return OptimizationResponse(**result)
         

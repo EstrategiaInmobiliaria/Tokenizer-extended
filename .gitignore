@@ -43,3 +43,5 @@ yarn-error.log*
 
 # hf
 public/hf
+# python virtualenv (Cloud Agent env)
+/.venv
