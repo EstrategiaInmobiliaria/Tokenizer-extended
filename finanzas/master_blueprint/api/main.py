@@ -110,7 +110,7 @@ class DCFRequest(BaseModel):
     operating_costs: List[float]
     capex: List[float]
     taxes: List[float]
-    terminal_value_method: str = Field("perpetuity", regex="^(perpetuity|exit_multiple)$")
+    terminal_value_method: str = Field("perpetuity", pattern="^(perpetuity|exit_multiple)$")
     perpetual_growth_rate: float = Field(0.02, ge=0, le=0.1)
     exit_cap_rate: float = Field(0.08, ge=0, le=1)
     include_scenarios: bool = Field(False, description="Incluir análisis de escenarios")
