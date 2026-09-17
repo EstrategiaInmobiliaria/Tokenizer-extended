@@ -1,0 +1,519 @@
+@prefix : <http://example.org/automotive#> .
+@prefix auto: <http://example.org/automotive#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# ============================================
+# INSTANCIAS - GRUPOS CORPORATIVOS
+# ============================================
+
+auto:GrupoVolkswagen
+    a auto:GrupoCorporativo ;
+    auto:nombreComercial "Volkswagen Group" ;
+    auto:paisOrigen "Alemania" ;
+    auto:añoFundacion 1937 ;
+    auto:urlOficial <https://www.volkswagenag.com> .
+
+auto:GrupoToyota
+    a auto:GrupoCorporativo ;
+    auto:nombreComercial "Toyota Motor Corporation" ;
+    auto:paisOrigen "Japón" ;
+    auto:añoFundacion 1937 ;
+    auto:urlOficial <https://www.toyota-global.com> .
+
+auto:GrupoStellantis
+    a auto:GrupoCorporativo ;
+    auto:nombreComercial "Stellantis N.V." ;
+    auto:paisOrigen "Países Bajos" ;
+    auto:añoFundacion 2021 ;
+    rdfs:comment "Fusión de Fiat Chrysler Automobiles y Groupe PSA"@es .
+
+auto:GrupoHyundai
+    a auto:GrupoCorporativo ;
+    auto:nombreComercial "Hyundai Motor Group" ;
+    auto:paisOrigen "Corea del Sur" ;
+    auto:añoFundacion 1967 .
+
+auto:GrupoBMW
+    a auto:GrupoCorporativo ;
+    auto:nombreComercial "BMW Group" ;
+    auto:paisOrigen "Alemania" ;
+    auto:añoFundacion 1916 .
+
+# ============================================
+# INSTANCIAS - MARCAS
+# ============================================
+
+auto:VolkswagenMarca
+    a auto:Marca, auto:Fabricante ;
+    auto:nombreComercial "Volkswagen" ;
+    auto:perteneceA auto:GrupoVolkswagen ;
+    auto:paisOrigen "Alemania" .
+
+auto:Audi
+    a auto:Marca, auto:Fabricante ;
+    auto:nombreComercial "Audi" ;
+    auto:perteneceA auto:GrupoVolkswagen ;
+    auto:paisOrigen "Alemania" .
+
+auto:Porsche
+    a auto:Marca, auto:Fabricante ;
+    auto:nombreComercial "Porsche" ;
+    auto:perteneceA auto:GrupoVolkswagen ;
+    auto:paisOrigen "Alemania" .
+
+auto:SEAT
+    a auto:Marca, auto:Fabricante ;
+    auto:nombreComercial "SEAT" ;
+    auto:perteneceA auto:GrupoVolkswagen ;
+    auto:paisOrigen "España" .
+
+auto:Skoda
+    a auto:Marca, auto:Fabricante ;
+    auto:nombreComercial "Škoda" ;
+    auto:perteneceA auto:GrupoVolkswagen ;
+    auto:paisOrigen "República Checa" .
+
+auto:Toyota
+    a auto:Marca, auto:Fabricante ;
+    auto:nombreComercial "Toyota" ;
+    auto:perteneceA auto:GrupoToyota ;
+    auto:paisOrigen "Japón" .
+
+auto:Lexus
+    a auto:Marca, auto:Fabricante ;
+    auto:nombreComercial "Lexus" ;
+    auto:perteneceA auto:GrupoToyota ;
+    auto:paisOrigen "Japón" .
+
+auto:Hyundai
+    a auto:Marca, auto:Fabricante ;
+    auto:nombreComercial "Hyundai" ;
+    auto:perteneceA auto:GrupoHyundai ;
+    auto:paisOrigen "Corea del Sur" .
+
+auto:Kia
+    a auto:Marca, auto:Fabricante ;
+    auto:nombreComercial "Kia" ;
+    auto:perteneceA auto:GrupoHyundai ;
+    auto:paisOrigen "Corea del Sur" .
+
+auto:BMW
+    a auto:Marca, auto:Fabricante ;
+    auto:nombreComercial "BMW" ;
+    auto:perteneceA auto:GrupoBMW ;
+    auto:paisOrigen "Alemania" .
+
+auto:MINI
+    a auto:Marca, auto:Fabricante ;
+    auto:nombreComercial "MINI" ;
+    auto:perteneceA auto:GrupoBMW ;
+    auto:paisOrigen "Reino Unido" .
+
+auto:Ford
+    a auto:Marca, auto:Fabricante ;
+    auto:nombreComercial "Ford Motor Company" ;
+    auto:paisOrigen "Estados Unidos" ;
+    auto:añoFundacion 1903 .
+
+auto:Tesla
+    a auto:Marca, auto:Fabricante ;
+    auto:nombreComercial "Tesla, Inc." ;
+    auto:paisOrigen "Estados Unidos" ;
+    auto:añoFundacion 2003 .
+
+# ============================================
+# INSTANCIAS - PROVEEDORES
+# ============================================
+
+auto:Bosch
+    a auto:Proveedor ;
+    auto:nombreComercial "Robert Bosch GmbH" ;
+    auto:paisOrigen "Alemania" ;
+    rdfs:comment "Proveedor Tier 1: sistemas de propulsión, electrónica, ADAS"@es .
+
+auto:CATL
+    a auto:Proveedor ;
+    auto:nombreComercial "Contemporary Amperex Technology Co. Limited" ;
+    auto:paisOrigen "China" ;
+    rdfs:comment "Mayor fabricante mundial de baterías para vehículos eléctricos"@es .
+
+auto:LGEnergySolution
+    a auto:Proveedor ;
+    auto:nombreComercial "LG Energy Solution" ;
+    auto:paisOrigen "Corea del Sur" .
+
+auto:Harman
+    a auto:Proveedor ;
+    auto:nombreComercial "Harman International" ;
+    auto:paisOrigen "Estados Unidos" ;
+    rdfs:comment "Sistemas de audio e infoentretenimiento"@es .
+
+auto:ZF
+    a auto:Proveedor ;
+    auto:nombreComercial "ZF Friedrichshafen AG" ;
+    auto:paisOrigen "Alemania" ;
+    rdfs:comment "Transmisiones y sistemas de dirección"@es .
+
+auto:Panasonic
+    a auto:Proveedor ;
+    auto:nombreComercial "Panasonic Corporation" ;
+    auto:paisOrigen "Japón" .
+
+# ============================================
+# INSTANCIAS - PLATAFORMAS TÉCNICAS
+# ============================================
+
+auto:PlataformaMQB
+    a auto:PlataformaTecnica ;
+    auto:nombreComercial "MQB (Modularer Querbaukasten)" ;
+    rdfs:label "MQB"@en ;
+    rdfs:comment "Plataforma modular transversal del Grupo Volkswagen"@es .
+
+auto:PlataformaTNGA
+    a auto:PlataformaTecnica ;
+    auto:nombreComercial "TNGA (Toyota New Global Architecture)" ;
+    rdfs:label "TNGA"@en .
+
+auto:PlataformaEGMP
+    a auto:PlataformaTecnica ;
+    auto:nombreComercial "E-GMP (Electric-Global Modular Platform)" ;
+    rdfs:label "E-GMP"@en ;
+    rdfs:comment "Plataforma eléctrica del Grupo Hyundai"@es .
+
+auto:PlataformaCMAR
+    a auto:PlataformaTecnica ;
+    auto:nombreComercial "CLAR (Cluster Architecture)" ;
+    rdfs:label "CLAR"@en ;
+    rdfs:comment "Plataforma modular de BMW"@es .
+
+# ============================================
+# INSTANCIAS - COMPONENTES
+# ============================================
+
+auto:BateriaCATL_NCM811
+    a auto:BateriaLitioIon ;
+    auto:nombreComercial "CATL NCM 811 Cell" ;
+    auto:suministradoPor auto:CATL ;
+    auto:capacidadBateriaKWh 82.0 ;
+    rdfs:comment "Celda con química Níquel-Cobalto-Manganeso en proporción 8:1:1"@es .
+
+auto:BateriaLG_NMC
+    a auto:BateriaLitioIon ;
+    auto:nombreComercial "LG NMC Battery Module" ;
+    auto:suministradoPor auto:LGEnergySolution ;
+    auto:capacidadBateriaKWh 77.4 .
+
+auto:BateriaPanasonic_2170
+    a auto:BateriaLitioIon ;
+    auto:nombreComercial "Panasonic 2170 Cell" ;
+    auto:suministradoPor auto:Panasonic ;
+    rdfs:comment "Celda 21700 usada en Tesla Model 3/Y"@es .
+
+auto:MotorEA888
+    a auto:MotorCombustion ;
+    auto:nombreComercial "EA888 Gen 4" ;
+    auto:cilindrada 2.0 ;
+    auto:potenciaHP 245 ;
+    rdfs:comment "Motor turbo 2.0L TSI del Grupo Volkswagen"@es .
+
+auto:TransmisionZF8HP
+    a auto:Transmision ;
+    auto:nombreComercial "ZF 8HP Automatic Transmission" ;
+    auto:suministradoPor auto:ZF ;
+    rdfs:comment "Transmisión automática de 8 velocidades"@es .
+
+auto:InfoHarmanKardon
+    a auto:SistemaInfoentretenimiento ;
+    auto:nombreComercial "Harman Kardon Premium Audio" ;
+    auto:suministradoPor auto:Harman .
+
+auto:SistemaADAS_Bosch
+    a auto:SistemaAsistenciaConduccion ;
+    auto:nombreComercial "Bosch Driving Assistance System" ;
+    auto:suministradoPor auto:Bosch ;
+    rdfs:comment "Incluye frenado de emergencia, control de crucero adaptativo, asistente de mantenimiento de carril"@es .
+
+# ============================================
+# INSTANCIAS - VEHÍCULOS TOYOTA
+# ============================================
+
+auto:ToyotaRAV4_2024
+    a auto:SUV, auto:VehiculoHibrido ;
+    auto:nombreComercial "Toyota RAV4 Hybrid 2024" ;
+    auto:codigoModelo "XA50" ;
+    auto:fabricadoPor auto:Toyota ;
+    auto:comercializadoBajo auto:Toyota ;
+    auto:compartePlataforma auto:PlataformaTNGA ;
+    auto:tienePropulsion auto:PropulsionHibrida ;
+    auto:tieneSistemaTraccion auto:TraccionIntegral ;
+    auto:añoLanzamiento 2024 ;
+    auto:potenciaHP 219 ;
+    auto:pesoKg 1715 ;
+    auto:numeroPlazas 5 ;
+    auto:precioBase 34500.00 ;
+    auto:emisionesCO2 102 ;
+    auto:aceleracion0a100 7.8 ;
+    auto:cumpleNormativa "Euro 6d-ISC-FCM", "EPA Tier 3 Bin 70" ;
+    auto:usaComponente auto:SistemaADAS_Bosch .
+
+auto:ToyotaRAV4Prime_2024
+    a auto:SUV, auto:VehiculoHibrido ;
+    auto:nombreComercial "Toyota RAV4 Prime 2024" ;
+    auto:codigoModelo "XA50 PHEV" ;
+    auto:fabricadoPor auto:Toyota ;
+    auto:comercializadoBajo auto:Toyota ;
+    auto:compartePlataforma auto:PlataformaTNGA ;
+    auto:tienePropulsion auto:PropulsionHibrida ;
+    auto:tieneSistemaTraccion auto:TraccionIntegral ;
+    auto:esVarianteDE auto:ToyotaRAV4_2024 ;
+    auto:añoLanzamiento 2024 ;
+    auto:potenciaHP 302 ;
+    auto:pesoKg 1935 ;
+    auto:numeroPlazas 5 ;
+    auto:precioBase 46800.00 ;
+    auto:capacidadBateriaKWh 18.1 ;
+    auto:autonomiaKm 75 ;
+    auto:emisionesCO2 22 ;
+    auto:aceleracion0a100 5.7 ;
+    auto:cumpleNormativa "Euro 6d-ISC-FCM" ;
+    rdfs:comment "Versión plug-in hybrid con 75 km de autonomía eléctrica"@es .
+
+auto:LexusRX450h_2024
+    a auto:SUV, auto:VehiculoHibrido ;
+    auto:nombreComercial "Lexus RX 450h+ 2024" ;
+    auto:codigoModelo "AL20" ;
+    auto:fabricadoPor auto:Lexus ;
+    auto:comercializadoBajo auto:Lexus ;
+    auto:compartePlataforma auto:PlataformaTNGA ;
+    auto:tienePropulsion auto:PropulsionHibrida ;
+    auto:tieneSistemaTraccion auto:TraccionIntegral ;
+    auto:añoLanzamiento 2023 ;
+    auto:potenciaHP 366 ;
+    auto:pesoKg 2160 ;
+    auto:numeroPlazas 5 ;
+    auto:precioBase 68500.00 ;
+    auto:capacidadBateriaKWh 18.1 ;
+    auto:autonomiaKm 65 ;
+    auto:aceleracion0a100 6.5 ;
+    auto:usaComponente auto:InfoHarmanKardon .
+
+# ============================================
+# INSTANCIAS - VEHÍCULOS VOLKSWAGEN GROUP
+# ============================================
+
+auto:VWGolf8_2023
+    a auto:Hatchback ;
+    auto:nombreComercial "Volkswagen Golf 8 GTI" ;
+    auto:codigoModelo "Mk8" ;
+    auto:fabricadoPor auto:VolkswagenMarca ;
+    auto:comercializadoBajo auto:VolkswagenMarca ;
+    auto:compartePlataforma auto:PlataformaMQB ;
+    auto:tienePropulsion auto:PropulsionGasolina ;
+    auto:tieneSistemaTraccion auto:TraccionDelantera ;
+    auto:añoLanzamiento 2020 ;
+    auto:potenciaHP 245 ;
+    auto:pesoKg 1470 ;
+    auto:numeroPlazas 5 ;
+    auto:precioBase 38000.00 ;
+    auto:emisionesCO2 158 ;
+    auto:aceleracion0a100 6.2 ;
+    auto:velocidadMaxima 250 ;
+    auto:usaComponente auto:MotorEA888 ;
+    auto:cumpleNormativa "Euro 6d-ISC-FCM" .
+
+auto:AudiA3_2023
+    a auto:Sedan ;
+    auto:nombreComercial "Audi A3 40 TFSI" ;
+    auto:codigoModelo "8Y" ;
+    auto:fabricadoPor auto:Audi ;
+    auto:comercializadoBajo auto:Audi ;
+    auto:compartePlataforma auto:PlataformaMQB ;
+    auto:tienePropulsion auto:PropulsionGasolina ;
+    auto:tieneSistemaTraccion auto:TraccionDelantera ;
+    auto:añoLanzamiento 2020 ;
+    auto:potenciaHP 190 ;
+    auto:pesoKg 1395 ;
+    auto:numeroPlazas 5 ;
+    auto:precioBase 36500.00 ;
+    auto:emisionesCO2 132 ;
+    auto:aceleracion0a100 7.3 ;
+    auto:usaComponente auto:MotorEA888 ;
+    auto:cumpleNormativa "Euro 6d" .
+
+auto:SEATLeon_2023
+    a auto:Hatchback ;
+    auto:nombreComercial "SEAT León FR" ;
+    auto:codigoModelo "KL" ;
+    auto:fabricadoPor auto:SEAT ;
+    auto:comercializadoBajo auto:SEAT ;
+    auto:compartePlataforma auto:PlataformaMQB ;
+    auto:tienePropulsion auto:PropulsionGasolina ;
+    auto:tieneSistemaTraccion auto:TraccionDelantera ;
+    auto:añoLanzamiento 2020 ;
+    auto:potenciaHP 150 ;
+    auto:pesoKg 1342 ;
+    auto:numeroPlazas 5 ;
+    auto:precioBase 28000.00 ;
+    auto:usaComponente auto:MotorEA888 ;
+    rdfs:comment "Hermano de plataforma MQB con Golf 8 y Audi A3"@es .
+
+auto:SkodaOctavia_2023
+    a auto:Sedan ;
+    auto:nombreComercial "Škoda Octavia RS" ;
+    auto:codigoModelo "NX" ;
+    auto:fabricadoPor auto:Skoda ;
+    auto:comercializadoBajo auto:Skoda ;
+    auto:compartePlataforma auto:PlataformaMQB ;
+    auto:tienePropulsion auto:PropulsionGasolina ;
+    auto:tieneSistemaTraccion auto:TraccionIntegral ;
+    auto:añoLanzamiento 2020 ;
+    auto:potenciaHP 245 ;
+    auto:pesoKg 1515 ;
+    auto:numeroPlazas 5 ;
+    auto:precioBase 42000.00 ;
+    auto:usaComponente auto:MotorEA888 .
+
+# ============================================
+# INSTANCIAS - VEHÍCULOS ELÉCTRICOS
+# ============================================
+
+auto:HyundaiIONIQ5_2024
+    a auto:SUV, auto:VehiculoElectrico ;
+    auto:nombreComercial "Hyundai IONIQ 5 Long Range AWD" ;
+    auto:fabricadoPor auto:Hyundai ;
+    auto:comercializadoBajo auto:Hyundai ;
+    auto:compartePlataforma auto:PlataformaEGMP ;
+    auto:tienePropulsion auto:PropulsionElectrica ;
+    auto:tieneSistemaTraccion auto:TraccionIntegral ;
+    auto:añoLanzamiento 2021 ;
+    auto:potenciaHP 320 ;
+    auto:pesoKg 2190 ;
+    auto:numeroPlazas 5 ;
+    auto:precioBase 52500.00 ;
+    auto:capacidadBateriaKWh 77.4 ;
+    auto:autonomiaKm 507 ;
+    auto:emisionesCO2 0 ;
+    auto:aceleracion0a100 5.2 ;
+    auto:velocidadMaxima 185 ;
+    auto:usaComponente auto:BateriaLG_NMC ;
+    auto:cumpleNormativa "Euro 6d" ;
+    rdfs:comment "Vehículo eléctrico con arquitectura de 800V para carga ultrarrápida"@es .
+
+auto:KiaEV6_2024
+    a auto:SUV, auto:VehiculoElectrico, auto:VehiculoLargaAutonomia ;
+    auto:nombreComercial "Kia EV6 GT-Line AWD" ;
+    auto:fabricadoPor auto:Kia ;
+    auto:comercializadoBajo auto:Kia ;
+    auto:compartePlataforma auto:PlataformaEGMP ;
+    auto:tienePropulsion auto:PropulsionElectrica ;
+    auto:tieneSistemaTraccion auto:TraccionIntegral ;
+    auto:añoLanzamiento 2021 ;
+    auto:potenciaHP 325 ;
+    auto:pesoKg 2185 ;
+    auto:numeroPlazas 5 ;
+    auto:precioBase 54900.00 ;
+    auto:capacidadBateriaKWh 77.4 ;
+    auto:autonomiaKm 528 ;
+    auto:emisionesCO2 0 ;
+    auto:aceleracion0a100 5.2 ;
+    auto:usaComponente auto:BateriaLG_NMC ;
+    rdfs:comment "Comparte plataforma E-GMP con Hyundai IONIQ 5"@es .
+
+auto:TeslaModel3LongRange_2024
+    a auto:Sedan, auto:VehiculoElectrico, auto:VehiculoLargaAutonomia ;
+    auto:nombreComercial "Tesla Model 3 Long Range AWD" ;
+    auto:fabricadoPor auto:Tesla ;
+    auto:comercializadoBajo auto:Tesla ;
+    auto:tienePropulsion auto:PropulsionElectrica ;
+    auto:tieneSistemaTraccion auto:TraccionIntegral ;
+    auto:añoLanzamiento 2023 ;
+    auto:potenciaHP 366 ;
+    auto:pesoKg 1844 ;
+    auto:numeroPlazas 5 ;
+    auto:precioBase 49990.00 ;
+    auto:capacidadBateriaKWh 82.0 ;
+    auto:autonomiaKm 629 ;
+    auto:emisionesCO2 0 ;
+    auto:aceleracion0a100 4.4 ;
+    auto:velocidadMaxima 201 ;
+    auto:usaComponente auto:BateriaPanasonic_2170 ;
+    rdfs:comment "Mayor autonomía WLTP de su segmento"@es .
+
+auto:TeslaModelY_2024
+    a auto:SUV, auto:VehiculoElectrico, auto:VehiculoLargaAutonomia ;
+    auto:nombreComercial "Tesla Model Y Long Range AWD" ;
+    auto:fabricadoPor auto:Tesla ;
+    auto:comercializadoBajo auto:Tesla ;
+    auto:tienePropulsion auto:PropulsionElectrica ;
+    auto:tieneSistemaTraccion auto:TraccionIntegral ;
+    auto:añoLanzamiento 2022 ;
+    auto:potenciaHP 378 ;
+    auto:pesoKg 1979 ;
+    auto:numeroPlazas 7 ;
+    auto:precioBase 54990.00 ;
+    auto:capacidadBateriaKWh 82.0 ;
+    auto:autonomiaKm 533 ;
+    auto:emisionesCO2 0 ;
+    auto:aceleracion0a100 5.0 ;
+    auto:usaComponente auto:BateriaPanasonic_2170 .
+
+auto:BMWIX3_2024
+    a auto:SUV, auto:VehiculoElectrico, auto:VehiculoLargaAutonomia ;
+    auto:nombreComercial "BMW iX3" ;
+    auto:codigoModelo "G08" ;
+    auto:fabricadoPor auto:BMW ;
+    auto:comercializadoBajo auto:BMW ;
+    auto:compartePlataforma auto:PlataformaCMAR ;
+    auto:tienePropulsion auto:PropulsionElectrica ;
+    auto:tieneSistemaTraccion auto:TraccionTrasera ;
+    auto:añoLanzamiento 2021 ;
+    auto:potenciaHP 286 ;
+    auto:pesoKg 2260 ;
+    auto:numeroPlazas 5 ;
+    auto:precioBase 68500.00 ;
+    auto:capacidadBateriaKWh 80.0 ;
+    auto:autonomiaKm 461 ;
+    auto:emisionesCO2 0 ;
+    auto:aceleracion0a100 6.8 ;
+    auto:usaComponente auto:BateriaCATL_NCM811 .
+
+# ============================================
+# INSTANCIAS - VEHÍCULOS DISCONTINUADOS
+# ============================================
+
+auto:FordFocus_2018
+    a auto:Hatchback ;
+    auto:nombreComercial "Ford Focus Mk4" ;
+    auto:codigoModelo "C519" ;
+    auto:fabricadoPor auto:Ford ;
+    auto:comercializadoBajo auto:Ford ;
+    auto:tienePropulsion auto:PropulsionGasolina ;
+    auto:añoLanzamiento 2018 ;
+    auto:añoDescontinuacion 2022 ;
+    auto:potenciaHP 150 ;
+    auto:numeroPlazas 5 ;
+    rdfs:comment "Discontinuado en Europa en 2022, descontinuado en EE.UU. en 2018"@es .
+
+# ============================================
+# JOINT VENTURES Y RELACIONES COLABORATIVAS
+# ============================================
+
+auto:Toyota auto:tieneJointVenture auto:BMW .
+auto:Toyota auto:tieneJointVenture auto:Lexus .
+
+# Joint venture real: BZ4X / Solterra
+# (Omitido por brevedad, pero sería instancia compartida)
+
+# ============================================
+# RELACIONES ADICIONALES - COMPATIBILIDAD DE COMPONENTES
+# ============================================
+
+auto:BateriaCATL_NCM811 auto:compatibleCon auto:BateriaLG_NMC .
+auto:MotorEA888 auto:compatibleCon auto:TransmisionZF8HP .
+
+# ============================================
+# FIN DE LOS DATOS DE INSTANCIAS
+# ============================================

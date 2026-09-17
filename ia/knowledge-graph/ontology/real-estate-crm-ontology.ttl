@@ -1,0 +1,633 @@
+@prefix crm: <http://example.org/realestate-crm#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# ============================================
+# ONTOLOGÍA CRM INMOBILIARIA
+# Prospección, Clasificación y Seguimiento de Leads
+# ============================================
+
+<http://example.org/realestate-crm>
+    a owl:Ontology ;
+    dcterms:title "Real Estate CRM Knowledge Graph Ontology"@es ;
+    dcterms:description "Ontología para clasificación inteligente de leads inmobiliarios, scoring predictivo y optimización de conversión"@es ;
+    dcterms:creator "Jaime Wilk - Estrategia Inmobiliaria" ;
+    dcterms:created "2026-08-19"^^xsd:date ;
+    owl:versionInfo "1.0.0" .
+
+# ============================================
+# JERARQUÍA DE CLASES - LEADS Y PROSPECTOS
+# ============================================
+
+crm:Lead
+    a owl:Class ;
+    rdfs:label "Lead"@es, "Prospect"@en ;
+    rdfs:comment "Prospecto potencial que ha mostrado interés en bienes raíces"@es .
+
+crm:HotLead
+    a owl:Class ;
+    rdfs:subClassOf crm:Lead ;
+    rdfs:label "Lead Caliente"@es, "Hot Lead"@en ;
+    rdfs:comment "Alta intención de compra en corto plazo (0-3 meses), presupuesto definido, financiamiento listo"@es ;
+    skos:definition "Score ≥ 80/100, urgencia alta, probabilidad conversión >60%"@en .
+
+crm:WarmLead
+    a owl:Class ;
+    rdfs:subClassOf crm:Lead ;
+    rdfs:label "Lead Tibio"@es, "Warm Lead"@en ;
+    rdfs:comment "Intención media, mediano plazo (3-12 meses), explorando opciones"@es ;
+    skos:definition "Score 50-79/100, urgencia media, probabilidad conversión 30-60%"@en .
+
+crm:ColdLead
+    a owl:Class ;
+    rdfs:subClassOf crm:Lead ;
+    rdfs:label "Lead Frío"@es, "Cold Lead"@en ;
+    rdfs:comment "Baja intención, largo plazo (>12 meses), investigación preliminar"@es ;
+    skos:definition "Score <50/100, urgencia baja, probabilidad conversión <30%"@en .
+
+crm:Cliente
+    a owl:Class ;
+    rdfs:label "Cliente"@es, "Customer"@en ;
+    rdfs:comment "Lead convertido que realizó una compra o renta"@es .
+
+crm:ClienteRecurrente
+    a owl:Class ;
+    rdfs:subClassOf crm:Cliente ;
+    rdfs:label "Cliente Recurrente"@es ;
+    rdfs:comment "Cliente que ha realizado múltiples transacciones o referidos"@es .
+
+# ============================================
+# CLASES - MOTIVACIÓN DE COMPRA
+# ============================================
+
+crm:MotivaciónCompra
+    a owl:Class ;
+    rdfs:label "Motivación de Compra"@es .
+
+crm:InversiónROI
+    a owl:Class ;
+    rdfs:subClassOf crm:MotivaciónCompra ;
+    rdfs:label "Inversión (ROI)"@es ;
+    rdfs:comment "Busca apreciación de capital o renta para generar ingreso pasivo"@es .
+
+crm:ViviendaPropia
+    a owl:Class ;
+    rdfs:subClassOf crm:MotivaciónCompra ;
+    rdfs:label "Vivienda Propia"@es ;
+    rdfs:comment "First-time buyer o upgrade de vivienda actual"@es .
+
+crm:PropiedadComercial
+    a owl:Class ;
+    rdfs:subClassOf crm:MotivaciónCompra ;
+    rdfs:label "Propiedad Comercial"@es ;
+    rdfs:comment "Local, oficina o bodega para negocio"@es .
+
+crm:RentaInmediata
+    a owl:Class ;
+    rdfs:subClassOf crm:MotivaciónCompra ;
+    rdfs:label "Renta Inmediata"@es ;
+    rdfs:comment "Necesita rentar en corto plazo (no compra)"@es .
+
+# ============================================
+# CLASES - MADUREZ FINANCIERA
+# ============================================
+
+crm:MadurezFinanciera
+    a owl:Class ;
+    rdfs:label "Madurez Financiera"@es .
+
+crm:FinanciamientoAprobado
+    a owl:Class ;
+    rdfs:subClassOf crm:MadurezFinanciera ;
+    rdfs:label "Financiamiento Aprobado"@es ;
+    rdfs:comment "Cuenta con pre-aprobación hipotecaria vigente"@es .
+
+crm:EnProceso
+    a owl:Class ;
+    rdfs:subClassOf crm:MadurezFinanciera ;
+    rdfs:label "En Proceso de Aprobación"@es ;
+    rdfs:comment "Trámite de crédito iniciado pero no finalizado"@es .
+
+crm:SinFinanciamiento
+    a owl:Class ;
+    rdfs:subClassOf crm:MadurezFinanciera ;
+    rdfs:label "Sin Financiamiento"@es ;
+    rdfs:comment "No ha iniciado proceso de aprobación hipotecaria"@es .
+
+crm:PagoContado
+    a owl:Class ;
+    rdfs:subClassOf crm:MadurezFinanciera ;
+    rdfs:label "Pago de Contado"@es ;
+    rdfs:comment "Tiene liquidez para comprar sin crédito"@es .
+
+# ============================================
+# CLASES - PROPIEDADES
+# ============================================
+
+crm:Propiedad
+    a owl:Class ;
+    rdfs:label "Propiedad"@es, "Property"@en ;
+    rdfs:comment "Bien inmueble disponible para venta o renta"@es .
+
+crm:Departamento
+    a owl:Class ;
+    rdfs:subClassOf crm:Propiedad ;
+    rdfs:label "Departamento"@es .
+
+crm:Casa
+    a owl:Class ;
+    rdfs:subClassOf crm:Propiedad ;
+    rdfs:label "Casa"@es .
+
+crm:Terreno
+    a owl:Class ;
+    rdfs:subClassOf crm:Propiedad ;
+    rdfs:label "Terreno"@es .
+
+crm:LocalComercial
+    a owl:Class ;
+    rdfs:subClassOf crm:Propiedad ;
+    rdfs:label "Local Comercial"@es .
+
+crm:Oficina
+    a owl:Class ;
+    rdfs:subClassOf crm:Propiedad ;
+    rdfs:label "Oficina"@es .
+
+# ============================================
+# CLASES - AGENTES Y CUENTAS
+# ============================================
+
+crm:Agente
+    a owl:Class ;
+    rdfs:label "Agente Inmobiliario"@es ;
+    rdfs:comment "Asesor que maneja leads y cierra ventas"@es .
+
+crm:Cuenta
+    a owl:Class ;
+    rdfs:label "Cuenta Comercial"@es ;
+    rdfs:comment "Entidad de negocio (persona física o moral)"@es .
+
+# ============================================
+# CLASES - INTERACCIONES Y EVENTOS
+# ============================================
+
+crm:Interacción
+    a owl:Class ;
+    rdfs:label "Interacción"@es ;
+    rdfs:comment "Punto de contacto entre lead y agente/sistema"@es .
+
+crm:LlamadaTelefónica
+    a owl:Class ;
+    rdfs:subClassOf crm:Interacción ;
+    rdfs:label "Llamada Telefónica"@es .
+
+crm:EmailEnviado
+    a owl:Class ;
+    rdfs:subClassOf crm:Interacción ;
+    rdfs:label "Email Enviado"@es .
+
+crm:MensajeWhatsApp
+    a owl:Class ;
+    rdfs:subClassOf crm:Interacción ;
+    rdfs:label "Mensaje WhatsApp"@es .
+
+crm:VisitaPropiedad
+    a owl:Class ;
+    rdfs:subClassOf crm:Interacción ;
+    rdfs:label "Visita a Propiedad"@es ;
+    rdfs:comment "Tour físico o virtual de inmueble"@es .
+
+crm:DescargaBrochure
+    a owl:Class ;
+    rdfs:subClassOf crm:Interacción ;
+    rdfs:label "Descarga de Brochure"@es .
+
+# ============================================
+# PROPIEDADES DE OBJETO - RELACIONES
+# ============================================
+
+crm:asignadoA
+    a owl:ObjectProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range crm:Agente ;
+    rdfs:label "asignado a"@es ;
+    rdfs:comment "Lead asignado a agente específico"@es .
+
+crm:gestionaPara
+    a owl:ObjectProperty ;
+    owl:inverseOf crm:asignadoA ;
+    rdfs:domain crm:Agente ;
+    rdfs:range crm:Lead ;
+    rdfs:label "gestiona para"@es .
+
+crm:perteneceACuenta
+    a owl:ObjectProperty ;
+    rdfs:domain crm:Agente ;
+    rdfs:range crm:Cuenta ;
+    rdfs:label "pertenece a cuenta"@es ;
+    rdfs:comment "Agente trabaja para cuenta comercial (Jaime Wilk, Estrategia Inmobiliaria, Agartha)"@es .
+
+crm:interesadoEn
+    a owl:ObjectProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range crm:Propiedad ;
+    rdfs:label "interesado en"@es ;
+    rdfs:comment "Lead ha mostrado interés en propiedad específica"@es .
+
+crm:visitóPropiedad
+    a owl:ObjectProperty ;
+    rdfs:subPropertyOf crm:interesadoEn ;
+    rdfs:domain crm:Lead ;
+    rdfs:range crm:Propiedad ;
+    rdfs:label "visitó propiedad"@es .
+
+crm:tieneMotivaciónexterna a owl:ObjectProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range crm:MotivaciónCompra ;
+    rdfs:label "tiene motivación"@es .
+
+crm:tieneMadurezFinanciera
+    a owl:ObjectProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range crm:MadurezFinanciera ;
+    rdfs:label "tiene madurez financiera"@es .
+
+crm:tuvoInteracción
+    a owl:ObjectProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range crm:Interacción ;
+    rdfs:label "tuvo interacción"@es .
+
+crm:realizóInteracción
+    a owl:ObjectProperty ;
+    rdfs:domain crm:Agente ;
+    rdfs:range crm:Interacción ;
+    rdfs:label "realizó interacción"@es .
+
+crm:leadSimilarA
+    a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range crm:Lead ;
+    rdfs:label "lead similar a"@es ;
+    rdfs:comment "Leads con perfiles comparables (misma zona, presupuesto, motivación)"@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - SCORING Y MÉTRICAS
+# ============================================
+
+crm:scoreTotal
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "score total"@es ;
+    rdfs:comment "Puntuación predictiva de conversión (0-100)"@es .
+
+crm:scoreIntención
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "score de intención"@es ;
+    rdfs:comment "Urgencia/seriedad de compra (0-100)"@es .
+
+crm:scorePresupuesto
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "score de presupuesto"@es ;
+    rdfs:comment "Capacidad financiera vs inventario disponible (0-100)"@es .
+
+crm:scoreEngagement
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "score de engagement"@es ;
+    rdfs:comment "Nivel de interacción con contenido y agente (0-100)"@es .
+
+crm:probabilidadConversión
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "probabilidad de conversión"@es ;
+    rdfs:comment "Probabilidad de cerrar venta en próximos 90 días (0-1)"@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - INFORMACIÓN PERSONAL
+# ============================================
+
+crm:nombreCompleto
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:string ;
+    rdfs:label "nombre completo"@es .
+
+crm:email
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:string ;
+    rdfs:label "email"@es .
+
+crm:teléfono
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:string ;
+    rdfs:label "teléfono"@es .
+
+crm:edadAproximada
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:integer ;
+    rdfs:label "edad aproximada"@es .
+
+crm:ocupación
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:string ;
+    rdfs:label "ocupación"@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - PRESUPUESTO Y FINANCIAMIENTO
+# ============================================
+
+crm:presupuestoMin
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "presupuesto mínimo (MXN)"@es .
+
+crm:presupuestoMax
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "presupuesto máximo (MXN)"@es .
+
+crm:engancheDisponible
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "enganche disponible (MXN)"@es .
+
+crm:porcentajeEnganche
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "porcentaje de enganche"@es ;
+    rdfs:comment "Porcentaje del precio que puede dar de enganche (0-100)"@es .
+
+crm:ingresoMensual
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "ingreso mensual (MXN)"@es .
+
+crm:scoreCrediticio
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:integer ;
+    rdfs:label "score crediticio"@es ;
+    rdfs:comment "Score Buró de Crédito (300-850)"@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - PREFERENCIAS DE PROPIEDAD
+# ============================================
+
+crm:zonaPreferida
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:string ;
+    rdfs:label "zona preferida"@es ;
+    rdfs:comment "Colonia, municipio o ciudad de interés"@es .
+
+crm:tipoPropiedad
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:string ;
+    rdfs:label "tipo de propiedad preferida"@es .
+
+crm:recámarasDeseadas
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:integer ;
+    rdfs:label "número de recámaras deseadas"@es .
+
+crm:m2Mínimos
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "metros cuadrados mínimos"@es .
+
+crm:amenidadesRequeridas
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:string ;
+    rdfs:label "amenidades requeridas"@es ;
+    rdfs:comment "Ej: alberca, gym, pet-friendly, balcón"@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - TEMPORALIDAD Y URGENCIA
+# ============================================
+
+crm:plazodeCompra
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:string ;
+    rdfs:label "plazo de compra"@es ;
+    rdfs:comment "0-3 meses / 3-6 meses / 6-12 meses / >12 meses"@es .
+
+crm:fechaPrimeraInteracción
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:date ;
+    rdfs:label "fecha de primera interacción"@es .
+
+crm:fechaÚltimaInteracción
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:date ;
+    rdfs:label "fecha de última interacción"@es .
+
+crm:díasDesdeÚltimoContacto
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:integer ;
+    rdfs:label "días desde último contacto"@es .
+
+crm:númeroInteracciones
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:integer ;
+    rdfs:label "número total de interacciones"@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - CANAL DE ORIGEN
+# ============================================
+
+crm:canalOrigen
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:string ;
+    rdfs:label "canal de origen"@es ;
+    rdfs:comment "Facebook Ads, Google Ads, Referido, Website, Inmuebles24, etc."@es .
+
+crm:campañaOrigen
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:string ;
+    rdfs:label "campaña de origen"@es .
+
+crm:referidoPor
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:string ;
+    rdfs:label "referido por"@es ;
+    rdfs:comment "Nombre del cliente que refirió este lead"@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - INFORMACIÓN DE PROPIEDAD
+# ============================================
+
+crm:precioVenta
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Propiedad ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "precio de venta (MXN)"@es .
+
+crm:precioRenta
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Propiedad ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "precio de renta mensual (MXN)"@es .
+
+crm:ubicación
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Propiedad ;
+    rdfs:range xsd:string ;
+    rdfs:label "ubicación"@es .
+
+crm:m2Construidos
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Propiedad ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "m² construidos"@es .
+
+crm:m2Terreno
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Propiedad ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "m² de terreno"@es .
+
+crm:recámaras
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Propiedad ;
+    rdfs:range xsd:integer ;
+    rdfs:label "número de recámaras"@es .
+
+crm:baños
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Propiedad ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "número de baños"@es .
+
+crm:estacionamientos
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Propiedad ;
+    rdfs:range xsd:integer ;
+    rdfs:label "número de estacionamientos"@es .
+
+crm:disponible
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Propiedad ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "disponible"@es .
+
+# ============================================
+# PROPIEDADES DE DATOS - VECTOR EMBEDDINGS (PARA INDEXACIÓN)
+# ============================================
+
+crm:vectorEmbedding
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range xsd:string ;
+    rdfs:label "vector embedding"@es ;
+    rdfs:comment "Representación vectorial del lead (768 dimensiones, formato JSON)"@es .
+
+crm:vectorPropiedad
+    a owl:DatatypeProperty ;
+    rdfs:domain crm:Propiedad ;
+    rdfs:range xsd:string ;
+    rdfs:label "vector de propiedad"@es ;
+    rdfs:comment "Representación vectorial de características de propiedad"@es .
+
+# ============================================
+# AXIOMAS Y REGLAS DE RESTRICCIÓN
+# ============================================
+
+# Restricción: Todo lead debe tener nombre y al menos un contacto
+crm:Lead
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty crm:nombreCompleto ;
+        owl:minCardinality 1
+    ] ;
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty crm:email ;
+        owl:minCardinality 1
+    ] .
+
+# Restricción: Hot leads deben tener score >= 80
+crm:HotLead
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty crm:scoreTotal ;
+        owl:minInclusive 80
+    ] .
+
+# Restricción: Leads con madurez financiera deben tener presupuesto
+crm:Lead
+    rdfs:subClassOf [
+        a owl:Restriction ;
+        owl:onProperty crm:presupuestoMax ;
+        owl:minCardinality 1
+    ] .
+
+# ============================================
+# CLASES ENUMERADAS
+# ============================================
+
+crm:EstatusProceso
+    a owl:Class ;
+    owl:oneOf (crm:EstatusNuevo crm:EstatusContactado crm:EstatusCalificado 
+               crm:EstatusNegociación crm:EstatusCerrado crm:EstatusPerdido) .
+
+crm:EstatusNuevo a owl:NamedIndividual, crm:EstatusProceso ;
+    rdfs:label "Nuevo"@es .
+
+crm:EstatusContactado a owl:NamedIndividual, crm:EstatusProceso ;
+    rdfs:label "Contactado"@es .
+
+crm:EstatusCalificado a owl:NamedIndividual, crm:EstatusProceso ;
+    rdfs:label "Calificado"@es .
+
+crm:EstatusNegociación a owl:NamedIndividual, crm:EstatusProceso ;
+    rdfs:label "En Negociación"@es .
+
+crm:EstatusCerrado a owl:NamedIndividual, crm:EstatusProceso ;
+    rdfs:label "Cerrado/Ganado"@es .
+
+crm:EstatusPerdido a owl:NamedIndividual, crm:EstatusProceso ;
+    rdfs:label "Perdido"@es .
+
+crm:tieneEstatus
+    a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:domain crm:Lead ;
+    rdfs:range crm:EstatusProceso ;
+    rdfs:label "tiene estatus"@es .
+
+# ============================================
+# FIN DE LA ONTOLOGÍA
+# ============================================

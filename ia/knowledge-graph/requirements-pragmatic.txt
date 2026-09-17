@@ -1,0 +1,14 @@
+# GraphRAG Pragmático - Dependencies Mínimas
+# Sistema completo VCF → Kùzu en 3 semanas
+
+# Core (obligatorio)
+kuzu==0.1.0                    # Graph database embebido
+pandas==2.1.3                  # Manipulación de datos
+vobject==0.9.7                 # Parser VCF
+openai==1.6.1                  # GPT-4o-mini clasificación
+tqdm==4.66.1                   # Progress bars
+python-dotenv==1.0.0           # Environment variables
+
+# Optional (para funciones avanzadas)
+# splink==3.9.12               # Deduplicación (solo si >10K contactos)
+# jupyter==1.0.0               # Para notebooks de análisis

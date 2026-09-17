@@ -1,0 +1,55 @@
+# Apache Jena Fuseki Configuration for Automotive Knowledge Graph
+# This configuration sets up a triplestore with OWL reasoning capabilities
+
+@prefix fuseki:  <http://jena.apache.org/fuseki#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix tdb2:    <http://jena.apache.org/2016/tdb#> .
+@prefix ja:      <http://jena.hpl.hp.com/2005/11/Assembler#> .
+@prefix :        <#> .
+
+## ---------------------------------------------------------------
+## Service endpoint: /automotive
+
+:service_automotive rdf:type fuseki:Service ;
+    fuseki:name                       "automotive" ;
+    fuseki:serviceQuery               "query" ;
+    fuseki:serviceQuery               "sparql" ;
+    fuseki:serviceUpdate              "update" ;
+    fuseki:serviceUpload              "upload" ;
+    fuseki:serviceReadWriteGraphStore "data" ;
+    fuseki:dataset                    :automotive_dataset .
+
+## ---------------------------------------------------------------
+## TDB2 Dataset with Inference
+
+:automotive_dataset rdf:type ja:RDFDataset ;
+    ja:defaultGraph :automotive_inf_model .
+
+## Base TDB2 storage
+:tdb_dataset_readwrite rdf:type tdb2:DatasetTDB2 ;
+    tdb2:location "/fuseki/databases/automotive" ;
+    tdb2:unionDefaultGraph true .
+
+## Inference Model with OWL reasoning
+:automotive_inf_model rdf:type ja:InfModel ;
+    ja:baseModel :tdb_graph ;
+    ja:reasoner [
+        ja:reasonerURL <http://jena.hpl.hp.com/2003/OWLFBRuleReasoner>
+    ] .
+
+## Base graph from TDB2
+:tdb_graph rdf:type tdb2:GraphTDB2 ;
+    tdb2:dataset :tdb_dataset_readwrite .
+
+## ---------------------------------------------------------------
+## Alternative: GraphDB-Free Configuration (If using GraphDB)
+## Uncomment and configure connection parameters
+
+# :automotive_graphdb rdf:type ja:RDFDataset ;
+#     ja:defaultGraph :graphdb_model .
+#
+# :graphdb_model rdf:type ja:Model ;
+#     ja:content [
+#         ja:externalContent <http://localhost:7200/repositories/automotive>
+#     ] .

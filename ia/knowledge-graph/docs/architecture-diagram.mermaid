@@ -1,0 +1,49 @@
+---
+title: "Automotive Knowledge Graph - Architecture"
+---
+graph TB
+    subgraph Presentation["🎨 Presentation Layer"]
+        YASGUI["YASGUI<br/>Web Interface<br/>:8080"]
+        Jupyter["Jupyter Lab<br/>Notebooks<br/>:8888"]
+        Python["Python API<br/>RDFLib"]
+    end
+    
+    subgraph Query["🔍 Query Layer"]
+        SPARQL["SPARQL Endpoint<br/>HTTP REST API<br/>:3030/automotive"]
+    end
+    
+    subgraph Reasoning["🧠 Reasoning Layer"]
+        Reasoner["OWL Reasoner<br/>Jena OWLFBRuleReasoner"]
+        InferenceRules["Inference Rules:<br/>• Subclass hierarchy<br/>• Inverse properties<br/>• Transitivity<br/>• Symmetry"]
+    end
+    
+    subgraph Storage["💾 Storage Layer"]
+        TDB["Apache Jena TDB2<br/>Native RDF Store<br/>800+ triples"]
+        OntoGraph["Ontology Graph<br/>automotive-ontology.ttl"]
+        DataGraph["Data Graph<br/>automotive-instances.ttl"]
+    end
+    
+    subgraph Validation["✅ Validation Layer"]
+        SHACL["SHACL Engine<br/>pyshacl"]
+        Shapes["13 Constraint Shapes:<br/>• Cardinality rules<br/>• Range validations<br/>• Business logic"]
+    end
+    
+    YASGUI -->|HTTP POST| SPARQL
+    Jupyter -->|SPARQLWrapper| SPARQL
+    Python -->|RDFLib| TDB
+    
+    SPARQL -->|Query + Inference| Reasoner
+    Reasoner -->|Pattern Match| TDB
+    Reasoner -.-|Uses| InferenceRules
+    
+    TDB -->|Contains| OntoGraph
+    TDB -->|Contains| DataGraph
+    
+    SHACL -->|Validates| TDB
+    SHACL -.-|Uses| Shapes
+    
+    style Presentation fill:#e1f5ff
+    style Query fill:#fff3e0
+    style Reasoning fill:#f3e5f5
+    style Storage fill:#e8f5e9
+    style Validation fill:#fff9c4
