@@ -1,0 +1,278 @@
+{
+  "name": "WhatsApp Voice Notes → Kùzu Graph",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "whatsapp-webhook",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-whatsapp",
+      "name": "WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "whatsapp-contact-update"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.message.type}}",
+              "operation": "equals",
+              "value2": "audio"
+            }
+          ]
+        }
+      },
+      "id": "filter-audio",
+      "name": "Filter Audio Messages",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "model": "whisper-1",
+        "fileId": "={{$json.message.audio.url}}",
+        "options": {
+          "language": "es"
+        }
+      },
+      "id": "transcribe-audio",
+      "name": "Transcribe with Whisper",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [650, 250],
+      "credentials": {
+        "openAiApi": {
+          "id": "1",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Eres un asistente que extrae información estructurada de notas de voz sobre reuniones de negocios.\n\nExtrae:\n- nombre_contacto: Nombre completo\n- empresa: Empresa donde trabaja\n- puesto: Cargo/puesto\n- tema: Tema de conversación (Inmobiliario, ESG, Manufactura, etc.)\n- zona: Ciudad/ubicación\n- contexto: Resumen de la conversación\n- accion_sugerida: Siguiente paso recomendado\n- urgencia: alta, media, baja\n\nResponde SOLO con JSON válido."
+            },
+            {
+              "role": "user",
+              "content": "Nota de voz transcrita:\n\n={{$json.transcription}}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.1,
+          "response_format": "json_object"
+        }
+      },
+      "id": "extract-info",
+      "name": "Extract Contact Info (GPT-4o-mini)",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [850, 250],
+      "credentials": {
+        "openAiApi": {
+          "id": "1",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "MATCH (p:Persona {nombre: $nombre})\nSET p.empresa = $empresa,\n    p.puesto = $puesto,\n    p.tema = $tema,\n    p.zona = $zona,\n    p.notas = COALESCE(p.notas, '') + '\\n[' + $fecha + '] ' + $contexto,\n    p.ultima_interaccion = $fecha\nRETURN p",
+        "parameters": {
+          "values": [
+            {
+              "name": "nombre",
+              "value": "={{$json.nombre_contacto}}"
+            },
+            {
+              "name": "empresa",
+              "value": "={{$json.empresa}}"
+            },
+            {
+              "name": "puesto",
+              "value": "={{$json.puesto}}"
+            },
+            {
+              "name": "tema",
+              "value": "={{$json.tema}}"
+            },
+            {
+              "name": "zona",
+              "value": "={{$json.zona}}"
+            },
+            {
+              "name": "contexto",
+              "value": "={{$json.contexto}}"
+            },
+            {
+              "name": "fecha",
+              "value": "={{$now.toISO()}}"
+            }
+          ]
+        }
+      },
+      "id": "update-kuzu",
+      "name": "Update Kùzu Graph",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1050, 250],
+      "credentials": {
+        "postgres": {
+          "id": "2",
+          "name": "Kùzu (via Postgres)"
+        }
+      },
+      "notes": "Note: Kùzu doesn't have native n8n node, use Postgres connector or HTTP API"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.urgencia}}",
+              "operation": "equals",
+              "value2": "alta"
+            }
+          ]
+        }
+      },
+      "id": "check-urgency",
+      "name": "Check Urgency",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1250, 250]
+    },
+    {
+      "parameters": {
+        "to": "+525512345678",
+        "message": "🔥 ACCIÓN URGENTE:\n\nContacto: {{$json.nombre_contacto}}\nEmpresa: {{$json.empresa}}\n\n✅ Acción sugerida:\n{{$json.accion_sugerida}}\n\n📝 Contexto:\n{{$json.contexto}}"
+      },
+      "id": "notify-urgent",
+      "name": "Notify Urgent Action",
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [1450, 200],
+      "credentials": {
+        "twilioApi": {
+          "id": "3",
+          "name": "Twilio"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"success\", \"contact\": $json.nombre_contacto, \"action\": $json.accion_sugerida } }}"
+      },
+      "id": "response-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1450, 350]
+    }
+  ],
+  "connections": {
+    "WhatsApp Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter Audio Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Audio Messages": {
+      "main": [
+        [
+          {
+            "node": "Transcribe with Whisper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe with Whisper": {
+      "main": [
+        [
+          {
+            "node": "Extract Contact Info (GPT-4o-mini)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Contact Info (GPT-4o-mini)": {
+      "main": [
+        [
+          {
+            "node": "Update Kùzu Graph",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Kùzu Graph": {
+      "main": [
+        [
+          {
+            "node": "Check Urgency",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Urgency": {
+      "main": [
+        [
+          {
+            "node": "Notify Urgent Action",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Urgent Action": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-08-19T12:57:00.000Z",
+  "versionId": "1"
+}

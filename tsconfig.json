@@ -29,5 +29,12 @@
     "**/*.cjs",
     "**/*.mjs"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "finanzas",
+    "inmobiliaria",
+    "ingenieria",
+    "docencia",
+    "ia"
+  ]
 }

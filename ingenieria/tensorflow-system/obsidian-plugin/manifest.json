@@ -1,0 +1,10 @@
+{
+  "id": "tensorflow-intelligence-sync",
+  "name": "TensorFlow Intelligence Sync",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Sincroniza decisiones y aprendizajes del Sistema de Inteligencia TensorFlow con tu Obsidian Vault",
+  "author": "TensorFlow Intelligence System",
+  "authorUrl": "https://github.com/tensorflow-intelligence",
+  "isDesktopOnly": false
+}

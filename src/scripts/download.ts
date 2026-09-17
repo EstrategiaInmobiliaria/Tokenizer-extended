@@ -21,26 +21,40 @@ async function download() {
         continue;
       }
 
-      // eg https://huggingface.co/codellama/CodeLlama-7b-hf/resolve/main/tokenizer.json
-      const res = await fetch(
-        `https://huggingface.co/${orgId}/${modelId}/resolve/${encodeURIComponent(
-          rev
-        )}/${file}`,
-        {
-          headers: {
-            Authorization: `Bearer ${env.HF_API_KEY}`,
-            ContentType: "application/json",
-          },
+      try {
+        // eg https://huggingface.co/codellama/CodeLlama-7b-hf/resolve/main/tokenizer.json
+        const headers: Record<string, string> = {
+          ContentType: "application/json",
+        };
+        
+        if (env.HF_API_KEY) {
+          headers.Authorization = `Bearer ${env.HF_API_KEY}`;
         }
-      );
 
-      if (!res.ok) {
-        throw new Error(`Failed to fetch ${file} for ${modelName}`);
+        const res = await fetch(
+          `https://huggingface.co/${orgId}/${modelId}/resolve/${encodeURIComponent(
+            rev
+          )}/${file}`,
+          { headers }
+        );
+
+        if (!res.ok) {
+          console.warn(
+            `Warning: Failed to fetch ${file} for ${modelName} (HTTP ${res.status}). This model may require authentication or may not be publicly accessible. Skipping...`
+          );
+          continue;
+        }
+
+        await fs.mkdir(targetDir, { recursive: true });
+        console.log("Writing to", targetPath);
+        await fs.writeFile(targetPath, await res.text());
+      } catch (error) {
+        console.warn(
+          `Warning: Failed to download ${file} for ${modelName}:`,
+          error instanceof Error ? error.message : String(error),
+          "Skipping..."
+        );
       }
-
-      await fs.mkdir(targetDir, { recursive: true });
-      console.log("Writing to", targetPath);
-      await fs.writeFile(targetPath, await res.text());
     }
   }
 }

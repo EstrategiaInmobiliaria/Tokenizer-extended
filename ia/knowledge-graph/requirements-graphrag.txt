@@ -1,0 +1,31 @@
+# GraphRAG Contact Network - ETL Pipeline
+# Pipeline completo de ingesta de 45K contactos desde múltiples fuentes
+
+# Instalación de dependencias
+pip install pandas numpy splink faiss-cpu sentence-transformers networkx neo4j py2neo python-dotenv vobject linkedin-api tweepy
+
+# Para búsqueda vectorial con GPU (opcional, si disponible)
+# pip install faiss-gpu
+
+# Para base de datos vectorial persistente (alternativa a FAISS)
+pip install pgvector psycopg2-binary
+
+# Para Neo4j Graph Data Science (algoritmos de grafo)
+# Instalar Neo4j Desktop y el plugin GDS
+# https://neo4j.com/download/
+
+# Para WhatsApp Business API
+pip install twilio
+
+# Para procesamiento de vCard
+pip install vobject
+
+# Para scraping LinkedIn (uso limitado, respetar rate limits)
+pip install linkedin-api
+
+# Versiones recomendadas:
+# splink==3.9.12
+# faiss-cpu==1.7.4
+# sentence-transformers==2.2.2
+# neo4j==5.14.1
+# pandas==2.1.3

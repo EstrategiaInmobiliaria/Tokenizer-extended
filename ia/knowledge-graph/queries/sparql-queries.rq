@@ -1,0 +1,448 @@
+# SPARQL Queries - Automotive Knowledge Graph
+# Queries organized by Competency Question Categories
+
+## ============================================
+## CATEGORÍA A: JERARQUÍA Y RELACIONES CORPORATIVAS
+## ============================================
+
+## CQ-A1: ¿Qué marcas pertenecen a un grupo corporativo específico?
+## Ejemplo: Grupo Volkswagen
+
+PREFIX auto: <http://example.org/automotive#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?marca ?nombreMarca ?paisOrigen
+WHERE {
+  ?marca auto:perteneceA auto:GrupoVolkswagen ;
+         auto:nombreComercial ?nombreMarca .
+  OPTIONAL { ?marca auto:paisOrigen ?paisOrigen }
+}
+ORDER BY ?nombreMarca
+
+## ============================================
+
+## CQ-A2: ¿Qué empresas fabrican vehículos híbridos?
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT DISTINCT ?fabricante ?nombreFabricante (COUNT(?vehiculo) as ?numModelos)
+WHERE {
+  ?vehiculo a auto:VehiculoHibrido ;
+            auto:fabricadoPor ?fabricante .
+  ?fabricante auto:nombreComercial ?nombreFabricante .
+}
+GROUP BY ?fabricante ?nombreFabricante
+ORDER BY DESC(?numModelos)
+
+## ============================================
+
+## CQ-A3: ¿Qué empresas tienen joint ventures entre sí?
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?empresa1 ?nombre1 ?empresa2 ?nombre2
+WHERE {
+  ?empresa1 auto:tieneJointVenture ?empresa2 ;
+            auto:nombreComercial ?nombre1 .
+  ?empresa2 auto:nombreComercial ?nombre2 .
+  FILTER(STR(?empresa1) < STR(?empresa2))  # Evitar duplicados por simetría
+}
+
+## ============================================
+## CATEGORÍA B: TAXONOMÍA DE VEHÍCULOS
+## ============================================
+
+## CQ-B1: ¿Qué modelos SUV fueron lanzados después de 2020?
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?vehiculo ?nombre ?fabricante ?año ?precio
+WHERE {
+  ?vehiculo a auto:SUV ;
+            auto:nombreComercial ?nombre ;
+            auto:fabricadoPor ?fabUri ;
+            auto:añoLanzamiento ?año .
+  ?fabUri auto:nombreComercial ?fabricante .
+  OPTIONAL { ?vehiculo auto:precioBase ?precio }
+  FILTER(?año > 2020)
+}
+ORDER BY DESC(?año) ?nombre
+
+## ============================================
+
+## CQ-B2: ¿Cuáles son todos los vehículos eléctricos ordenados por autonomía?
+
+PREFIX auto: <http://example.org/automotive#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT ?vehiculo ?nombre ?fabricante ?autonomia ?capacidadBateria ?precio
+WHERE {
+  ?vehiculo rdf:type/rdfs:subClassOf* auto:VehiculoElectrico ;
+            auto:nombreComercial ?nombre ;
+            auto:autonomiaKm ?autonomia ;
+            auto:fabricadoPor ?fabUri .
+  ?fabUri auto:nombreComercial ?fabricante .
+  OPTIONAL { ?vehiculo auto:capacidadBateriaKWh ?capacidadBateria }
+  OPTIONAL { ?vehiculo auto:precioBase ?precio }
+}
+ORDER BY DESC(?autonomia)
+
+## ============================================
+
+## CQ-B3: ¿Qué vehículos comparten la misma plataforma técnica?
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?plataforma ?nombrePlataforma 
+       (GROUP_CONCAT(DISTINCT ?nombreVehiculo; separator=", ") as ?vehiculos)
+       (COUNT(DISTINCT ?vehiculo) as ?numVehiculos)
+WHERE {
+  ?plataforma a auto:PlataformaTecnica ;
+              auto:nombreComercial ?nombrePlataforma .
+  ?vehiculo auto:compartePlataforma ?plataforma ;
+            auto:nombreComercial ?nombreVehiculo .
+}
+GROUP BY ?plataforma ?nombrePlataforma
+HAVING (COUNT(DISTINCT ?vehiculo) > 1)
+ORDER BY DESC(?numVehiculos)
+
+## ============================================
+## CATEGORÍA C: COMPONENTES Y PROVEEDORES
+## ============================================
+
+## CQ-C1: ¿Qué fabricantes utilizan baterías del proveedor CATL?
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT DISTINCT ?vehiculo ?nombreVehiculo ?fabricante ?bateria
+WHERE {
+  ?bateria auto:suministradoPor auto:CATL .
+  ?vehiculo auto:usaComponente ?bateria ;
+            auto:nombreComercial ?nombreVehiculo ;
+            auto:fabricadoPor ?fabUri .
+  ?fabUri auto:nombreComercial ?fabricante .
+}
+ORDER BY ?fabricante ?nombreVehiculo
+
+## ============================================
+
+## CQ-C2: ¿Qué componentes son compartidos entre modelos de diferentes marcas?
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?componente ?nombreComponente 
+       (COUNT(DISTINCT ?marca) as ?numMarcas)
+       (GROUP_CONCAT(DISTINCT ?nombreMarca; separator=", ") as ?marcas)
+WHERE {
+  ?vehiculo auto:usaComponente ?componente ;
+            auto:comercializadoBajo ?marca .
+  ?marca auto:nombreComercial ?nombreMarca .
+  ?componente auto:nombreComercial ?nombreComponente .
+}
+GROUP BY ?componente ?nombreComponente
+HAVING (COUNT(DISTINCT ?marca) > 1)
+ORDER BY DESC(?numMarcas)
+
+## ============================================
+
+## CQ-C3: ¿Qué proveedores suministran a más fabricantes diferentes?
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?proveedor ?nombreProveedor 
+       (COUNT(DISTINCT ?fabricante) as ?numFabricantes)
+       (COUNT(DISTINCT ?componente) as ?numComponentes)
+WHERE {
+  ?componente auto:suministradoPor ?proveedor .
+  ?vehiculo auto:usaComponente ?componente ;
+            auto:fabricadoPor ?fabricante .
+  ?proveedor auto:nombreComercial ?nombreProveedor .
+}
+GROUP BY ?proveedor ?nombreProveedor
+ORDER BY DESC(?numFabricantes)
+
+## ============================================
+## CATEGORÍA D: ESPECIFICACIONES TÉCNICAS
+## ============================================
+
+## CQ-D1: ¿Qué vehículos tienen más de 300 HP y tracción integral?
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?vehiculo ?nombre ?fabricante ?potencia ?aceleracion ?precio
+WHERE {
+  ?vehiculo auto:nombreComercial ?nombre ;
+            auto:potenciaHP ?potencia ;
+            auto:tieneSistemaTraccion auto:TraccionIntegral ;
+            auto:fabricadoPor ?fabUri .
+  ?fabUri auto:nombreComercial ?fabricante .
+  OPTIONAL { ?vehiculo auto:aceleracion0a100 ?aceleracion }
+  OPTIONAL { ?vehiculo auto:precioBase ?precio }
+  FILTER(?potencia > 300)
+}
+ORDER BY DESC(?potencia)
+
+## ============================================
+
+## CQ-D2: ¿Cuál es la relación peso/potencia promedio por tipo de vehículo?
+
+PREFIX auto: <http://example.org/automotive#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT ?tipo 
+       (COUNT(?vehiculo) as ?cantidad)
+       (AVG(?peso) as ?pesoPromedio)
+       (AVG(?potencia) as ?potenciaPromedio)
+       (AVG(?peso / ?potencia) as ?relacionPesoPotencia)
+WHERE {
+  ?vehiculo a ?tipo ;
+            auto:pesoKg ?peso ;
+            auto:potenciaHP ?potencia .
+  FILTER(?tipo IN (auto:SUV, auto:Sedan, auto:Hatchback, auto:Pickup))
+}
+GROUP BY ?tipo
+ORDER BY ?relacionPesoPotencia
+
+## ============================================
+
+## CQ-D3: ¿Qué modelos cumplen con la norma Euro 6d?
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?vehiculo ?nombre ?fabricante ?emisiones ?normativas
+WHERE {
+  ?vehiculo auto:nombreComercial ?nombre ;
+            auto:cumpleNormativa ?normativas ;
+            auto:fabricadoPor ?fabUri .
+  ?fabUri auto:nombreComercial ?fabricante .
+  OPTIONAL { ?vehiculo auto:emisionesCO2 ?emisiones }
+  FILTER(CONTAINS(?normativas, "Euro 6d"))
+}
+ORDER BY ?emisiones
+
+## ============================================
+## CATEGORÍA E: EVOLUCIÓN TEMPORAL Y MERCADO
+## ============================================
+
+## CQ-E1: ¿Cuántos modelos nuevos lanzó cada fabricante en 2023?
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?fabricante ?nombreFabricante (COUNT(?vehiculo) as ?modelosLanzados)
+WHERE {
+  ?vehiculo auto:añoLanzamiento 2023 ;
+            auto:fabricadoPor ?fabricante .
+  ?fabricante auto:nombreComercial ?nombreFabricante .
+}
+GROUP BY ?fabricante ?nombreFabricante
+ORDER BY DESC(?modelosLanzados)
+
+## ============================================
+
+## CQ-E2: ¿Qué vehículos han sido discontinuados en los últimos 3 años?
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?vehiculo ?nombre ?fabricante ?añoLanzamiento ?añoDescontinuacion
+WHERE {
+  ?vehiculo auto:nombreComercial ?nombre ;
+            auto:añoDescontinuacion ?añoDescontinuacion ;
+            auto:añoLanzamiento ?añoLanzamiento ;
+            auto:fabricadoPor ?fabUri .
+  ?fabUri auto:nombreComercial ?fabricante .
+  FILTER(?añoDescontinuacion >= 2021 && ?añoDescontinuacion <= 2024)
+}
+ORDER BY DESC(?añoDescontinuacion)
+
+## ============================================
+
+## CQ-E3: Distribución de tipos de propulsión por fabricante
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?fabricante 
+       (COUNT(?gasVehicle) as ?gasolina)
+       (COUNT(?hibVehicle) as ?hibrido)
+       (COUNT(?elecVehicle) as ?electrico)
+WHERE {
+  ?fabricante a auto:Fabricante ;
+              auto:nombreComercial ?nombreFab .
+  OPTIONAL {
+    ?gasVehicle auto:fabricadoPor ?fabricante ;
+                auto:tienePropulsion auto:PropulsionGasolina .
+  }
+  OPTIONAL {
+    ?hibVehicle auto:fabricadoPor ?fabricante ;
+                auto:tienePropulsion auto:PropulsionHibrida .
+  }
+  OPTIONAL {
+    ?elecVehicle auto:fabricadoPor ?fabricante ;
+                 auto:tienePropulsion auto:PropulsionElectrica .
+  }
+}
+GROUP BY ?fabricante
+ORDER BY DESC(?electrico)
+
+## ============================================
+## CONSULTAS AVANZADAS CON INFERENCIA
+## ============================================
+
+## Query 1: Encuentra todos los vehículos (incluyendo inferencia de subclases)
+## Esta query aprovecha el reasoner OWL para inferir instancias de subclases
+
+PREFIX auto: <http://example.org/automotive#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT ?vehiculo ?nombre ?tipo
+WHERE {
+  ?vehiculo rdf:type ?tipo ;
+            auto:nombreComercial ?nombre .
+  ?tipo rdfs:subClassOf* auto:Vehiculo .
+}
+ORDER BY ?tipo ?nombre
+
+## ============================================
+
+## Query 2: Vehículos de larga autonomía (>= 500 km) - Inferencia por regla
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?vehiculo ?nombre ?autonomia
+WHERE {
+  {
+    ?vehiculo a auto:VehiculoLargaAutonomia ;
+              auto:nombreComercial ?nombre ;
+              auto:autonomiaKm ?autonomia .
+  }
+  UNION
+  {
+    ?vehiculo a auto:VehiculoElectrico ;
+              auto:nombreComercial ?nombre ;
+              auto:autonomiaKm ?autonomia .
+    FILTER(?autonomia >= 500)
+  }
+}
+ORDER BY DESC(?autonomia)
+
+## ============================================
+
+## Query 3: Relaciones inversas - Encontrar qué produce cada fabricante
+## (Aprovecha owl:inverseOf entre fabricadoPor y produceModelo)
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?fabricante ?nombreFab 
+       (COUNT(?vehiculo) as ?totalModelos)
+       (GROUP_CONCAT(?nombreVehiculo; separator=", ") as ?modelos)
+WHERE {
+  {
+    ?fabricante auto:produceModelo ?vehiculo .
+  }
+  UNION
+  {
+    ?vehiculo auto:fabricadoPor ?fabricante .
+  }
+  ?fabricante auto:nombreComercial ?nombreFab .
+  ?vehiculo auto:nombreComercial ?nombreVehiculo .
+}
+GROUP BY ?fabricante ?nombreFab
+ORDER BY DESC(?totalModelos)
+
+## ============================================
+
+## Query 4: Análisis de competitividad - SUV eléctricos premium
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?vehiculo ?nombre ?fabricante ?precio ?autonomia ?potencia ?aceleracion
+WHERE {
+  ?vehiculo a auto:SUV, auto:VehiculoElectrico ;
+            auto:nombreComercial ?nombre ;
+            auto:fabricadoPor ?fabUri ;
+            auto:precioBase ?precio ;
+            auto:autonomiaKm ?autonomia ;
+            auto:potenciaHP ?potencia .
+  ?fabUri auto:nombreComercial ?fabricante .
+  OPTIONAL { ?vehiculo auto:aceleracion0a100 ?aceleracion }
+  FILTER(?precio > 50000)
+}
+ORDER BY DESC(?autonomia)
+
+## ============================================
+
+## Query 5: Cadena de suministro - De proveedor a vehículo
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?proveedor ?componente ?vehiculo ?fabricante
+WHERE {
+  ?componente auto:suministradoPor ?proveedor ;
+              auto:nombreComercial ?nombreComponente .
+  ?vehiculo auto:usaComponente ?componente ;
+            auto:nombreComercial ?nombreVehiculo ;
+            auto:fabricadoPor ?fabUri .
+  ?proveedor auto:nombreComercial ?nombreProveedor .
+  ?fabUri auto:nombreComercial ?nombreFabricante .
+}
+ORDER BY ?proveedor ?fabricante
+
+## ============================================
+## CONSULTAS DE DIAGNÓSTICO Y VALIDACIÓN
+## ============================================
+
+## Query: Contar tripletas por grafo
+
+SELECT ?g (COUNT(*) as ?triples)
+WHERE {
+  GRAPH ?g { ?s ?p ?o }
+}
+GROUP BY ?g
+ORDER BY DESC(?triples)
+
+## ============================================
+
+## Query: Listar todas las clases definidas
+
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?class ?label ?comment (COUNT(?instance) as ?instanceCount)
+WHERE {
+  ?class a owl:Class .
+  OPTIONAL { ?class rdfs:label ?label FILTER(LANG(?label) = "es") }
+  OPTIONAL { ?class rdfs:comment ?comment FILTER(LANG(?comment) = "es") }
+  OPTIONAL { ?instance a ?class }
+}
+GROUP BY ?class ?label ?comment
+ORDER BY ?class
+
+## ============================================
+
+## Query: Verificar integridad referencial
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT ?vehiculo ?nombre 
+WHERE {
+  ?vehiculo a auto:Vehiculo ;
+            auto:nombreComercial ?nombre .
+  FILTER NOT EXISTS { ?vehiculo auto:fabricadoPor ?fab }
+}
+
+## ============================================
+
+## Query: Estadísticas generales del grafo
+
+PREFIX auto: <http://example.org/automotive#>
+
+SELECT 
+  (COUNT(DISTINCT ?vehiculo) as ?totalVehiculos)
+  (COUNT(DISTINCT ?fabricante) as ?totalFabricantes)
+  (COUNT(DISTINCT ?componente) as ?totalComponentes)
+  (COUNT(DISTINCT ?proveedor) as ?totalProveedores)
+WHERE {
+  OPTIONAL { ?vehiculo a auto:Vehiculo }
+  OPTIONAL { ?fabricante a auto:Fabricante }
+  OPTIONAL { ?componente a auto:Componente }
+  OPTIONAL { ?proveedor a auto:Proveedor }
+}

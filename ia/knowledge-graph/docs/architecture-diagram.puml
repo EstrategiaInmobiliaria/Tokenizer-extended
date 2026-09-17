@@ -1,0 +1,66 @@
+@startuml automotive-knowledge-graph
+
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+
+title Automotive Knowledge Graph - System Architecture
+
+package "Presentation Layer" {
+    [YASGUI\nWeb Interface] as yasgui
+    [Jupyter Lab\nNotebooks] as jupyter
+    [Python API\n(RDFLib)] as python
+}
+
+package "Query Layer" {
+    [SPARQL Endpoint\nHTTP REST API\n:3030/automotive/query] as sparql
+}
+
+package "Reasoning Layer" {
+    [OWL Reasoner\n(Jena OWLFBRuleReasoner)] as reasoner
+    note right of reasoner
+        • Subclass inference
+        • Inverse properties
+        • Transitivity
+        • Symmetry
+    end note
+}
+
+package "Storage Layer" {
+    database "Apache Jena TDB2\n800+ RDF Triples" as tdb {
+        folder "Ontology\nGraph" as onto_graph
+        folder "Data\nGraph" as data_graph
+    }
+}
+
+package "Validation Layer" {
+    [SHACL Engine\n(pyshacl)] as shacl
+    note right of shacl
+        13 constraint shapes
+        • Cardinality rules
+        • Range validations
+        • Business logic
+    end note
+}
+
+package "Data Sources" {
+    [automotive-ontology.ttl\n45 classes\n40 properties] as ontology
+    [automotive-instances.ttl\n38 instances\n800+ triples] as instances
+    [shacl-shapes.ttl\n13 validation rules] as shapes
+}
+
+yasgui --> sparql : HTTP POST
+jupyter --> sparql : SPARQLWrapper
+python --> tdb : RDFLib
+
+sparql --> reasoner : Query + Inference
+reasoner --> tdb : Pattern Matching
+
+ontology --> onto_graph : Load
+instances --> data_graph : Load
+shapes --> shacl : Validate
+
+shacl ..> tdb : Read & Validate
+
+@enduml

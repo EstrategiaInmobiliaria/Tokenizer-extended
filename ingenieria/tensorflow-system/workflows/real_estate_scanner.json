@@ -1,0 +1,225 @@
+{
+  "name": "Real Estate Opportunity Scanner",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 7 * * 1"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Monday 7AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": "Desarrollos_Inmobiliarios",
+        "options": {}
+      },
+      "name": "Get Real Estate Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const row = item.json;\n  \n  items.push({\n    json: {\n      desarrollo: row.nombre || 'Sin nombre',\n      precio_m2: parseFloat(row.precio_m2) || 0,\n      ubicacion: row.ubicacion || 'CDMX',\n      amenidades: parseInt(row.amenidades) || 8,\n      velocidad_ventas: parseFloat(row.velocidad_ventas) || 0.5,\n      cap_rate: parseFloat(row.cap_rate) || 6.0\n    }\n  });\n}\n\nreturn items;"
+      },
+      "name": "Transform to API Format",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/predict/real-estate",
+        "options": {
+          "bodyContentType": "json"
+        },
+        "jsonParameters": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "precio_m2",
+              "value": "={{ $json.precio_m2 }}"
+            },
+            {
+              "name": "ubicacion",
+              "value": "={{ $json.ubicacion }}"
+            },
+            {
+              "name": "amenidades",
+              "value": "={{ $json.amenidades }}"
+            },
+            {
+              "name": "velocidad_ventas",
+              "value": "={{ $json.velocidad_ventas }}"
+            },
+            {
+              "name": "cap_rate",
+              "value": "={{ $json.cap_rate }}"
+            }
+          ]
+        }
+      },
+      "name": "Predict with TensorFlow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const items = $input.all();\n\n// Agregar nombre del desarrollo a la predicción\nconst results = items.map((item, index) => ({\n  ...item.json,\n  desarrollo: $('Transform to API Format').item.json(index).desarrollo\n}));\n\n// Ordenar por probabilidad\nresults.sort((a, b) => b.probabilidad_venta_12m - a.probabilidad_venta_12m);\n\nconst top3 = results.slice(0, 3);\n\nlet mensaje = '🏗️ *REPORTE SEMANAL INMOBILIARIO*\\n\\n';\nmensaje += `📊 Analizados: ${results.length} desarrollos\\n`;\nmensaje += `✅ Alta prioridad: ${results.filter(r => r.probabilidad_venta_12m > 0.7).length}\\n\\n`;\n\nmensaje += '*TOP 3 OPORTUNIDADES*\\n\\n';\n\nfor (let i = 0; i < top3.length; i++) {\n  const dev = top3[i];\n  mensaje += `*${i + 1}. ${dev.desarrollo}*\\n`;\n  mensaje += `   Probabilidad: ${dev.certeza}\\n`;\n  mensaje += `   Precio estimado: $${(dev.precio_estimado / 1000000).toFixed(1)}M\\n`;\n  mensaje += `   Días: ${dev.dias_estimados}\\n`;\n  mensaje += `   🎯 ${dev.recomendacion}\\n\\n`;\n}\n\nmensaje += '_Generado por TensorFlow AI_';\n\nreturn [{ json: { mensaje, top3 } }];"
+      },
+      "name": "Generate Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v18.0/YOUR_PHONE_NUMBER_ID/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {
+          "bodyContentType": "json"
+        },
+        "jsonParameters": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "messaging_product",
+              "value": "whatsapp"
+            },
+            {
+              "name": "to",
+              "value": "YOUR_WHATSAPP_NUMBER"
+            },
+            {
+              "name": "type",
+              "value": "text"
+            },
+            {
+              "name": "text",
+              "value": "={{ { \"body\": $json.mensaje } }}"
+            }
+          ]
+        }
+      },
+      "name": "Send WhatsApp Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": "Predicciones_Historial",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ $now.format('yyyy-MM-dd') }}",
+            "desarrollo": "={{ $json.desarrollo }}",
+            "probabilidad": "={{ $json.probabilidad_venta_12m }}",
+            "precio_estimado": "={{ $json.precio_estimado }}",
+            "dias_estimados": "={{ $json.dias_estimados }}",
+            "recomendacion": "={{ $json.recomendacion }}"
+          }
+        }
+      },
+      "name": "Save to History",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "position": [1050, 500]
+    }
+  ],
+  "connections": {
+    "Schedule Monday 7AM": {
+      "main": [
+        [
+          {
+            "node": "Get Real Estate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Real Estate Data": {
+      "main": [
+        [
+          {
+            "node": "Transform to API Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform to API Format": {
+      "main": [
+        [
+          {
+            "node": "Predict with TensorFlow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Predict with TensorFlow": {
+      "main": [
+        [
+          {
+            "node": "Generate Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Save to History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Report": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-10T06:00:00.000Z",
+  "versionId": "1"
+}
