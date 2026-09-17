@@ -126,7 +126,7 @@ python main_pipeline.py --vcf /path/to/contacts.vcf
 ## 📁 Estructura del Proyecto
 
 ```
-/workspace/
+ingenieria/network-management/
 ├── backend/
 │   ├── vcf_processor/
 │   │   ├── vcf_parser.py          # Parser VCF
