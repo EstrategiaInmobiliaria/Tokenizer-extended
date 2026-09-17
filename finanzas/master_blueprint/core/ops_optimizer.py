@@ -864,7 +864,7 @@ if __name__ == "__main__":
         
         # Visualizar (solo para 2 productos)
         print(f"\n📊 Generando visualización...")
-        optimizer.plot_2d_optimization(save_path="/workspace/master_blueprint/optimization_2d.png")
+        optimizer.plot_2d_optimization(save_path="optimization_2d.png")
     
     print("\n" + "=" * 80)
     print("Nota: El Enfoque 1 (analítico) es exacto y eficiente para el modelo cerrado.")

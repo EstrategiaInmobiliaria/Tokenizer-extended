@@ -1,45 +1,138 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# .gitignore único de la raíz: unión de las reglas de todos los proyectos del monorepo.
+# Las reglas específicas de un proyecto van anidadas o anotadas con su carpeta.
 
-# dependencies
+# ---------------------------------------------------------------------------
+# Tiktokenizer (Next.js / T3)
+# ---------------------------------------------------------------------------
 /node_modules
 /.pnp
 .pnp.js
-
-# testing
 /coverage
-
-# database
 /prisma/db.sqlite
 /prisma/db.sqlite-journal
-
-# next.js
 /.next/
 /out/
 next-env.d.ts
-
-# production
 /build
-
-# misc
-.DS_Store
 *.pem
-
-# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-
-# local env files
-# do not commit any .env files to git, except for the .env.example file. https://create.t3.gg/en/usage/env-variables#using-environment-variables
-.env
-.env*.local
-
-# vercel
 .vercel
-
-# typescript
 *.tsbuildinfo
-
-# hf
 public/hf
+
+# ---------------------------------------------------------------------------
+# Variables de entorno (solo se versionan los *.example)
+# https://create.t3.gg/en/usage/env-variables#using-environment-variables
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+
+# ---------------------------------------------------------------------------
+# Python (finanzas/, ingenieria/, docencia/, ia/, inmobiliaria/)
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+sdist/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+venv/
+env/
+ENV/
+.venv
+env.bak/
+venv.bak/
+.pytest_cache/
+.coverage
+.coverage.*
+.cache
+htmlcov/
+.tox/
+.hypothesis/
+nosetests.xml
+coverage.xml
+*.cover
+.ipynb_checkpoints/
+docs/_build/
+
+# ---------------------------------------------------------------------------
+# ML / datos generados
+# ---------------------------------------------------------------------------
+*.h5
+*.pb
+*.ckpt
+*.ckpt.*
+events.out.tfevents.*
+checkpoint/
+saved_model/
+!*.tflite
+*.npy
+*.npz
+*.pkl
+*.pickle
+dump.rdb
+n8n_data/
+.n8n/
+.supabase/
+
+# ---------------------------------------------------------------------------
+# ingenieria/network-management: exports privados y datos locales
+# ---------------------------------------------------------------------------
+ingenieria/network-management/data/raw/*
+ingenieria/network-management/data/processed/*
+ingenieria/network-management/data/graph/kuzu_db/*
+!ingenieria/network-management/data/raw/.gitkeep
+!ingenieria/network-management/data/processed/.gitkeep
+!ingenieria/network-management/data/graph/.gitkeep
+*.vcf
+*.vcard
+*Connections*.csv
+*connections*.csv
+instagram_data/
+instagram-*.zip
+*.ogg
+*.m4a
+*.wav
+
+# ---------------------------------------------------------------------------
+# Logs, temporales, backups, archivos comprimidos
+# ---------------------------------------------------------------------------
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.temp
+*.zip
+*.tar.gz
+*.rar
+backup/
+*.backup
+*.bak
+
+# ---------------------------------------------------------------------------
+# IDEs y sistema operativo
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
