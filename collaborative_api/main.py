@@ -25,6 +25,13 @@ app = FastAPI(
     version="1.0",
 )
 
+_missing = [k for k in ("GEMINI_API_KEY", "ANTHROPIC_API_KEY") if not os.getenv(k)]
+if _missing:
+    raise RuntimeError(
+        f"Faltan variables de entorno: {', '.join(_missing)}. "
+        "Defínelas en el entorno o en un archivo .env (ver .env.example)."
+    )
+
 # Clientes asíncronos para no bloquear el event loop de FastAPI.
 gemini_client = genai.Client()
 claude_client = anthropic.AsyncAnthropic()
