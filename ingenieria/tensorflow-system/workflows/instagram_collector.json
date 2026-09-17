@@ -1,0 +1,223 @@
+{
+  "name": "Instagram Data Collector",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 2 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Daily 2AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://graph.facebook.com/v18.0/me/media",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {
+          "qs": {
+            "fields": "id,caption,media_type,media_url,timestamp,like_count,comments_count,saved,impressions",
+            "limit": "100"
+          }
+        }
+      },
+      "name": "Get Instagram Posts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const items = [];\n\nfor (const item of $input.all()) {\n  const post = item.json;\n  \n  // Extraer hashtags del caption\n  const caption = post.caption || '';\n  const hashtags = (caption.match(/#\\w+/g) || []).length;\n  \n  // Calcular engagement\n  const engagement = post.like_count + (post.comments_count * 5) + (post.saved || 0) * 3;\n  \n  items.push({\n    json: {\n      fecha: post.timestamp,\n      tipo_contenido: post.media_type === 'CAROUSEL_ALBUM' ? 'Carrusel' : \n                      post.media_type === 'VIDEO' ? 'Reel' : 'Post',\n      tema_categoria: 'Sin categorizar',\n      hora_publicacion: new Date(post.timestamp).getHours(),\n      num_hashtags: hashtags,\n      longitud_caption: caption.length,\n      likes: post.like_count,\n      guardados: post.saved || 0,\n      comentarios: post.comments_count,\n      shares: 0,\n      alcance: post.impressions || post.like_count * 5,\n      engagement_score: engagement\n    }\n  });\n}\n\nreturn items;"
+      },
+      "name": "Transform Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": "Instagram_Data",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ $json.fecha }}",
+            "tipo_contenido": "={{ $json.tipo_contenido }}",
+            "tema_categoria": "={{ $json.tema_categoria }}",
+            "hora_publicacion": "={{ $json.hora_publicacion }}",
+            "num_hashtags": "={{ $json.num_hashtags }}",
+            "longitud_caption": "={{ $json.longitud_caption }}",
+            "likes": "={{ $json.likes }}",
+            "guardados": "={{ $json.guardados }}",
+            "comentarios": "={{ $json.comentarios }}",
+            "shares": "={{ $json.shares }}",
+            "alcance": "={{ $json.alcance }}"
+          }
+        },
+        "options": {}
+      },
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/generate/weekly-content-schedule",
+        "options": {
+          "bodyContentType": "json"
+        },
+        "jsonParameters": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "temas_disponibles",
+              "value": "=[\"Cap Rate\", \"Estrategia Inmobiliaria\", \"Caso UIA\", \"ExO\", \"Tenis\"]"
+            }
+          ]
+        }
+      },
+      "name": "Get Weekly Schedule from TensorFlow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const schedule = $input.first().json.semana;\nlet mensaje = '📅 *CALENDARIO SEMANAL DE CONTENIDO*\\n\\n';\n\nfor (const dia of schedule.slice(0, 7)) {\n  mensaje += `*${dia.dia}*\\n`;\n  \n  for (const post of dia.posts.slice(0, 2)) {\n    const hora = post.hora.toString().padStart(2, '0');\n    mensaje += `  📱 ${hora}:00 - ${post.tipo} sobre \"${post.tema}\"\\n`;\n    mensaje += `     Engagement: ${post.engagement_esperado.toFixed(1)}/100\\n`;\n  }\n  mensaje += '\\n';\n}\n\nmensaje += '\\n_Generado por TensorFlow Intelligence System_';\n\nreturn [{ json: { mensaje } }];"
+      },
+      "name": "Format WhatsApp Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v18.0/YOUR_PHONE_NUMBER_ID/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {
+          "bodyContentType": "json"
+        },
+        "jsonParameters": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "messaging_product",
+              "value": "whatsapp"
+            },
+            {
+              "name": "to",
+              "value": "YOUR_WHATSAPP_NUMBER"
+            },
+            {
+              "name": "type",
+              "value": "text"
+            },
+            {
+              "name": "text",
+              "value": "={{ { \"body\": $json.mensaje } }}"
+            }
+          ]
+        }
+      },
+      "name": "Send WhatsApp Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Daily 2AM": {
+      "main": [
+        [
+          {
+            "node": "Get Instagram Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Instagram Posts": {
+      "main": [
+        [
+          {
+            "node": "Transform Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Data": {
+      "main": [
+        [
+          {
+            "node": "Save to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Get Weekly Schedule from TensorFlow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Weekly Schedule from TensorFlow": {
+      "main": [
+        [
+          {
+            "node": "Format WhatsApp Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format WhatsApp Message": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2024-08-10T06:00:00.000Z",
+  "versionId": "1"
+}
