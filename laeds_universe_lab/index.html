@@ -209,7 +209,7 @@
                 <h2>Controles</h2>
                 <div class="slider-row"><label for="speed">Reloj</label><input type="range" id="speed" min="0" max="10" step="0.1" value="1"><output id="speedVal">1.0×</output></div>
                 <p class="note" id="speedNote"></p>
-                <div class="slider-row"><label for="damp">Fricción</label><input type="range" id="damp" min="0" max="2" step="0.01" value="0.8"><output id="dampVal">0.80</output></div>
+                <div class="slider-row"><label for="damp">Fricción</label><input type="range" id="damp" min="0" max="2" step="0.01" value="0"><output id="dampVal">0.00</output></div>
                 <div class="buttons">
                     <button id="pauseBtn">Pausa</button>
                     <button id="fitBtn">Reencuadrar</button>
@@ -522,7 +522,7 @@ function updateLive() {
 /* =====================================================================
    3. Physics: velocity Verlet on a force-directed potential
    ===================================================================== */
-const P = { kSpring: 2.2, kRep: 0.0045, eps: 0.002, kCenter: 0.5, damping: 0.8, DT: 1 / 120, daysPerSec: 0.05, timeMult: 1 };   // 1 simulated day = 20 s at 1×
+const P = { kSpring: 2.2, kRep: 0.0045, eps: 0.002, kCenter: 0.5, damping: 0, DT: 1 / 120, daysPerSec: 0.05, timeMult: 1 };   // 1 simulated day = 20 s at 1×
 const S = { t: 0, days: 0, paused: false, E0: null, KE: 0, PE: 0, steps: 0, stage: 'attract' };
 
 const restLen = a => 0.1 + 0.55 * (1 - a);
@@ -575,8 +575,9 @@ function step(dt) {
     accel();
     for (const n of N) {
         if (n === drag.node) { n.vx = n.vy = 0; continue; }
-        n.vx = (n.vx + 0.5 * (n.oax + n.ax) * dt) * damp;
-        n.vy = (n.vy + 0.5 * (n.oay + n.ay) * dt) * damp;
+        const d = n.settleUntil > S.t ? Math.exp(-2.5 * dt) : damp;
+        n.vx = (n.vx + 0.5 * (n.oax + n.ax) * dt) * d;
+        n.vy = (n.vy + 0.5 * (n.oay + n.ay) * dt) * d;
     }
     S.t += dt;
 }
@@ -640,8 +641,9 @@ function explain(pr) {
    ===================================================================== */
 const stage = $('stage'), canvas = $('c'), ctx = canvas.getContext('2d');
 let W = 0, H = 0, dpr = 1;
-const cam = { cx: 0, cy: 0, scale: 300 };
-const drag = { node: null, pan: null, moved: false, id: null };
+const cam = { cx: 0, cy: 0, scale: 300, fitScale: 300 };
+const drag = { node: null, pan: null, moved: false, id: null, hold: null };
+const HOLD_MS = 4000;      // after dropping a node the universe holds still this long, so the what-if score can be read
 let hover = null, selected = null, focus = null, recs = [], whyOpen = false;
 const particles = [], pulses = [];
 
@@ -653,7 +655,7 @@ function resize() {
 function fit() {
     let maxR = 0.5;
     for (const n of M.nodes) maxR = Math.max(maxR, Math.hypot(n.x, n.y));
-    cam.cx = 0; cam.cy = 0; cam.scale = Math.min(W, H) / 2 / (maxR * 1.15);
+    cam.cx = 0; cam.cy = 0; cam.scale = Math.min(W, H) / 2 / (maxR * 1.3); cam.fitScale = cam.scale;
 }
 const toScreen = (x, y) => [W / 2 + (x - cam.cx) * cam.scale, H / 2 + (y - cam.cy) * cam.scale];
 const toWorld = (sx, sy) => [cam.cx + (sx - W / 2) / cam.scale, cam.cy + (sy - H / 2) / cam.scale];
@@ -775,6 +777,13 @@ function draw(now) {
         ctx.strokeStyle = `rgba(198,169,107,${(1 - u) * 0.8})`; ctx.lineWidth = 2 * (1 - u) + 0.5;
         ctx.beginPath(); ctx.arc(x, y, 8 + u * 60, 0, 7); ctx.stroke();
     }
+    // what-if hold: a dashed ring that empties as the hold runs out
+    if (drag.hold || drag.node) {
+        const n = drag.node || drag.hold.node, [x, y] = toScreen(n.x, n.y), r = nodeRadius(n) + 11;
+        const frac = drag.node ? 1 : clamp((drag.hold.until - now) / HOLD_MS, 0, 1);
+        ctx.strokeStyle = 'rgba(236,231,219,0.8)'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 4]);
+        ctx.beginPath(); ctx.arc(x, y, r, -Math.PI / 2, -Math.PI / 2 + frac * 2 * Math.PI); ctx.stroke(); ctx.setLineDash([]);
+    }
     // particles flowing A → B
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i], u = (now - p.t0) / p.dur; if (u > 1) { particles.splice(i, 1); continue; }
@@ -790,7 +799,7 @@ function draw(now) {
     for (const n of M.nodes) if (n.kind !== 'community') drawNode(n, now);
 
     // labels
-    const showAll = cam.scale > 520;
+    const showAll = cam.scale > cam.fitScale * 2.2;
     const labelled = new Set();
     const mark = n => { if (n && !labelled.has(n.id)) { labelled.add(n.id); drawLabel(n, false); } };
     if (focus) { mark(M.nodes[focus.a]); mark(M.nodes[focus.b]); }
@@ -939,9 +948,9 @@ function renderMetrics() {
     const drift = (E - S.E0) / Math.abs(S.E0 || 1);
     $('eD').innerHTML = (drift >= 0 ? '+' : '') + (drift * 100).toFixed(2) + '<small>%</small>';
     $('eNote').textContent = P.damping > 0
-        ? `Con fricción ${P.damping.toFixed(2)} el mapa se asienta y la energía se disipa (deriva negativa). Pon la fricción en 0 para comprobar que Verlet conserva la energía.`
-        : 'Fricción 0: sin disipación, la deriva mide el error del integrador (velocity Verlet, simpléctico).';
-    $('clock').innerHTML = `día <b>${S.days.toFixed(1)}</b> · t <b>${S.t.toFixed(0)}s</b>${S.paused ? ' · <b>PAUSA</b>' : ''}${drag.node ? ' · <b>EXPLORANDO</b> (física en espera)' : ''}`;
+        ? `Con fricción ${P.damping.toFixed(2)} el mapa se asienta y la energía se disipa (deriva negativa). Vuelve a 0 para comprobar que Verlet conserva la energía.`
+        : 'Fricción 0: el universo orbita sin disipación y la deriva mide el error del integrador (velocity Verlet, simpléctico). Se recalibra al conectar o soltar un nodo.';
+    $('clock').innerHTML = `día <b>${S.days.toFixed(1)}</b> · t <b>${S.t.toFixed(0)}s</b>${S.paused ? ' · <b>PAUSA</b>' : ''}${(drag.node || drag.hold) ? ' · <b>EXPLORANDO</b> (física en espera)' : ''}`;
 }
 function renderDebug(fps, steps) {
     const d = $('debug'); if (d.hidden) return;
@@ -989,6 +998,7 @@ canvas.addEventListener('pointerdown', e => {
     const rect = canvas.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
     const n = pickNode(mx, my);
     drag.moved = false; drag.id = e.pointerId; drag.start = { x: e.clientX, y: e.clientY };
+    if (drag.hold) endHold();
     if (n) { drag.node = n; n.vx = n.vy = 0; }
     else drag.pan = { x: e.clientX, y: e.clientY, cx: cam.cx, cy: cam.cy };
     canvas.setPointerCapture(e.pointerId);
@@ -1015,9 +1025,19 @@ canvas.addEventListener('pointerup', e => {
     stage.classList.remove('grab');
     if (drag.node && !drag.moved) select(drag.node === selected ? null : drag.node);
     else if (drag.pan && !drag.moved) select(null);
-    if (drag.node && drag.moved) resetEnergyRef();
+    if (drag.node && drag.moved) {
+        // keep the dropped node (and the universe) still for a moment, then let the forces answer
+        drag.hold = { node: drag.node, until: performance.now() + HOLD_MS };
+        drag.node.vx = drag.node.vy = 0;
+    }
     drag.node = null; drag.pan = null;
 });
+function endHold() {
+    if (!drag.hold) return;
+    const n = drag.hold.node; drag.hold = null;
+    n.settleUntil = S.t + 6;      // local friction for a few seconds so the released node does not ring forever at friction 0
+    resetEnergyRef();
+}
 canvas.addEventListener('pointerleave', () => { hover = null; $('tooltip').hidden = true; });
 canvas.addEventListener('wheel', e => {
     e.preventDefault();
@@ -1093,9 +1113,11 @@ let last = performance.now(), acc = 0, uiTimer = 0, frames = 0, fpsT = 0, fps = 
 function frame(now) {
     const real = Math.min(0.1, (now - last) / 1000); last = now;
     let steps = 0;
-    // while a node is being dragged the universe holds still: the drag is a what-if probe, and the
-    // score responds to the new position alone; on release the forces take over again
-    if (!S.paused && !drag.node) {
+    if (drag.hold && now >= drag.hold.until) endHold();
+    // while a node is dragged or held the universe stands still: the drag is a what-if probe and the
+    // score responds to the new position alone; afterwards the forces take over again
+    const exploring = !!drag.node || !!drag.hold;
+    if (!S.paused && !exploring) {
         acc += real;
         steps = Math.min(Math.floor(acc / P.DT), 8);
         for (let i = 0; i < steps; i++) step(P.DT);
@@ -1130,8 +1152,12 @@ function init(newSeed) {
     selected = null; focus = null; recs = []; whyOpen = false; particles.length = 0; pulses.length = 0; trace.pair = null; trace.pts = [];
     S.t = 0; S.days = 0;
     accel();
-    // settle a little before showing, so the first frame is not a random cloud
-    const d0 = P.damping; P.damping = 2.5; for (let i = 0; i < 240; i++) step(P.DT); P.damping = d0;
+    // settle before showing, so the first frame is not a random cloud
+    const d0 = P.damping; P.damping = 2.5; for (let i = 0; i < 480; i++) step(P.DT); P.damping = d0;
+    // then set the whole system slowly turning (plus a little thermal noise): with friction 0 angular momentum and
+    // energy are conserved, so the universe keeps orbiting and the drift readout validates the integrator
+    const OMEGA = 0.15;
+    for (const n of M.nodes) { n.vx = -OMEGA * n.y + (rnd() - 0.5) * 0.04; n.vy = OMEGA * n.x + (rnd() - 0.5) * 0.04; n.settleUntil = 0; }
     S.t = 0;
     updateLive(); updateMetrics(); resetEnergyRef();
     S.KE = kinetic(); S.PE = potential();
