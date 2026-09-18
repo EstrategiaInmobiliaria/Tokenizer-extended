@@ -773,6 +773,7 @@ function draw(now) {
     // connect pulses (expanding rings)
     for (let i = pulses.length - 1; i >= 0; i--) {
         const p = pulses[i], u = (now - p.t0) / 900; if (u > 1) { pulses.splice(i, 1); continue; }
+        if (u < 0) continue;      // scheduled for later; a negative radius would throw and abort the frame
         const [x, y] = toScreen(p.x, p.y);
         ctx.strokeStyle = `rgba(198,169,107,${(1 - u) * 0.8})`; ctx.lineWidth = 2 * (1 - u) + 0.5;
         ctx.beginPath(); ctx.arc(x, y, 8 + u * 60, 0, 7); ctx.stroke();
@@ -787,6 +788,7 @@ function draw(now) {
     // particles flowing A → B
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i], u = (now - p.t0) / p.dur; if (u > 1) { particles.splice(i, 1); continue; }
+        if (u < 0) continue;
         const A = M.nodes[p.a], B = M.nodes[p.b], [ax, ay] = toScreen(A.x, A.y), [bx, by] = toScreen(B.x, B.y);
         const dx = bx - ax, dy = by - ay, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L;
         const w = Math.sin(u * Math.PI) * p.amp * Math.sin(u * 9 + p.phase);
@@ -999,6 +1001,7 @@ canvas.addEventListener('pointerdown', e => {
     const rect = canvas.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
     const n = pickNode(mx, my);
     drag.moved = false; drag.id = e.pointerId; drag.start = { x: e.clientX, y: e.clientY };
+    $('tooltip').hidden = true;
     if (drag.hold) endHold();
     if (n) { drag.node = n; n.vx = n.vy = 0; }
     else drag.pan = { x: e.clientX, y: e.clientY, cx: cam.cx, cy: cam.cy };
@@ -1174,7 +1177,7 @@ init(seed);
 requestAnimationFrame(frame);
 
 // expose the live model for inspection (like Aurelith's window.__system)
-window.__laeds = { M, S, P, metrics, score, updateLive, updateMetrics, recommendationsFor, explain, timingOf, tickTimings, step, kinetic, potential, resetEnergyRef, connect, select: id => select(M.nodes[id]) };
+window.__laeds = { M, S, P, metrics, cam, score, updateLive, updateMetrics, recommendationsFor, explain, timingOf, tickTimings, step, kinetic, potential, resetEnergyRef, connect, select: id => select(M.nodes[id]), toScreen, pickNode, state: () => ({ selected, focus, recs, whyOpen, drag }) };
 })();
     </script>
 </body>
