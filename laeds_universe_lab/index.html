@@ -523,7 +523,7 @@ function updateLive() {
    3. Physics: velocity Verlet on a force-directed potential
    ===================================================================== */
 const P = { kSpring: 2.2, kRep: 0.0045, eps: 0.002, kCenter: 0.5, damping: 0, DT: 1 / 120, daysPerSec: 0.05, timeMult: 1 };   // 1 simulated day = 20 s at 1×
-const S = { t: 0, days: 0, paused: false, E0: null, KE: 0, PE: 0, steps: 0, stage: 'attract', recalibrateAt: 0 };
+const S = { t: 0, days: 0, paused: false, E0: null, KE: 0, PE: 0, steps: 0, stage: 'attract', recalibrateAt: 0, focusHoldUntil: 0 };
 
 const restLen = a => 0.1 + 0.55 * (1 - a);
 
@@ -671,7 +671,7 @@ const nodeColor = n => n.active ? COLORS.gold : n.kind === 'person' ? COLORS[n.t
 const nodeRadius = n => n.kind === 'community' ? 13 : n.kind === 'broker' ? 6.5 : n.kind === 'property' ? 5 : 5.5;
 
 function pickNode(mx, my) {
-    let best = null, bd = 16;
+    let best = null, bd = 20;
     for (const n of M.nodes) {
         const [sx, sy] = toScreen(n.x, n.y), d = Math.hypot(sx - mx, sy - my) - (n.kind === 'community' ? 6 : 0);
         if (d < bd) { bd = d; best = n; }
@@ -991,6 +991,7 @@ function connect(pr) {
     pulses.push({ x: A.x, y: A.y, t0: now }); pulses.push({ x: B.x, y: B.y, t0: now + 300 });
     playTone(220 + pr.live * 500, 0.35); setTimeout(() => playTone((220 + pr.live * 500) * 1.5, 0.45), 160);
     setStage('act');
+    S.focusHoldUntil = now + 4000;   // keep the connected pair on the card long enough to read before moving to the next best
     updateLive(); updateMetrics(); renderFocus(); renderRecs(); renderMetrics();
 }
 
@@ -1136,11 +1137,11 @@ function frame(now) {
         uiTimer = 0;
         S.KE = kinetic(); S.PE = potential();
         updateMetrics();
-        if (!selected) {
+        if (!selected && now >= S.focusHoldUntil) {
             // hysteresis: only hand the "next best" card to a new pair when it clearly wins, so the trace is not reset by jitter
             const top = metrics.top[0] || null;
-            if (!focus || focus.connected || !metrics.top.includes(focus) || (top && top.energy > focus.energy + 0.04)) {
-                if (focus !== top) { focus = top; whyOpen = whyOpen && !!top; renderWhy(); }
+            if (!focus || focus.connected || !metrics.top.includes(focus) || (top && top.energy > focus.energy + 0.08)) {
+                if (focus !== top) { if (focus && focus.connected) setStage('attract'); focus = top; whyOpen = whyOpen && !!top; renderWhy(); }
             }
         }
         renderMetrics(); renderFocus(); renderRecs(); drawLoop(); renderDebug(fps, steps);
@@ -1158,7 +1159,7 @@ function init(newSeed) {
     const d0 = P.damping; P.damping = 2.5; for (let i = 0; i < 480; i++) step(P.DT); P.damping = d0;
     // then set the whole system slowly turning (plus a little thermal noise): with friction 0 angular momentum and
     // energy are conserved, so the universe keeps orbiting and the drift readout validates the integrator
-    const OMEGA = 0.15;
+    const OMEGA = 0.08;
     for (const n of M.nodes) { n.vx = -OMEGA * n.y + (rnd() - 0.5) * 0.04; n.vy = OMEGA * n.x + (rnd() - 0.5) * 0.04; n.settleUntil = 0; }
     S.t = 0;
     updateLive(); updateMetrics(); resetEnergyRef();
