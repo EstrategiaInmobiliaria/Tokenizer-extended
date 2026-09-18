@@ -207,7 +207,8 @@
             </div>
             <div>
                 <h2>Controles</h2>
-                <div class="slider-row"><label for="speed">Reloj</label><input type="range" id="speed" min="0" max="2" step="0.01" value="1"><output id="speedVal">1.00×</output></div>
+                <div class="slider-row"><label for="speed">Reloj</label><input type="range" id="speed" min="0" max="10" step="0.1" value="1"><output id="speedVal">1.0×</output></div>
+                <p class="note" id="speedNote"></p>
                 <div class="slider-row"><label for="damp">Fricción</label><input type="range" id="damp" min="0" max="2" step="0.01" value="0.8"><output id="dampVal">0.80</output></div>
                 <div class="buttons">
                     <button id="pauseBtn">Pausa</button>
@@ -456,7 +457,7 @@ function score(pr, spatial, isStatic) {
     if (A.kind !== 'person' && B.kind === 'person') [A, B] = [B, A];
     const comp = { zone: 0, budget: 0, timing: 0, rel: 0, community: pr.communityName, inventory: null, trust: null, factor: 1 };
     const relStatic = Math.min(1, pr.sharedN * 0.7);
-    comp.rel = pr.connected ? 1 : (isStatic ? relStatic : 0.6 * relStatic + 0.4 * spatial);
+    comp.rel = pr.connected ? 1 : (isStatic ? relStatic : 0.5 * relStatic + 0.5 * spatial);
 
     if (pr.kind === 'pp') {
         comp.zone = zoneMatch(A.zone, B.zone);
@@ -520,7 +521,7 @@ function updateLive() {
 /* =====================================================================
    3. Physics: velocity Verlet on a force-directed potential
    ===================================================================== */
-const P = { kSpring: 2.2, kRep: 0.0045, eps: 0.002, kCenter: 0.5, damping: 0.8, DT: 1 / 120, daysPerSec: 0.2, timeMult: 1 };
+const P = { kSpring: 2.2, kRep: 0.0045, eps: 0.002, kCenter: 0.5, damping: 0.8, DT: 1 / 120, daysPerSec: 0.05, timeMult: 1 };   // 1 simulated day = 20 s at 1×
 const S = { t: 0, days: 0, paused: false, E0: null, KE: 0, PE: 0, steps: 0, stage: 'attract' };
 
 const restLen = a => 0.1 + 0.55 * (1 - a);
@@ -885,7 +886,7 @@ function renderFocus() {
     if (A.kind !== 'person' && B.kind === 'person') [A, B] = [B, A];
     $('focusKicker').textContent = selected ? (focus.connected ? 'Conexión activa' : 'Conexión recomendada') : 'Next best connection';
     $('fA').innerHTML = who(A); $('fB').innerHTML = who(B);
-    $('fScore').textContent = pct(focus.live);
+    $('fScore').textContent = (clamp(focus.live, 0, 1) * 100).toFixed(1) + '%';
     $('fBar').style.width = pct(focus.live);
     $('fText').innerHTML = explain(focus);
     $('connectBtn').disabled = focus.connected;
@@ -1029,7 +1030,12 @@ $('clearBtn').addEventListener('click', () => select(null));
 $('recs').addEventListener('click', e => { const el = e.target.closest('.rec'); if (!el) return; focus = recs[+el.dataset.i]; whyOpen = false; renderFocus(); renderWhy(); renderRecs(); playTone(220 + focus.live * 500, 0.15); });
 
 const speedEl = $('speed'), dampEl = $('damp');
-speedEl.addEventListener('input', () => { P.timeMult = +speedEl.value; $('speedVal').textContent = P.timeMult.toFixed(2) + '×'; });
+function updateSpeedLabel() {
+    $('speedVal').textContent = P.timeMult.toFixed(1) + '×';
+    const secs = P.timeMult > 0 ? 1 / (P.daysPerSec * P.timeMult) : Infinity;
+    $('speedNote').textContent = P.timeMult > 0 ? `1 día de decisión = ${secs < 10 ? secs.toFixed(1) : Math.round(secs)} s reales. Los timings cuentan hacia cero y las oportunidades activas cambian con ellos.` : 'Reloj detenido: los timings no avanzan; la física sigue.';
+}
+speedEl.addEventListener('input', () => { P.timeMult = +speedEl.value; updateSpeedLabel(); });
 dampEl.addEventListener('input', () => { P.damping = +dampEl.value; $('dampVal').textContent = P.damping.toFixed(2); resetEnergyRef(); });
 const pauseBtn = $('pauseBtn');
 function togglePause() { S.paused = !S.paused; pauseBtn.textContent = S.paused ? 'Reanudar' : 'Pausa'; pauseBtn.classList.toggle('on', S.paused); }
@@ -1125,7 +1131,7 @@ function init(newSeed) {
     updateLive(); updateMetrics(); resetEnergyRef();
     S.KE = kinetic(); S.PE = potential();
     focus = metrics.top[0] || null;
-    fit(); setStage('attract'); renderMetrics(); renderFocus(); renderWhy(); renderRecs(); drawLoop();
+    fit(); setStage('attract'); updateSpeedLabel(); renderMetrics(); renderFocus(); renderWhy(); renderRecs(); drawLoop();
 }
 
 new ResizeObserver(() => { const oldMin = Math.min(W, H); resize(); if (oldMin) cam.scale *= Math.min(W, H) / oldMin; }).observe(stage);
