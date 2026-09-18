@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LÆDS® Connection Intelligence Lab</title>
+    <style>
+        :root {
+            --bg: #0a0a0b;
+            --panel: rgba(14, 14, 17, 0.92);
+            --line: rgba(255, 255, 255, 0.08);
+            --text: #ece7db;
+            --muted: #8f8a80;
+            --gold: #c6a96b;
+            --gold-bg: rgba(198, 169, 107, 0.12);
+            --buyer: #7fb3ff;
+            --seller: #ff8c5a;
+            --investor: #c9a0ff;
+            --broker: #ede6d6;
+            --property: #6fd3a8;
+            --community: #8a7fb8;
+            --serif: Georgia, "Times New Roman", serif;
+            --mono: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+            --sans: "Helvetica Neue", Helvetica, Arial, "Segoe UI", sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body {
+            margin: 0; height: 100%; background: var(--bg); color: var(--text);
+            font-family: var(--sans); overflow: hidden;
+        }
+
+        #top {
+            height: 64px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 22px; border-bottom: 1px solid var(--line); background: var(--panel);
+        }
+        .brand { display: flex; align-items: baseline; gap: 14px; }
+        .brand .logo { font-family: var(--serif); font-size: 30px; letter-spacing: 0.04em; color: var(--gold); }
+        .brand .logo sup { font-size: 11px; margin-left: 2px; color: var(--muted); }
+        .brand .sub { font-size: 11px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--muted); }
+
+        #pipeline { display: flex; align-items: center; gap: 10px; list-style: none; margin: 0; padding: 0; }
+        #pipeline li {
+            font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; padding: 6px 12px;
+            border: 1px solid var(--line); border-radius: 4px; color: var(--muted); transition: all .25s;
+        }
+        #pipeline li.on { color: var(--gold); border-color: var(--gold); background: var(--gold-bg); box-shadow: 0 0 18px rgba(198, 169, 107, 0.25); }
+        #pipeline li.done { color: var(--text); border-color: rgba(198, 169, 107, 0.4); }
+        #pipeline li.arrow { border: none; padding: 0; font-size: 13px; }
+
+        .tools { display: flex; gap: 8px; }
+
+        button {
+            font: inherit; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text);
+            background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 4px;
+            padding: 8px 12px; cursor: pointer;
+        }
+        button:hover { background: rgba(255, 255, 255, 0.09); border-color: rgba(255, 255, 255, 0.3); }
+        button.on { color: var(--gold); border-color: var(--gold); }
+        button.primary { border-color: var(--gold); color: #0a0a0b; background: var(--gold); font-weight: 600; letter-spacing: 0.18em; }
+        button.primary:hover { background: #d8bc80; }
+        button.primary[disabled] { opacity: 0.45; cursor: default; }
+        button.ghost { border-color: transparent; color: var(--muted); padding: 4px 6px; }
+
+        #app { display: flex; height: calc(100vh - 64px); }
+        aside { width: 320px; flex: none; background: var(--panel); overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+        #left { border-right: 1px solid var(--line); }
+        #right { border-left: 1px solid var(--line); width: 360px; }
+
+        h2 { margin: 0 0 10px; font-size: 10px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+        .card { border: 1px solid var(--line); border-radius: 6px; padding: 14px; }
+        .card.gold { border-color: rgba(198, 169, 107, 0.45); background: var(--gold-bg); }
+
+        .metrics { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .metric { display: flex; align-items: baseline; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+        .metric .v { font-family: var(--mono); font-size: 26px; min-width: 72px; text-align: right; font-variant-numeric: tabular-nums; }
+        .metric .k { font-size: 12px; color: var(--muted); line-height: 1.35; }
+        .metric.gold .v { color: var(--gold); }
+
+        .energy { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .stat { border: 1px solid var(--line); border-radius: 5px; padding: 9px 10px; }
+        .stat .k { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+        .stat .v { margin-top: 4px; font-family: var(--mono); font-size: 15px; font-variant-numeric: tabular-nums; }
+        .stat .v small { color: var(--muted); font-size: 10px; margin-left: 3px; }
+
+        .slider-row { display: flex; align-items: center; gap: 10px; font-size: 12px; margin-top: 8px; }
+        .slider-row label { color: var(--muted); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; min-width: 62px; }
+        .slider-row output { font-family: var(--mono); min-width: 52px; text-align: right; }
+        input[type=range] { flex: 1; accent-color: var(--gold); }
+        .buttons { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+        .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; font-size: 12px; color: var(--muted); }
+        .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; vertical-align: -1px; }
+        .legend i.sq { border-radius: 1px; }
+        .legend i.dm { transform: rotate(45deg); border-radius: 1px; }
+        .legend i.ring { background: transparent !important; border: 1.5px solid var(--community); }
+
+        .note { font-size: 11px; color: var(--muted); line-height: 1.5; }
+        .foot { font-size: 11px; color: var(--muted); line-height: 1.55; border-top: 1px solid var(--line); padding-top: 12px; margin-top: auto; }
+
+        #stage { flex: 1; position: relative; min-width: 0; background: radial-gradient(ellipse at 50% 40%, #121218 0%, var(--bg) 70%); }
+        #stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; }
+        #stage.grab canvas { cursor: grabbing; }
+        #hint { position: absolute; right: 18px; bottom: 14px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-align: right; line-height: 1.7; pointer-events: none; }
+        #tooltip { position: absolute; pointer-events: none; font-size: 12px; background: rgba(10, 10, 11, 0.9); border: 1px solid var(--line); border-radius: 4px; padding: 6px 9px; transform: translate(12px, 12px); white-space: nowrap; }
+        #tooltip[hidden] { display: none; }
+        #tooltip b { display: block; font-weight: 500; }
+        #tooltip span { color: var(--muted); font-family: var(--mono); font-size: 11px; }
+        #debug { position: absolute; left: 16px; top: 14px; font-family: var(--mono); font-size: 11px; color: var(--muted); background: rgba(10, 10, 11, 0.85); border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px; line-height: 1.55; white-space: pre; pointer-events: none; }
+        #debug[hidden] { display: none; }
+        #clock { position: absolute; left: 18px; bottom: 14px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--muted); pointer-events: none; }
+        #clock b { color: var(--text); font-weight: 500; }
+
+        .pair { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin: 8px 0 10px; }
+        .pair .who { font-size: 14px; line-height: 1.3; }
+        .pair .who small { display: block; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-top: 2px; }
+        .pair .who:last-child { text-align: right; }
+        .pair .arrow { font-family: var(--serif); font-size: 22px; color: var(--gold); }
+        .match { display: flex; align-items: baseline; gap: 8px; }
+        .match .v { font-family: var(--mono); font-size: 40px; color: var(--gold); line-height: 1; }
+        .match .k { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+        .bar { height: 3px; background: rgba(255, 255, 255, 0.08); border-radius: 2px; margin: 10px 0 12px; overflow: hidden; }
+        .bar i { display: block; height: 100%; background: var(--gold); width: 0; transition: width .2s; }
+        .reason { font-size: 13px; line-height: 1.55; margin: 0 0 12px; }
+        .reason b { color: var(--gold); font-weight: 500; }
+
+        #why { list-style: none; margin: 0 0 12px; padding: 0; font-size: 12px; }
+        #why li { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+        #why li .chk { font-family: var(--mono); color: var(--gold); width: 14px; }
+        #why li .chk.no { color: var(--muted); }
+        #why li .lbl { flex: 1; }
+        #why li .val { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+        #why li .val.hi { color: var(--gold); }
+        #why li small { color: var(--muted); display: block; font-size: 11px; }
+        .actions { display: flex; gap: 8px; align-items: center; }
+        .actions .primary { flex: 1; padding: 11px; }
+
+        #recs { display: flex; flex-direction: column; gap: 6px; }
+        .rec { display: grid; grid-template-columns: 26px 1fr auto; gap: 10px; align-items: center; padding: 9px 10px; border: 1px solid var(--line); border-radius: 5px; cursor: pointer; }
+        .rec:hover { background: rgba(255, 255, 255, 0.04); }
+        .rec.on { border-color: var(--gold); background: var(--gold-bg); }
+        .rec .n { font-family: var(--mono); color: var(--gold); font-size: 14px; }
+        .rec .who { font-size: 13px; }
+        .rec .who small { display: block; color: var(--muted); font-size: 11px; margin-top: 2px; }
+        .rec .sc { font-family: var(--mono); font-size: 16px; }
+        .rec .sc.hi { color: var(--gold); }
+        .rec.done .n::after { content: "✓"; }
+
+        #loop { width: 100%; height: 190px; display: block; }
+        #loopInfo { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+        #loopInfo b { color: var(--gold); font-weight: 500; }
+
+        #modal { position: fixed; inset: 0; background: rgba(5, 5, 6, 0.78); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 20; }
+        #modal[hidden] { display: none; }
+        .modal-card { background: #101013; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 8px; width: min(820px, 100%); max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7); }
+        .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+        .modal-head h3 { margin: 0; font-family: var(--serif); font-weight: normal; font-size: 19px; letter-spacing: 0.03em; }
+        .modal-head div { display: flex; gap: 8px; }
+        #promptText { margin: 0; padding: 20px; font: 13px/1.6 var(--mono); color: var(--text); white-space: pre-wrap; overflow-y: auto; user-select: text; }
+
+        @media (max-width: 1180px) {
+            aside { width: 260px; }
+            #right { width: 300px; }
+            .brand .sub, #hint { display: none; }
+        }
+    </style>
+</head>
+
+<body>
+    <header id="top">
+        <div class="brand"><span class="logo">LÆDS<sup>®</sup></span><span class="sub">Connection Intelligence Lab</span></div>
+        <ol id="pipeline">
+            <li data-stage="attract" class="on">ATTRACT</li><li class="arrow">→</li>
+            <li data-stage="connect">CONNECT</li><li class="arrow">→</li>
+            <li data-stage="match">MATCH</li><li class="arrow">→</li>
+            <li data-stage="act">ACT</li>
+        </ol>
+        <div class="tools">
+            <button id="soundBtn" title="Tono generado por WebAudio según el score">Sonido off</button>
+            <button id="debugBtn" title="Variables del modelo (tecla D)">Debug</button>
+            <button id="promptBtn">Ver el prompt</button>
+        </div>
+    </header>
+
+    <div id="app">
+        <aside id="left">
+            <div>
+                <h2>Hoy</h2>
+                <div class="metrics">
+                    <div class="metric"><span class="v" id="mTotal">–</span><span class="k">conexiones posibles<br><small>n·(n−1)/2</small></span></div>
+                    <div class="metric"><span class="v" id="mHigh">–</span><span class="k">de alta relevancia<br><small>afinidad &gt; 0.75</small></span></div>
+                    <div class="metric gold"><span class="v" id="mRec">–</span><span class="k">interacciones recomendadas<br><small>top 6 por energía potencial</small></span></div>
+                    <div class="metric gold"><span class="v" id="mAct">–</span><span class="k">oportunidades activas<br><small>alta relevancia con timing &lt; 7 días, o conectadas</small></span></div>
+                </div>
+            </div>
+            <div>
+                <h2>Energía del sistema</h2>
+                <div class="energy">
+                    <div class="stat"><div class="k">Cinética</div><div class="v" id="eK">–</div></div>
+                    <div class="stat"><div class="k">Potencial</div><div class="v" id="eP">–</div></div>
+                    <div class="stat"><div class="k">Total</div><div class="v" id="eT">–</div></div>
+                    <div class="stat"><div class="k">Deriva</div><div class="v" id="eD">–</div></div>
+                </div>
+                <p class="note" id="eNote"></p>
+            </div>
+            <div>
+                <h2>Controles</h2>
+                <div class="slider-row"><label for="speed">Reloj</label><input type="range" id="speed" min="0" max="10" step="0.1" value="1"><output id="speedVal">1.0×</output></div>
+                <p class="note" id="speedNote"></p>
+                <div class="slider-row"><label for="damp">Fricción</label><input type="range" id="damp" min="0" max="2" step="0.01" value="0"><output id="dampVal">0.00</output></div>
+                <div class="buttons">
+                    <button id="pauseBtn">Pausa</button>
+                    <button id="fitBtn">Reencuadrar</button>
+                    <button id="reseedBtn">Nuevo universo</button>
+                </div>
+            </div>
+            <div>
+                <h2>Leyenda</h2>
+                <div class="legend">
+                    <span><i style="background:var(--buyer)"></i>Comprador</span>
+                    <span><i style="background:var(--seller)"></i>Vendedor</span>
+                    <span><i style="background:var(--investor)"></i>Inversionista</span>
+                    <span><i class="dm" style="background:var(--broker)"></i>Broker</span>
+                    <span><i class="sq" style="background:var(--property)"></i>Propiedad</span>
+                    <span><i class="ring"></i>Comunidad</span>
+                    <span><i style="background:var(--gold)"></i>Oportunidad activa</span>
+                    <span><i style="background:transparent;border:1.5px solid #fff"></i>Seleccionado</span>
+                </div>
+            </div>
+            <div class="foot">Las fuerzas del mapa usan la afinidad estructural (zona, presupuesto, timing inicial, comunidades). El score en vivo añade la cercanía actual en el mapa como parte de la relación: mover un nodo recalcula su score.</div>
+        </aside>
+
+        <section id="stage">
+            <canvas id="c"></canvas>
+            <div id="debug" hidden></div>
+            <div id="clock"></div>
+            <div id="hint">Clic en un nodo para inspeccionar<br>Arrastra un nodo: el universo espera y el score responde<br>Rueda para zoom · Arrastra el fondo para desplazar · Espacio pausa</div>
+            <div id="tooltip" hidden></div>
+        </section>
+
+        <aside id="right">
+            <div class="card gold" id="focusCard">
+                <h2 id="focusKicker">Next best connection</h2>
+                <div class="pair">
+                    <div class="who" id="fA"></div>
+                    <div class="arrow">↔</div>
+                    <div class="who" id="fB"></div>
+                </div>
+                <div class="match"><span class="v" id="fScore">–</span><span class="k">match</span></div>
+                <div class="bar"><i id="fBar"></i></div>
+                <p class="reason" id="fText"></p>
+                <ul id="why" hidden></ul>
+                <div class="actions">
+                    <button id="connectBtn" class="primary">Connect</button>
+                    <button id="whyBtn">¿Por qué?</button>
+                </div>
+            </div>
+            <div id="recsWrap" hidden>
+                <h2 id="recsTitle">Conexiones recomendadas</h2>
+                <div id="recs"></div>
+                <div class="buttons"><button id="clearBtn" class="ghost">Quitar selección</button></div>
+            </div>
+            <div class="card">
+                <h2>Potencial de conexión vs timing</h2>
+                <canvas id="loop"></canvas>
+                <div id="loopInfo"></div>
+            </div>
+        </aside>
+    </div>
+
+    <div id="modal" hidden>
+        <div class="modal-card" role="dialog" aria-labelledby="modalTitle">
+            <div class="modal-head">
+                <h3 id="modalTitle">El prompt que hizo esto</h3>
+                <div><button id="copyPrompt">Copiar</button><button id="closePrompt">Cerrar</button></div>
+            </div>
+            <pre id="promptText">TITLE: LÆDS® Universe — Relationship Intelligence Engine
+
+GOAL: Create a single, self-contained HTML file (no external libraries, no build step, no assets, fully offline) that simulates a relationship intelligence engine for real estate, NOT a CRM dashboard.
+
+CORE CONCEPT: Model human connections like gravity. Not contacts, but potential energy between them.
+
+1. DATA MODEL (100 synthetic nodes, generated in JS):
+- PEOPLE (40): {id, name, type: buyer/seller/investor, budget: 1.5M-15M, zone: Lomas/Angelopolis/Centro/Zavaleta, need: inversion/patrimonio/renta, timing: 0-30 days}
+- BROKERS (15): {id, name, specialty, inventory, trust_score: 0.6-0.99}
+- PROPERTIES (30): {id, title, price, zone, roi: 6-18%, status}
+- COMMUNITIES (15): {id, name: WhatsApp groups, members}
+
+2. PHYSICS ENGINE (Aurelith architecture): a REAL force-directed graph model.
+For each pair (A,B): attraction_force = zone_match*0.3 + budget_match*0.3 + timing_match*0.2 + relationship_proximity*0.2; if same community, boost *1.5; if broker has property that matches buyer budget+zone, create high potential energy.
+SIMULATION: Verlet integration. Nodes attract/repel based on potential. 60fps in canvas.
+METRICS: total_possible_connections = n*(n-1)/2; high_relevance: attraction &gt; 0.75; recommended: top 6 by energy; active_opportunities: high_relevance + timing &lt; 7 days.
+VALIDATION: live calculation of the metrics updating as the simulation runs; show energy conservation like Aurelith shows orbital energy.
+VISUALIZATION: canvas network, dots + glowing lines, line opacity = attraction_force, zoom/pan, click node to inspect. Pure canvas.
+
+3. DYNAMIC SYSTEM (Engine architecture): all readouts driven by the SAME live model.
+LEAD → MATCH ENGINE → SCORE (0-100%), WHY (bullet list), NEXT BEST CONNECTION card, and a "Connection Potential vs Timing" live loop graph. If I move a buyer node, SCORE must recalculate live. Optional WebAudio tone based on match score.
+
+4. INTERACTION (Maestro architecture): HUMAN → SIGNAL → INTERPRETATION → STATE → RESPONSE → NEW SIGNAL.
+Click any PERSON → 3 recommended connections with explanation "Te recomiendo conectar A con B porque..."; click WHY → reasoning chain (zone %, budget %, community); click CONNECT → node becomes "active opportunity", metrics update, particle flow from A to B.
+
+5. UI LAYOUT: Top pipeline ATTRACT → CONNECT → MATCH → ACT. Center canvas universe. Left: TODAY metrics. Right: NEXT BEST CONNECTION with match %, WHY expandable, CONNECT button.
+
+6. CONSTRAINTS: one HTML file, all CSS+JS inline, no external libraries, no CDN, no fetch, offline, no build step, requestAnimationFrame, expose model variables (console / debug panel), 100 nodes @ 60fps.
+
+7. DELIGHT: nodes glow on high match, lines animate like gravitational fields, particle flow on CONNECT, system serif for LÆDS®, monospace for metrics, dark universe (#0A0A0B) + gold accent (#C6A96B).</pre>
+        </div>
+    </div>
+
+    <script>
+(() => {
+'use strict';
+
+/* =====================================================================
+   0. Utilities
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const fmtM = v => '$' + (v / 1e6).toFixed(1) + 'M';
+const pct = v => Math.round(clamp(v, 0, 1) * 100) + '%';
+const fmtInt = v => v.toLocaleString('es-MX');
+let seed = 20260918;
+const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+const pick = arr => arr[Math.floor(rnd() * arr.length)];
+const rint = (a, b) => a + Math.floor(rnd() * (b - a + 1));
+const logUniform = (a, b) => a * Math.pow(b / a, rnd());
+
+/* =====================================================================
+   1. Data model: 100 synthetic nodes
+   ===================================================================== */
+const ZONES = ['Lomas', 'Angelópolis', 'Centro', 'Zavaleta'];
+const ADJ = { 'Lomas|Angelópolis': 0.5, 'Angelópolis|Zavaleta': 0.5, 'Centro|Zavaleta': 0.5 };
+const zoneMatch = (a, b) => a === b ? 1 : (ADJ[a + '|' + b] ?? ADJ[b + '|' + a] ?? 0);
+const FIRST = ['Sofía', 'Mateo', 'Valentina', 'Santiago', 'Regina', 'Diego', 'Camila', 'Emiliano', 'Ximena', 'Leonardo', 'Renata', 'Sebastián', 'Mariana', 'Rodrigo', 'Fernanda', 'Andrés', 'Daniela', 'Alejandro', 'Paulina', 'Nicolás', 'Isabella', 'Gael', 'Lucía', 'Iker', 'Ana Paula', 'Bruno', 'Montserrat', 'Javier', 'Elena', 'Patricio', 'Carolina', 'Héctor', 'Julieta', 'Arturo', 'Natalia', 'Gonzalo', 'Victoria', 'Eduardo', 'Marcela', 'Tomás', 'Adriana', 'Rafael', 'Lorena', 'Óscar', 'Beatriz', 'Ignacio', 'Pilar', 'Álvaro', 'Rosa', 'Felipe', 'Teresa', 'Manuel', 'Claudia', 'Ricardo', 'Silvia'];
+const LAST = ['Hernández', 'García', 'Martínez', 'López', 'González', 'Pérez', 'Rodríguez', 'Sánchez', 'Ramírez', 'Torres', 'Flores', 'Rivera', 'Gómez', 'Díaz', 'Cruz', 'Morales', 'Reyes', 'Gutiérrez', 'Ortiz', 'Chávez', 'Ruiz', 'Mendoza', 'Aguilar', 'Vargas', 'Castillo', 'Romero', 'Herrera', 'Medina', 'Jiménez', 'Cabrera', 'Cordero', 'Salas', 'Bello', 'Anaya', 'Lara'];
+const NEEDS = ['inversión', 'patrimonio', 'renta'];
+const PTYPES = ['Depto', 'Depto', 'Casa', 'Casa', 'Penthouse', 'Local', 'Terreno', 'Oficina'];
+const PPLACES = {
+    'Lomas': ['Torre Adamant', 'Sonata', 'Parque Querétaro', 'Cascatta', 'Parque Nuevo León', 'Lomas III', 'Torre Verona'],
+    'Angelópolis': ['Vía Atlixcáyotl', 'Torre Titanium', 'Reserva Territorial', 'Blvd. del Niño Poblano', 'La Vista', 'Torre JV'],
+    'Centro': ['Calle 5 de Mayo', 'Barrio de Analco', 'Av. Reforma', 'Los Sapos', 'Calle 3 Oriente', 'Portal Hidalgo'],
+    'Zavaleta': ['Camino Real', 'Bosques de Zavaleta', 'Blvd. Forjadores', 'Av. Zavaleta', 'Rincón de Zavaleta', 'Santa Cruz Buenavista'],
+};
+const COMM_KIND = ['Inversionistas', 'Vecinos', 'Compradores', 'Propietarios', 'Familias', 'Preventas', 'Rentas', 'Terrenos'];
+
+const M = { nodes: [], pairs: [], edges: [], people: [], brokers: [], props: [], comms: [] };
+
+function fullName() { return pick(FIRST) + ' ' + pick(LAST); }
+
+function buildUniverse(newSeed) {
+    seed = newSeed >>> 0;
+    M.nodes = []; M.pairs = []; M.edges = []; M.people = []; M.brokers = []; M.props = []; M.comms = [];
+    let nid = 0;
+    const add = (o, ring, spread) => {
+        const ang = rnd() * Math.PI * 2, r = ring + (rnd() - 0.5) * spread;
+        Object.assign(o, { id: nid++, x: Math.cos(ang) * r, y: Math.sin(ang) * r, vx: 0, vy: 0, ax: 0, ay: 0, mass: o.kind === 'community' ? 3 : 1, active: false, comms: [], connections: 0 });
+        M.nodes.push(o); return o;
+    };
+    const used = new Set();
+    const uniqueName = () => { for (let i = 0; i < 40; i++) { const n = fullName(); if (!used.has(n)) { used.add(n); return n; } } return fullName() + ' ' + nid; };
+
+    for (let i = 0; i < 40; i++) {
+        M.people.push(add({
+            kind: 'person', name: uniqueName(), type: pick(['buyer', 'buyer', 'buyer', 'seller', 'seller', 'investor', 'investor']),
+            budget: Math.round(logUniform(1.5e6, 15e6) / 5e4) * 5e4, zone: pick(ZONES), need: pick(NEEDS),
+            timing0: rint(0, 30), cycleStart: 0,
+        }, 0.35, 0.5));
+    }
+    for (let i = 0; i < 15; i++) {
+        M.brokers.push(add({ kind: 'broker', name: uniqueName(), specialty: ZONES[i % 4], inventory: [], trust: +(0.6 + rnd() * 0.39).toFixed(2) }, 0.7, 0.25));
+    }
+    for (let i = 0; i < 30; i++) {
+        const zone = ZONES[i % 4];
+        const p = add({
+            kind: 'property', title: pick(PTYPES) + ' ' + pick(PPLACES[zone]), zone,
+            price: Math.round(logUniform(1.5e6, 15e6) / 5e4) * 5e4, roi: +(6 + rnd() * 12).toFixed(1),
+            status: pick(['disponible', 'disponible', 'disponible', 'disponible', 'apartada']),
+        }, 0.9, 0.3);
+        const local = M.brokers.filter(b => b.specialty === zone);
+        const broker = rnd() < 0.8 ? pick(local) : pick(M.brokers);
+        p.broker = broker.id; broker.inventory.push(p.id);
+        p.name = p.title;
+        M.props.push(p);
+    }
+    for (let i = 0; i < 15; i++) {
+        const zone = ZONES[i % 4], kind = COMM_KIND[i % COMM_KIND.length];
+        const c = add({ kind: 'community', name: kind + ' ' + zone + (i >= 8 ? ' ' + (2 + ((i - 8) >> 2)) : ''), zone, members: [] }, 1.15, 0.2);
+        const peopleHere = M.people.filter(p => p.zone === zone), brokersHere = M.brokers.filter(b => b.specialty === zone);
+        const np = rint(4, 9), nb = rint(1, 3);
+        for (let k = 0; k < np; k++) { const p = rnd() < 0.75 && peopleHere.length ? pick(peopleHere) : pick(M.people); if (!c.members.includes(p.id)) { c.members.push(p.id); p.comms.push(c.id); } }
+        for (let k = 0; k < nb; k++) { const b = rnd() < 0.75 && brokersHere.length ? pick(brokersHere) : pick(M.brokers); if (!c.members.includes(b.id)) { c.members.push(b.id); b.comms.push(c.id); } }
+        M.comms.push(c);
+    }
+    buildPairs();
+}
+
+/* =====================================================================
+   2. Match engine: pairwise affinity = zone·0.3 + budget·0.3 + timing·0.2 + relationship·0.2
+   ===================================================================== */
+function budgetFit(price, budget) {
+    const r = price / budget;
+    if (r >= 0.65 && r <= 1) return 1;
+    if (r < 0.65) return clamp(r / 0.65, 0, 1) ** 2;
+    return clamp(1 - (r - 1) / 0.25, 0, 1);
+}
+function needFit(need, roi) {
+    if (need === 'inversión') return clamp((roi - 8) / 8, 0, 1);
+    if (need === 'renta') return clamp(1 - Math.abs(roi - 11) / 6, 0, 1);
+    return 1 - clamp((roi - 10) / 8, 0, 1) * 0.5;
+}
+function typeFactor(a, b) {
+    if (a === b) return 0.7;
+    if ((a === 'buyer' && b === 'seller') || (a === 'seller' && b === 'buyer')) return 1;
+    if ((a === 'investor' && b === 'seller') || (a === 'seller' && b === 'investor')) return 1;
+    return 0.85;
+}
+const sharedComms = (a, b) => a.comms.filter(c => b.comms.includes(c));
+const nodeById = id => M.nodes[id];
+const timingOf = p => clamp(p.timing0 - (S.days - p.cycleStart), 0, 30);
+const urgency = p => 1 - timingOf(p) / 30;
+
+function buildPairs() {
+    M.pairs = []; M.edges = [];
+    const N = M.nodes;
+    for (let i = 0; i < N.length; i++) for (let j = i + 1; j < N.length; j++) {
+        const A = N[i], B = N[j];
+        let pr = null;
+        const ka = A.kind, kb = B.kind;
+        if (ka === 'person' && kb === 'person') pr = { kind: 'pp' };
+        else if ((ka === 'person' && kb === 'broker') || (ka === 'broker' && kb === 'person')) pr = { kind: 'pb' };
+        else if ((ka === 'person' && kb === 'property') || (ka === 'property' && kb === 'person')) pr = { kind: 'px' };
+        else if (ka === 'broker' && kb === 'broker') pr = { kind: 'bb' };
+        else if ((ka === 'broker' && kb === 'property') || (ka === 'property' && kb === 'broker')) {
+            const br = ka === 'broker' ? A : B, px = ka === 'broker' ? B : A;
+            if (px.broker === br.id) pr = { kind: 'bx', structural: true, base: 0.55 };
+        } else if (ka === 'community' || kb === 'community') {
+            const c = ka === 'community' ? A : B, m = ka === 'community' ? B : A;
+            if (m.kind !== 'community' && c.members.includes(m.id)) pr = { kind: 'cm', structural: true, base: 0.45 };
+        }
+        if (!pr) continue;
+        pr.a = A.id; pr.b = B.id; pr.connected = false; pr.live = pr.base || 0; pr.energy = 0; pr.comp = null; pr.minTiming = 99;
+        // shared WhatsApp groups are static: cache them once (for person–property, through the property's broker)
+        const relB = B.kind === 'property' ? nodeById(B.broker) : B, relA = A.kind === 'property' ? nodeById(A.broker) : A;
+        const shared = sharedComms(relA, relB);
+        pr.sharedN = shared.length; pr.communityName = shared.length ? nodeById(shared[0]).name : null;
+        if (!pr.structural) { pr.structural = false; pr.base = score(pr, 0, true).a; }
+        M.pairs.push(pr);
+        if (pr.structural || pr.base >= 0.45) M.edges.push(pr);
+    }
+}
+
+// Computes the affinity of a pair. spatial ∈ [0,1] is the live map proximity; static=true ignores it and the clock.
+function score(pr, spatial, isStatic) {
+    let A = nodeById(pr.a), B = nodeById(pr.b);
+    if (A.kind !== 'person' && B.kind === 'person') [A, B] = [B, A];
+    const comp = { zone: 0, budget: 0, timing: 0, rel: 0, community: pr.communityName, inventory: null, trust: null, factor: 1, spatial: isStatic ? 1 : spatial, mapFactor: 1 };
+    comp.rel = pr.connected ? 1 : Math.min(1, pr.sharedN * 0.7);
+
+    if (pr.kind === 'pp') {
+        comp.zone = zoneMatch(A.zone, B.zone);
+        comp.budget = 1 - Math.min(1, Math.abs(Math.log(A.budget / B.budget)) / Math.log(3));
+        comp.timing = isStatic ? 1 - Math.abs(A.timing0 - B.timing0) / 30 : 1 - Math.abs(timingOf(A) - timingOf(B)) / 30;
+        comp.factor = typeFactor(A.type, B.type);
+    } else if (pr.kind === 'pb') {
+        comp.zone = zoneMatch(A.zone, B.specialty);
+        let best = 0, bestProp = null;
+        for (const pid of B.inventory) {
+            const P = nodeById(pid), f = budgetFit(P.price, A.budget) * (P.status === 'apartada' ? 0.5 : 1);
+            if (f > best) { best = f; bestProp = P; }
+            if (f >= 0.8 && zoneMatch(P.zone, A.zone) === 1 && P.status === 'disponible') comp.inventory = comp.inventory || P.title;
+        }
+        comp.budget = best;
+        comp.bestProp = bestProp ? bestProp.title : null;
+        comp.timing = isStatic ? 1 - A.timing0 / 30 : urgency(A);
+        comp.trust = B.trust;
+        comp.factor = 0.7 + 0.3 * B.trust;
+    } else if (pr.kind === 'px') {
+        comp.zone = zoneMatch(A.zone, B.zone);
+        comp.budget = 0.7 * budgetFit(B.price, A.budget) + 0.3 * needFit(A.need, B.roi);
+        comp.timing = isStatic ? 1 - A.timing0 / 30 : urgency(A);
+        comp.factor = (B.status === 'apartada' ? 0.5 : 1) * (A.type === 'seller' ? 0.6 : 1);
+    } else if (pr.kind === 'bb') {
+        comp.zone = zoneMatch(A.specialty, B.specialty);
+        comp.budget = 0.5;
+        comp.timing = 0.5;
+        comp.factor = 0.6;
+    }
+    let a = comp.zone * 0.3 + comp.budget * 0.3 + comp.timing * 0.2 + comp.rel * 0.2;
+    if (comp.community) a *= 1.5;
+    a *= comp.factor;
+    if (comp.inventory) a += 0.15;
+    // the ×1.5 boost can push the raw sum past 1; compress softly above the 0.75 threshold instead of hard clipping,
+    // so ranking stays strictly monotonic and 100% is only asymptotic
+    if (a > 0.75) a = 0.75 + 0.25 * (1 - Math.exp(-(a - 0.75) / 0.25));
+    // like gravity, the live potential falls with distance in the relationship map: far apart → up to −20%
+    if (!isStatic && !pr.connected) { comp.mapFactor = 0.8 + 0.2 * spatial; a *= comp.mapFactor; }
+    if (pr.connected) a = Math.max(a, 0.8);
+    a = clamp(a, 0, 1);
+    return { a, comp };
+}
+
+const REL_L = 0.35;   // map distance (world units) over which spatial proximity decays
+function updateLive() {
+    for (const pr of M.pairs) {
+        if (pr.structural) { pr.live = pr.base; pr.energy = 0; continue; }
+        const A = nodeById(pr.a), B = nodeById(pr.b);
+        const d = Math.hypot(A.x - B.x, A.y - B.y);
+        const spatial = Math.exp(-d / REL_L);
+        const r = score(pr, spatial, false);
+        pr.live = r.a; pr.comp = r.comp;
+        let urg = 0;
+        if (A.kind === 'person' && B.kind === 'person') urg = (urgency(A) + urgency(B)) / 2;
+        else if (A.kind === 'person') urg = urgency(A);
+        else if (B.kind === 'person') urg = urgency(B);
+        pr.minTiming = Math.min(A.kind === 'person' ? timingOf(A) : 99, B.kind === 'person' ? timingOf(B) : 99);
+        pr.energy = r.a * (0.5 + 0.5 * urg) * (r.comp.inventory ? 1.5 : 1);
+    }
+}
+
+/* =====================================================================
+   3. Physics: velocity Verlet on a force-directed potential
+   ===================================================================== */
+const P = { kSpring: 2.2, kRep: 0.0045, eps: 0.002, kCenter: 0.5, damping: 0, DT: 1 / 120, daysPerSec: 0.05, timeMult: 1 };   // 1 simulated day = 20 s at 1×
+const S = { t: 0, days: 0, paused: false, E0: null, KE: 0, PE: 0, steps: 0, stage: 'attract', recalibrateAt: 0, focusHoldUntil: 0 };
+
+const restLen = a => 0.1 + 0.55 * (1 - a);
+
+function accel() {
+    const N = M.nodes;
+    for (const n of N) { n.ax = -P.kCenter * n.x / n.mass; n.ay = -P.kCenter * n.y / n.mass; }
+    for (let i = 0; i < N.length; i++) {
+        const A = N[i];
+        for (let j = i + 1; j < N.length; j++) {
+            const B = N[j];
+            const dx = B.x - A.x, dy = B.y - A.y, d2 = dx * dx + dy * dy + P.eps;
+            const f = P.kRep / (d2 * Math.sqrt(d2));      // repulsion, softened
+            A.ax -= f * dx / A.mass; A.ay -= f * dy / A.mass;
+            B.ax += f * dx / B.mass; B.ay += f * dy / B.mass;
+        }
+    }
+    for (const e of M.edges) {
+        const A = N[e.a], B = N[e.b];
+        const dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || 1e-6;
+        const k = P.kSpring * e.base, f = k * (d - restLen(e.base)) / d;
+        A.ax += f * dx / A.mass; A.ay += f * dy / A.mass;
+        B.ax -= f * dx / B.mass; B.ay -= f * dy / B.mass;
+    }
+}
+
+function potential() {
+    const N = M.nodes; let U = 0;
+    for (const n of N) U += 0.5 * P.kCenter * (n.x * n.x + n.y * n.y);
+    for (let i = 0; i < N.length; i++) for (let j = i + 1; j < N.length; j++) {
+        const dx = N[j].x - N[i].x, dy = N[j].y - N[i].y;
+        U += P.kRep / Math.sqrt(dx * dx + dy * dy + P.eps);
+    }
+    for (const e of M.edges) {
+        const A = N[e.a], B = N[e.b], d = Math.hypot(B.x - A.x, B.y - A.y), s = d - restLen(e.base);
+        U += 0.5 * P.kSpring * e.base * s * s;
+    }
+    return U;
+}
+function kinetic() { let K = 0; for (const n of M.nodes) K += 0.5 * n.mass * (n.vx * n.vx + n.vy * n.vy); return K; }
+
+function step(dt) {
+    const N = M.nodes, damp = Math.exp(-P.damping * dt);
+    for (const n of N) {
+        if (n === drag.node) continue;
+        n.x += n.vx * dt + 0.5 * n.ax * dt * dt;
+        n.y += n.vy * dt + 0.5 * n.ay * dt * dt;
+        n.oax = n.ax; n.oay = n.ay;
+    }
+    accel();
+    for (const n of N) {
+        if (n === drag.node) { n.vx = n.vy = 0; continue; }
+        const d = n.settleUntil > S.t ? Math.exp(-2.5 * dt) : damp;
+        n.vx = (n.vx + 0.5 * (n.oax + n.ax) * dt) * d;
+        n.vy = (n.vy + 0.5 * (n.oay + n.ay) * dt) * d;
+    }
+    S.t += dt;
+}
+
+function resetEnergyRef() { S.E0 = kinetic() + potential(); }
+
+/* =====================================================================
+   4. Metrics and recommendations
+   ===================================================================== */
+const metrics = { total: 0, evaluated: 0, high: 0, recommended: 6, active: 0, connected: 0, top: [] };
+function updateMetrics() {
+    const n = M.nodes.length;
+    metrics.total = n * (n - 1) / 2;
+    let high = 0, active = 0, connected = 0, evaluated = 0;
+    const cand = [];
+    for (const pr of M.pairs) {
+        if (pr.structural) continue;
+        evaluated++;
+        if (pr.live > 0.75) { high++; if (pr.minTiming < 7) active++; }
+        if (pr.connected) { connected++; if (!(pr.live > 0.75 && pr.minTiming < 7)) active++; }
+        if (!pr.connected) cand.push(pr);
+    }
+    cand.sort((x, y) => y.energy - x.energy);
+    metrics.evaluated = evaluated; metrics.high = high; metrics.active = active; metrics.connected = connected;
+    metrics.top = cand.slice(0, 6);
+}
+function recommendationsFor(node, k = 3) {
+    const list = M.pairs.filter(pr => !pr.structural && (pr.a === node.id || pr.b === node.id));
+    list.sort((x, y) => y.energy - x.energy);
+    return list.slice(0, k);
+}
+
+const TYPE_ES = { buyer: 'comprador', seller: 'vendedor', investor: 'inversionista' };
+function label(n) {
+    if (n.kind === 'person') return `${TYPE_ES[n.type]} · ${n.zone} · ${fmtM(n.budget)}`;
+    if (n.kind === 'broker') return `broker · ${n.specialty} · confianza ${pct(n.trust)}`;
+    if (n.kind === 'property') return `${n.zone} · ${fmtM(n.price)} · ROI ${n.roi}%`;
+    return `grupo WhatsApp · ${n.members.length} miembros`;
+}
+function explain(pr) {
+    let A = nodeById(pr.a), B = nodeById(pr.b);
+    if (A.kind !== 'person' && B.kind === 'person') [A, B] = [B, A];
+    const c = pr.comp || score(pr, 0, false).comp, r = [];
+    if (c.zone >= 1) r.push(`comparten zona (<b>${A.zone || A.specialty}</b>)`);
+    else if (c.zone >= 0.5) r.push('sus zonas son vecinas');
+    if (c.inventory) r.push(`<b>${B.name}</b> tiene <b>${c.inventory}</b> en la zona y dentro del presupuesto`);
+    else if (c.budget >= 0.8) r.push(`el presupuesto encaja al <b>${pct(c.budget)}</b>`);
+    else if (c.budget >= 0.5) r.push(`el presupuesto encaja parcialmente (${pct(c.budget)})`);
+    if (A.kind === 'person') { const t = Math.round(timingOf(A)); if (t <= 7) r.push(`<b>${A.name.split(' ')[0]}</b> decide en <b>${t} día${t === 1 ? '' : 's'}</b>`); else if (c.timing >= 0.5) r.push(`decide en ${t} días`); }
+    if (pr.connected) r.push('ya existe una <b>relación reciente</b>');
+    else if (c.community) r.push(`coinciden en el grupo <b>"${c.community}"</b>`);
+    if (!pr.connected && c.spatial >= 0.5) r.push('están cerca en el mapa de relaciones');
+    else if (!pr.connected && c.spatial < 0.1) r.push(`están lejos en el mapa (factor ×${c.mapFactor.toFixed(2)})`);
+    if (c.trust != null && c.trust >= 0.85) r.push(`la confianza del broker es <b>${pct(c.trust)}</b>`);
+    if (!r.length) r.push('la afinidad estructural es baja; conviene esperar una señal');
+    return `Te recomiendo conectar <b>${A.name}</b> con <b>${B.name}</b> porque ${r.join(', ')}.`;
+}
+
+/* =====================================================================
+   5. Canvas: camera, picking, drawing
+   ===================================================================== */
+const stage = $('stage'), canvas = $('c'), ctx = canvas.getContext('2d');
+let W = 0, H = 0, dpr = 1;
+const cam = { cx: 0, cy: 0, scale: 300, fitScale: 300 };
+const drag = { node: null, pan: null, moved: false, id: null, hold: null };
+const HOLD_MS = 4000;      // after dropping a node the universe holds still this long, so the what-if score can be read
+let hover = null, selected = null, focus = null, recs = [], whyOpen = false;
+const particles = [], pulses = [];
+
+function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = stage.clientWidth; H = stage.clientHeight;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+}
+function fit() {
+    let maxR = 0.5;
+    for (const n of M.nodes) maxR = Math.max(maxR, Math.hypot(n.x, n.y));
+    cam.cx = 0; cam.cy = 0; cam.scale = Math.min(W, H) / 2 / (maxR * 1.3); cam.fitScale = cam.scale;
+}
+const toScreen = (x, y) => [W / 2 + (x - cam.cx) * cam.scale, H / 2 + (y - cam.cy) * cam.scale];
+const toWorld = (sx, sy) => [cam.cx + (sx - W / 2) / cam.scale, cam.cy + (sy - H / 2) / cam.scale];
+
+const COLORS = { buyer: '#7fb3ff', seller: '#ff8c5a', investor: '#c9a0ff', broker: '#ede6d6', property: '#6fd3a8', community: '#8a7fb8', gold: '#c6a96b' };
+const rgbCache = new Map();
+function rgb(c) {
+    if (rgbCache.has(c)) return rgbCache.get(c);
+    const n = parseInt(c.slice(1), 16), s = `${n >> 16},${(n >> 8) & 255},${n & 255}`;
+    rgbCache.set(c, s); return s;
+}
+const nodeColor = n => n.active ? COLORS.gold : n.kind === 'person' ? COLORS[n.type] : COLORS[n.kind];
+const nodeRadius = n => n.kind === 'community' ? 13 : n.kind === 'broker' ? 6.5 : n.kind === 'property' ? 5 : 5.5;
+
+function pickNode(mx, my) {
+    let best = null, bd = 20;
+    for (const n of M.nodes) {
+        const [sx, sy] = toScreen(n.x, n.y), d = Math.hypot(sx - mx, sy - my) - (n.kind === 'community' ? 6 : 0);
+        if (d < bd) { bd = d; best = n; }
+    }
+    return best;
+}
+
+function drawNode(n, now) {
+    const [x, y] = toScreen(n.x, n.y), r = nodeRadius(n), col = nodeColor(n);
+    const isSel = n === selected, isFocus = focus && (focus.a === n.id || focus.b === n.id), isRec = recs.some(p => p.a === n.id || p.b === n.id);
+    if (n.kind === 'community') {
+        ctx.fillStyle = `rgba(${rgb(col)},0.08)`; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+        ctx.strokeStyle = `rgba(${rgb(col)},${isSel ? 0.9 : 0.45})`; ctx.lineWidth = 1.2; ctx.stroke();
+        ctx.fillStyle = `rgba(${rgb(col)},0.9)`; ctx.beginPath(); ctx.arc(x, y, 2.2, 0, 7); ctx.fill();
+        return;
+    }
+    if (n.active || isSel || isFocus) {
+        const gr = r * (isFocus ? 4.2 : 3.2) + (isFocus ? 2 * Math.sin(now / 300) : 0);
+        const g = ctx.createRadialGradient(x, y, 0, x, y, gr);
+        g.addColorStop(0, `rgba(${rgb(col)},0.55)`); g.addColorStop(1, `rgba(${rgb(col)},0)`);
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, gr, 0, 7); ctx.fill();
+    }
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    if (n.kind === 'broker') { ctx.moveTo(x, y - r); ctx.lineTo(x + r, y); ctx.lineTo(x, y + r); ctx.lineTo(x - r, y); ctx.closePath(); }
+    else if (n.kind === 'property') ctx.rect(x - r, y - r, 2 * r, 2 * r);
+    else ctx.arc(x, y, r, 0, 7);
+    ctx.fill();
+    if (isSel) { ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(x, y, r + 6, 0, 7); ctx.stroke(); }
+    else if (isRec || isFocus) { ctx.strokeStyle = COLORS.gold; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, y, r + 5, 0, 7); ctx.stroke(); }
+}
+
+function drawLabel(n, dim) {
+    const [x, y] = toScreen(n.x, n.y), r = nodeRadius(n);
+    ctx.font = n.kind === 'community' ? 'italic 11px Georgia, serif' : '500 12px "Helvetica Neue", Helvetica, Arial, sans-serif';
+    ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    ctx.fillStyle = 'rgba(0,0,0,0.75)'; ctx.fillText(n.name, x + r + 8, y + 1);
+    ctx.fillStyle = dim ? 'rgba(236,231,219,0.55)' : (n.active ? COLORS.gold : '#ece7db'); ctx.fillText(n.name, x + r + 7, y);
+}
+
+const BUCKETS = 10;
+function draw(now) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    // membership edges (structural), very faint
+    ctx.lineWidth = 0.6; ctx.strokeStyle = 'rgba(138,127,184,0.10)'; ctx.beginPath();
+    for (const pr of M.pairs) {
+        if (pr.kind !== 'cm') continue;
+        const A = M.nodes[pr.a], B = M.nodes[pr.b], [ax, ay] = toScreen(A.x, A.y), [bx, by] = toScreen(B.x, B.y);
+        ctx.moveTo(ax, ay); ctx.lineTo(bx, by);
+    }
+    ctx.stroke();
+    // broker → inventory edges
+    ctx.strokeStyle = 'rgba(111,211,168,0.16)'; ctx.beginPath();
+    for (const pr of M.pairs) {
+        if (pr.kind !== 'bx') continue;
+        const A = M.nodes[pr.a], B = M.nodes[pr.b], [ax, ay] = toScreen(A.x, A.y), [bx, by] = toScreen(B.x, B.y);
+        ctx.moveTo(ax, ay); ctx.lineTo(bx, by);
+    }
+    ctx.stroke();
+
+    // affinity edges, opacity = live affinity, batched by alpha bucket
+    const buckets = []; for (let i = 0; i < BUCKETS; i++) buckets.push([]);
+    const gold = [];
+    for (const pr of M.pairs) {
+        if (pr.structural || pr.live < 0.3) continue;
+        if (pr.live > 0.75 || pr.connected) { gold.push(pr); continue; }
+        buckets[Math.min(BUCKETS - 1, Math.floor((pr.live - 0.3) / 0.45 * BUCKETS))].push(pr);
+    }
+    ctx.lineWidth = 0.8;
+    for (let i = 0; i < BUCKETS; i++) {
+        if (!buckets[i].length) continue;
+        ctx.strokeStyle = `rgba(236,231,219,${(0.05 + 0.3 * (i + 0.5) / BUCKETS).toFixed(3)})`; ctx.beginPath();
+        for (const pr of buckets[i]) { const A = M.nodes[pr.a], B = M.nodes[pr.b], [ax, ay] = toScreen(A.x, A.y), [bx, by] = toScreen(B.x, B.y); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); }
+        ctx.stroke();
+    }
+    // high matches: gold, animated like a field
+    ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(198,169,107,0.55)'; ctx.setLineDash([6, 10]); ctx.lineDashOffset = -(now / 40) % 16; ctx.beginPath();
+    for (const pr of gold) { const A = M.nodes[pr.a], B = M.nodes[pr.b], [ax, ay] = toScreen(A.x, A.y), [bx, by] = toScreen(B.x, B.y); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); }
+    ctx.stroke(); ctx.setLineDash([]);
+    ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(198,169,107,0.18)'; ctx.beginPath();
+    for (const pr of gold) { const A = M.nodes[pr.a], B = M.nodes[pr.b], [ax, ay] = toScreen(A.x, A.y), [bx, by] = toScreen(B.x, B.y); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); }
+    ctx.stroke();
+
+    // focus pair: bright link
+    if (focus) {
+        const A = M.nodes[focus.a], B = M.nodes[focus.b], [ax, ay] = toScreen(A.x, A.y), [bx, by] = toScreen(B.x, B.y);
+        ctx.lineWidth = 2; ctx.strokeStyle = `rgba(198,169,107,${0.6 + 0.3 * Math.sin(now / 250)})`; ctx.shadowColor = COLORS.gold; ctx.shadowBlur = 12;
+        ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke(); ctx.shadowBlur = 0;
+    }
+    // recommendation links from selected node
+    if (selected) {
+        ctx.lineWidth = 1.4; ctx.strokeStyle = 'rgba(198,169,107,0.5)'; ctx.beginPath();
+        for (const pr of recs) { if (pr === focus) continue; const A = M.nodes[pr.a], B = M.nodes[pr.b], [ax, ay] = toScreen(A.x, A.y), [bx, by] = toScreen(B.x, B.y); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); }
+        ctx.stroke();
+    }
+
+    // connect pulses (expanding rings)
+    for (let i = pulses.length - 1; i >= 0; i--) {
+        const p = pulses[i], u = (now - p.t0) / 900; if (u > 1) { pulses.splice(i, 1); continue; }
+        if (u < 0) continue;      // scheduled for later; a negative radius would throw and abort the frame
+        const [x, y] = toScreen(p.x, p.y);
+        ctx.strokeStyle = `rgba(198,169,107,${(1 - u) * 0.8})`; ctx.lineWidth = 2 * (1 - u) + 0.5;
+        ctx.beginPath(); ctx.arc(x, y, 8 + u * 60, 0, 7); ctx.stroke();
+    }
+    // what-if hold: a dashed ring that empties as the hold runs out
+    if (drag.hold || drag.node) {
+        const n = drag.node || drag.hold.node, [x, y] = toScreen(n.x, n.y), r = nodeRadius(n) + 11;
+        const frac = drag.node ? 1 : clamp((drag.hold.until - now) / HOLD_MS, 0, 1);
+        ctx.strokeStyle = 'rgba(236,231,219,0.8)'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 4]);
+        ctx.beginPath(); ctx.arc(x, y, r, -Math.PI / 2, -Math.PI / 2 + frac * 2 * Math.PI); ctx.stroke(); ctx.setLineDash([]);
+    }
+    // particles flowing A → B
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i], u = (now - p.t0) / p.dur; if (u > 1) { particles.splice(i, 1); continue; }
+        if (u < 0) continue;
+        const A = M.nodes[p.a], B = M.nodes[p.b], [ax, ay] = toScreen(A.x, A.y), [bx, by] = toScreen(B.x, B.y);
+        const dx = bx - ax, dy = by - ay, L = Math.hypot(dx, dy) || 1, nx = -dy / L, ny = dx / L;
+        const w = Math.sin(u * Math.PI) * p.amp * Math.sin(u * 9 + p.phase);
+        const x = ax + dx * u + nx * w, y = ay + dy * u + ny * w;
+        ctx.fillStyle = `rgba(198,169,107,${0.9 * Math.sin(u * Math.PI)})`; ctx.beginPath(); ctx.arc(x, y, p.r, 0, 7); ctx.fill();
+    }
+
+    // nodes: communities first, then the rest
+    for (const n of M.nodes) if (n.kind === 'community') drawNode(n, now);
+    for (const n of M.nodes) if (n.kind !== 'community') drawNode(n, now);
+
+    // labels
+    const showAll = cam.scale > cam.fitScale * 2.2;
+    const labelled = new Set();
+    const mark = n => { if (n && !labelled.has(n.id)) { labelled.add(n.id); drawLabel(n, false); } };
+    if (focus) { mark(M.nodes[focus.a]); mark(M.nodes[focus.b]); }
+    for (const pr of recs) { mark(M.nodes[pr.a]); mark(M.nodes[pr.b]); }
+    mark(selected); mark(hover);
+    for (const n of M.nodes) if (n.active) mark(n);
+    for (const n of M.nodes) if (n.kind === 'community' && !labelled.has(n.id)) { labelled.add(n.id); drawLabel(n, true); }
+    if (showAll) for (const n of M.nodes) if (!labelled.has(n.id)) drawLabel(n, true);
+}
+
+/* =====================================================================
+   6. Loop chart: connection potential vs timing (the p-V analogue)
+   ===================================================================== */
+const loopC = $('loop'), lctx = loopC.getContext('2d');
+const trace = { pair: null, pts: [], lastSample: -1 };
+function focusPerson(pr) {
+    if (!pr) return null;
+    const A = M.nodes[pr.a], B = M.nodes[pr.b];
+    return A.kind === 'person' ? A : B.kind === 'person' ? B : null;
+}
+function sampleTrace() {
+    if (!focus) return;
+    if (trace.pair !== focus) { trace.pair = focus; trace.pts = []; trace.lastSample = -1; }
+    if (S.t - trace.lastSample < 0.1) return;
+    trace.lastSample = S.t;
+    const p = focusPerson(focus);
+    trace.pts.push({ x: p ? timingOf(p) : 15, y: focus.live });
+    if (trace.pts.length > 600) trace.pts.shift();
+}
+function drawLoop() {
+    const r = loopC.getBoundingClientRect(), w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
+    if (loopC.width !== w * dpr || loopC.height !== h * dpr) { loopC.width = w * dpr; loopC.height = h * dpr; }
+    lctx.setTransform(dpr, 0, 0, dpr, 0, 0); lctx.clearRect(0, 0, w, h);
+    const ml = 34, mr = 10, mt = 10, mb = 26;
+    const X = t => ml + (1 - t / 30) * (w - ml - mr), Y = a => mt + (1 - a) * (h - mt - mb);
+    lctx.font = '10px Menlo, Consolas, monospace'; lctx.fillStyle = '#6e6960'; lctx.strokeStyle = 'rgba(255,255,255,0.06)'; lctx.lineWidth = 1;
+    lctx.textAlign = 'right'; lctx.textBaseline = 'middle';
+    for (let a = 0; a <= 1; a += 0.25) { const y = Y(a); lctx.beginPath(); lctx.moveTo(ml, y); lctx.lineTo(w - mr, y); lctx.stroke(); lctx.fillText(a.toFixed(2), ml - 5, y); }
+    lctx.textAlign = 'center'; lctx.textBaseline = 'top';
+    for (let t = 0; t <= 30; t += 10) { const x = X(t); lctx.beginPath(); lctx.moveTo(x, mt); lctx.lineTo(x, h - mb); lctx.stroke(); lctx.fillText(t + 'd', x, h - mb + 5); }
+    lctx.strokeStyle = 'rgba(198,169,107,0.35)'; lctx.setLineDash([3, 4]);
+    lctx.beginPath(); lctx.moveTo(ml, Y(0.75)); lctx.lineTo(w - mr, Y(0.75)); lctx.stroke();
+    lctx.beginPath(); lctx.moveTo(X(7), mt); lctx.lineTo(X(7), h - mb); lctx.stroke(); lctx.setLineDash([]);
+    lctx.fillStyle = '#8f8a80'; lctx.textAlign = 'left'; lctx.fillText('días para decidir →  0', ml, h - 12);
+    lctx.save(); lctx.translate(9, (mt + h - mb) / 2); lctx.rotate(-Math.PI / 2); lctx.textAlign = 'center'; lctx.fillText('potencial', 0, 0); lctx.restore();
+
+    // all candidate pairs of the focus node (or the global top) as dots
+    const anchor = selected || (focus ? focusPerson(focus) : null);
+    const dots = anchor ? M.pairs.filter(pr => !pr.structural && (pr.a === anchor.id || pr.b === anchor.id)) : metrics.top;
+    for (const pr of dots) {
+        const p = focusPerson(pr); if (!p) continue;
+        const hi = pr.live > 0.75;
+        lctx.fillStyle = hi ? 'rgba(198,169,107,0.85)' : 'rgba(236,231,219,0.28)';
+        lctx.beginPath(); lctx.arc(X(timingOf(p)), Y(pr.live), hi ? 2.6 : 1.8, 0, 7); lctx.fill();
+    }
+    // the live trace of the focus pair, with the area under it (∫ potencial · d(días))
+    const pts = trace.pts;
+    let area = 0;
+    if (pts.length > 1) {
+        lctx.beginPath(); lctx.moveTo(X(pts[0].x), Y(0));
+        for (const q of pts) lctx.lineTo(X(q.x), Y(q.y));
+        lctx.lineTo(X(pts[pts.length - 1].x), Y(0)); lctx.closePath();
+        lctx.fillStyle = 'rgba(198,169,107,0.14)'; lctx.fill();
+        lctx.beginPath();
+        pts.forEach((q, i) => i ? lctx.lineTo(X(q.x), Y(q.y)) : lctx.moveTo(X(q.x), Y(q.y)));
+        lctx.strokeStyle = '#e2c98f'; lctx.lineWidth = 1.8; lctx.shadowColor = 'rgba(198,169,107,0.8)'; lctx.shadowBlur = 8; lctx.stroke(); lctx.shadowBlur = 0;
+        for (let i = 1; i < pts.length; i++) area += 0.5 * (pts[i - 1].y + pts[i].y) * Math.abs(pts[i - 1].x - pts[i].x);
+        const last = pts[pts.length - 1], hx = X(last.x), hy = Y(last.y);
+        const g = lctx.createRadialGradient(hx, hy, 0, hx, hy, 8); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.4, 'rgba(226,201,143,0.8)'); g.addColorStop(1, 'rgba(198,169,107,0)');
+        lctx.fillStyle = g; lctx.beginPath(); lctx.arc(hx, hy, 8, 0, 7); lctx.fill();
+    }
+    if (focus) {
+        const p = focusPerson(focus);
+        $('loopInfo').innerHTML = `potencial <b>${focus.live.toFixed(3)}</b> · timing <b>${p ? Math.round(timingOf(p)) : '–'} d</b> · ∫ potencial·días <b>${area.toFixed(2)}</b><br>línea punteada: umbral 0.75 y ventana de 7 días`;
+    } else $('loopInfo').textContent = '';
+}
+
+/* =====================================================================
+   7. Side panels
+   ===================================================================== */
+function setStage(st) {
+    S.stage = st;
+    const order = ['attract', 'connect', 'match', 'act'], idx = order.indexOf(st);
+    document.querySelectorAll('#pipeline li').forEach(li => {
+        const i = order.indexOf(li.dataset.stage);
+        li.classList.toggle('on', i === idx); li.classList.toggle('done', i < idx);
+    });
+}
+function who(n) { return `${n.name}<small>${label(n)}</small>`; }
+
+function renderFocus() {
+    const card = $('focusCard');
+    if (!focus) { $('fA').innerHTML = ''; $('fB').innerHTML = ''; $('fScore').textContent = '–'; $('fText').textContent = 'Sin candidatos.'; return; }
+    let A = M.nodes[focus.a], B = M.nodes[focus.b];
+    if (A.kind !== 'person' && B.kind === 'person') [A, B] = [B, A];
+    $('focusKicker').textContent = selected ? (focus.connected ? 'Conexión activa' : 'Conexión recomendada') : 'Next best connection';
+    $('fA').innerHTML = who(A); $('fB').innerHTML = who(B);
+    $('fScore').textContent = (clamp(focus.live, 0, 1) * 100).toFixed(1) + '%';
+    $('fBar').style.width = pct(focus.live);
+    $('fText').innerHTML = explain(focus);
+    $('connectBtn').disabled = focus.connected;
+    $('connectBtn').textContent = focus.connected ? 'Conectados' : 'Connect';
+    card.classList.toggle('gold', true);
+    if (whyOpen) renderWhy();
+}
+function renderWhy() {
+    const ul = $('why'); ul.hidden = !whyOpen; $('whyBtn').classList.toggle('on', whyOpen);
+    if (!whyOpen || !focus) return;
+    const c = focus.comp || score(focus, 0, false).comp;
+    const row = (ok, lbl, val, sub) => `<li><span class="chk ${ok ? '' : 'no'}">${ok ? '✓' : '·'}</span><span class="lbl">${lbl}${sub ? `<small>${sub}</small>` : ''}</span><span class="val ${ok ? 'hi' : ''}">${val}</span></li>`;
+    let A = M.nodes[focus.a], B = M.nodes[focus.b];
+    if (A.kind !== 'person' && B.kind === 'person') [A, B] = [B, A];
+    let html = '';
+    html += row(c.zone >= 0.5, 'Zona', pct(c.zone), `${A.zone || A.specialty} ↔ ${B.zone || B.specialty} · peso 0.30`);
+    const budgetSub = focus.kind === 'px' ? `${fmtM(B.price)} vs ${fmtM(A.budget)} · ROI ${B.roi}% para ${A.need}`
+        : focus.kind === 'pb' ? (c.bestProp ? `mejor encaje: ${c.bestProp}` : 'sin inventario compatible')
+        : focus.kind === 'pp' ? `${fmtM(A.budget)} vs ${fmtM(B.budget)}` : 'brokers: valor neutro';
+    html += row(c.budget >= 0.6, focus.kind === 'pp' ? 'Perfil / presupuesto' : 'Presupuesto y perfil', pct(c.budget), budgetSub + ' · peso 0.30');
+    html += row(c.timing >= 0.5, 'Timing', pct(c.timing), (A.kind === 'person' ? `${Math.round(timingOf(A))} días para decidir` : '') + ' · peso 0.20');
+    html += row(c.rel >= 0.35, 'Relación', pct(c.rel), (focus.connected ? 'relación reciente (conectados)' : c.community ? `grupo "${c.community}"` : 'sin grupo en común') + ' · peso 0.20');
+    if (c.community) html += row(true, 'Misma comunidad', '×1.5', 'boost por grupo compartido');
+    if (c.inventory) html += row(true, 'Inventario', '+0.15', `${c.inventory}: zona y presupuesto compatibles`);
+    if (c.trust != null) html += row(c.trust >= 0.8, 'Confianza del broker', pct(c.trust), `factor ${(0.7 + 0.3 * c.trust).toFixed(2)}`);
+    if (c.factor !== 1 && c.trust == null) html += row(c.factor >= 0.9, 'Complementariedad', `×${c.factor.toFixed(2)}`, 'tipo de lead / estatus de la propiedad');
+    if (!focus.connected) html += row(c.spatial >= 0.35, 'Cercanía en el mapa', `×${c.mapFactor.toFixed(3)}`, `proximidad ${pct(c.spatial)} · arrastra un nodo y este factor cambia en vivo`);
+    html += row(true, 'Score', (clamp(focus.live, 0, 1) * 100).toFixed(1) + '%', 'zona·0.3 + presupuesto·0.3 + timing·0.2 + relación·0.2, con ajustes; compresión suave sobre 0.75');
+    ul.innerHTML = html;
+}
+function renderRecs() {
+    const wrap = $('recsWrap');
+    if (!selected) { wrap.hidden = true; return; }
+    wrap.hidden = false;
+    $('recsTitle').textContent = `3 conexiones para ${selected.name}`;
+    $('recs').innerHTML = recs.map((pr, i) => {
+        const other = M.nodes[pr.a === selected.id ? pr.b : pr.a];
+        return `<div class="rec ${pr === focus ? 'on' : ''} ${pr.connected ? 'done' : ''}" data-i="${i}"><span class="n">${pr.connected ? '' : i + 1}</span><span class="who">${other.name}<small>${label(other)}</small></span><span class="sc ${pr.live > 0.75 ? 'hi' : ''}">${pct(pr.live)}</span></div>`;
+    }).join('');
+}
+function renderMetrics() {
+    $('mTotal').textContent = fmtInt(metrics.total);
+    $('mHigh').textContent = fmtInt(metrics.high);
+    $('mRec').textContent = fmtInt(Math.min(6, metrics.top.length));
+    $('mAct').textContent = fmtInt(metrics.active);
+    const K = S.KE, U = S.PE, E = K + U;
+    $('eK').textContent = K.toFixed(3); $('eP').textContent = U.toFixed(3); $('eT').textContent = E.toFixed(3);
+    const drift = (E - S.E0) / Math.abs(S.E0 || 1);
+    $('eD').innerHTML = (drift >= 0 ? '+' : '') + (drift * 100).toFixed(2) + '<small>%</small>';
+    $('eNote').textContent = P.damping > 0
+        ? `Con fricción ${P.damping.toFixed(2)} el mapa se asienta y la energía se disipa (deriva negativa). Vuelve a 0 para comprobar que Verlet conserva la energía.`
+        : 'Fricción 0: el universo orbita sin disipación y la deriva mide el error del integrador (velocity Verlet, simpléctico). Se recalibra al conectar o soltar un nodo.';
+    $('clock').innerHTML = `día <b>${S.days.toFixed(1)}</b> · t <b>${S.t.toFixed(0)}s</b>${S.paused ? ' · <b>PAUSA</b>' : ''}${(drag.node || drag.hold) ? ' · <b>EXPLORANDO</b> (física en espera)' : ''}`;
+}
+function renderDebug(fps, steps) {
+    const d = $('debug'); if (d.hidden) return;
+    d.textContent = [
+        `fps        ${fps}`, `substeps   ${steps}  dt ${P.DT.toFixed(4)}`, `nodes      ${M.nodes.length}  pairs ${M.pairs.length}  edges ${M.edges.length}`,
+        `evaluated  ${metrics.evaluated}  high ${metrics.high}  active ${metrics.active}  connected ${metrics.connected}`,
+        `KE ${S.KE.toFixed(4)}  PE ${S.PE.toFixed(4)}  E ${(S.KE + S.PE).toFixed(4)}  E0 ${(S.E0 || 0).toFixed(4)}`,
+        `damping ${P.damping.toFixed(2)}  kSpring ${P.kSpring}  kRep ${P.kRep}  kCenter ${P.kCenter}`,
+        `days ${S.days.toFixed(2)}  clock ×${P.timeMult.toFixed(2)}  stage ${S.stage}`,
+        `selected   ${selected ? `#${selected.id} ${selected.name}` : '–'}`, `focus      ${focus ? `#${focus.a}↔#${focus.b} live ${focus.live.toFixed(3)} energy ${focus.energy.toFixed(3)}` : '–'}`,
+        `window.__laeds → { M, S, P, metrics }`,
+    ].join('\n');
+}
+
+/* =====================================================================
+   8. Interaction: HUMAN → SIGNAL → INTERPRETATION → STATE → RESPONSE
+   ===================================================================== */
+function select(n) {
+    selected = n; whyOpen = false;
+    if (n) {
+        recs = n.kind === 'community' ? [] : recommendationsFor(n, 3);
+        focus = recs[0] || null;
+        setStage('connect');
+        if (focus) playTone(220 + focus.live * 500, 0.18);
+    } else { recs = []; focus = metrics.top[0] || null; setStage('attract'); }
+    renderFocus(); renderWhy(); renderRecs();
+}
+function connect(pr) {
+    if (!pr || pr.connected) return;
+    pr.connected = true;
+    const A = M.nodes[pr.a], B = M.nodes[pr.b];
+    A.active = B.active = true; A.connections++; B.connections++;
+    pr.base = Math.max(pr.base, 0.85);           // the relationship is now structural: stronger spring
+    if (!M.edges.includes(pr)) M.edges.push(pr);
+    resetEnergyRef();
+    const now = performance.now();
+    for (let i = 0; i < 28; i++) particles.push({ a: A.id, b: B.id, t0: now + i * 45, dur: 1100 + Math.random() * 400, amp: 6 + Math.random() * 14, phase: Math.random() * 6.28, r: 1.2 + Math.random() * 1.6 });
+    pulses.push({ x: A.x, y: A.y, t0: now }); pulses.push({ x: B.x, y: B.y, t0: now + 300 });
+    playTone(220 + pr.live * 500, 0.35); setTimeout(() => playTone((220 + pr.live * 500) * 1.5, 0.45), 160);
+    setStage('act');
+    S.focusHoldUntil = now + 4000;   // keep the connected pair on the card long enough to read before moving to the next best
+    updateLive(); updateMetrics(); renderFocus(); renderRecs(); renderMetrics();
+}
+
+canvas.addEventListener('pointerdown', e => {
+    const rect = canvas.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const n = pickNode(mx, my);
+    drag.moved = false; drag.id = e.pointerId; drag.start = { x: e.clientX, y: e.clientY };
+    $('tooltip').hidden = true;
+    if (drag.hold) endHold();
+    if (n) { drag.node = n; n.vx = n.vy = 0; }
+    else drag.pan = { x: e.clientX, y: e.clientY, cx: cam.cx, cy: cam.cy };
+    canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener('pointermove', e => {
+    const rect = canvas.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    if (drag.node) {
+        if (Math.hypot(e.clientX - drag.start.x, e.clientY - drag.start.y) > 3) drag.moved = true;
+        if (drag.moved) { const [wx, wy] = toWorld(mx, my); drag.node.x = wx; drag.node.y = wy; stage.classList.add('grab'); }
+        return;
+    }
+    if (drag.pan) {
+        const dx = e.clientX - drag.pan.x, dy = e.clientY - drag.pan.y;
+        if (Math.hypot(dx, dy) > 3) drag.moved = true;
+        if (drag.moved) { cam.cx = drag.pan.cx - dx / cam.scale; cam.cy = drag.pan.cy - dy / cam.scale; stage.classList.add('grab'); }
+        return;
+    }
+    hover = pickNode(mx, my);
+    const tip = $('tooltip');
+    if (hover) { tip.hidden = false; tip.style.left = mx + 'px'; tip.style.top = my + 'px'; tip.innerHTML = `<b>${hover.name}</b><span>${label(hover)}</span>`; }
+    else tip.hidden = true;
+});
+canvas.addEventListener('pointerup', e => {
+    stage.classList.remove('grab');
+    if (drag.node && !drag.moved) select(drag.node === selected ? null : drag.node);
+    else if (drag.pan && !drag.moved) select(null);
+    if (drag.node && drag.moved) {
+        // keep the dropped node (and the universe) still for a moment, then let the forces answer
+        drag.hold = { node: drag.node, until: performance.now() + HOLD_MS };
+        drag.node.vx = drag.node.vy = 0;
+    }
+    drag.node = null; drag.pan = null;
+});
+function endHold() {
+    if (!drag.hold) return;
+    const n = drag.hold.node; drag.hold = null;
+    n.settleUntil = S.t + 6;      // local friction for a few seconds so the released node does not ring forever at friction 0
+    S.recalibrateAt = n.settleUntil;   // the local friction dissipates the energy the drag injected; re-baseline once it ends
+    resetEnergyRef();
+}
+canvas.addEventListener('pointerleave', () => { hover = null; $('tooltip').hidden = true; });
+canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = canvas.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const [wx, wy] = toWorld(mx, my), f = Math.exp(-e.deltaY * 0.0015);
+    cam.scale = clamp(cam.scale * f, 40, 4000);
+    cam.cx = wx - (mx - W / 2) / cam.scale; cam.cy = wy - (my - H / 2) / cam.scale;
+}, { passive: false });
+
+$('connectBtn').addEventListener('click', () => connect(focus));
+$('whyBtn').addEventListener('click', () => { whyOpen = !whyOpen; if (whyOpen) setStage('match'); renderWhy(); });
+$('clearBtn').addEventListener('click', () => select(null));
+$('recs').addEventListener('click', e => { const el = e.target.closest('.rec'); if (!el) return; focus = recs[+el.dataset.i]; whyOpen = false; renderFocus(); renderWhy(); renderRecs(); playTone(220 + focus.live * 500, 0.15); });
+
+const speedEl = $('speed'), dampEl = $('damp');
+function updateSpeedLabel() {
+    $('speedVal').textContent = P.timeMult.toFixed(1) + '×';
+    const secs = P.timeMult > 0 ? 1 / (P.daysPerSec * P.timeMult) : Infinity;
+    $('speedNote').textContent = P.timeMult > 0 ? `1 día de decisión = ${secs < 10 ? secs.toFixed(1) : Math.round(secs)} s reales. Los timings cuentan hacia cero y las oportunidades activas cambian con ellos.` : 'Reloj detenido: los timings no avanzan; la física sigue.';
+}
+speedEl.addEventListener('input', () => { P.timeMult = +speedEl.value; updateSpeedLabel(); });
+dampEl.addEventListener('input', () => { P.damping = +dampEl.value; $('dampVal').textContent = P.damping.toFixed(2); resetEnergyRef(); });
+const pauseBtn = $('pauseBtn');
+function togglePause() { S.paused = !S.paused; pauseBtn.textContent = S.paused ? 'Reanudar' : 'Pausa'; pauseBtn.classList.toggle('on', S.paused); }
+pauseBtn.addEventListener('click', togglePause);
+$('fitBtn').addEventListener('click', fit);
+$('reseedBtn').addEventListener('click', () => { init((Math.random() * 4294967295) >>> 0); });
+$('debugBtn').addEventListener('click', () => { const d = $('debug'); d.hidden = !d.hidden; $('debugBtn').classList.toggle('on', !d.hidden); });
+window.addEventListener('keydown', e => {
+    if (!$('modal').hidden) { if (e.key === 'Escape') $('modal').hidden = true; return; }
+    if (['INPUT', 'BUTTON', 'TEXTAREA'].includes(e.target.tagName)) return;
+    if (e.code === 'Space') { e.preventDefault(); togglePause(); }
+    else if (e.key === 'd' || e.key === 'D') $('debugBtn').click();
+    else if (e.key === 'Escape') select(null);
+});
+
+// Sound: a tone whose pitch follows the match score (WebAudio, opt-in)
+const audio = { ctx: null, on: false };
+function playTone(freq, dur) {
+    if (!audio.on || !audio.ctx) return;
+    const c = audio.ctx, t = c.currentTime, o = c.createOscillator(), g = c.createGain(), f = c.createBiquadFilter();
+    o.type = 'triangle'; o.frequency.value = freq; f.type = 'lowpass'; f.frequency.value = 1800;
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.18, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(f); f.connect(g); g.connect(c.destination); o.start(t); o.stop(t + dur + 0.05);
+}
+$('soundBtn').addEventListener('click', async () => {
+    if (!audio.ctx) { try { audio.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) { $('soundBtn').textContent = 'Sin audio'; return; } }
+    audio.on = !audio.on; if (audio.on) await audio.ctx.resume();
+    $('soundBtn').textContent = audio.on ? 'Sonido on' : 'Sonido off'; $('soundBtn').classList.toggle('on', audio.on);
+    if (audio.on && focus) playTone(220 + focus.live * 500, 0.25);
+});
+
+// Prompt modal
+const modal = $('modal'), copyBtn = $('copyPrompt');
+$('promptBtn').addEventListener('click', () => { modal.hidden = false; copyBtn.textContent = 'Copiar'; });
+$('closePrompt').addEventListener('click', () => { modal.hidden = true; });
+modal.addEventListener('click', e => { if (e.target === modal) modal.hidden = true; });
+copyBtn.addEventListener('click', async () => {
+    const text = $('promptText').textContent; let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; } catch (_) { }
+    if (!ok) { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { ok = document.execCommand('copy'); } catch (_) { } ta.remove(); }
+    copyBtn.textContent = ok ? 'Copiado' : 'Selecciona y copia'; setTimeout(() => copyBtn.textContent = 'Copiar', 2500);
+});
+
+/* =====================================================================
+   9. Main loop
+   ===================================================================== */
+function tickTimings(dDays) {
+    S.days += dDays;
+    for (const p of M.people) if (p.timing0 - (S.days - p.cycleStart) < 0) { p.cycleStart = S.days; p.timing0 = rint(15, 30); }
+}
+let last = performance.now(), acc = 0, uiTimer = 0, frames = 0, fpsT = 0, fps = 0, lastSteps = 0;
+function frame(now) {
+    const real = Math.min(0.1, (now - last) / 1000); last = now;
+    let steps = 0;
+    if (drag.hold && now >= drag.hold.until) endHold();
+    if (S.recalibrateAt && S.t >= S.recalibrateAt) { S.recalibrateAt = 0; resetEnergyRef(); }
+    // while a node is dragged or held the universe stands still: the drag is a what-if probe and the
+    // score responds to the new position alone; afterwards the forces take over again
+    const exploring = !!drag.node || !!drag.hold;
+    if (!S.paused && !exploring) {
+        acc += real;
+        steps = Math.min(Math.floor(acc / P.DT), 8);
+        for (let i = 0; i < steps; i++) step(P.DT);
+        acc -= steps * P.DT; if (acc > P.DT * 8) acc = 0;
+        tickTimings(real * P.daysPerSec * P.timeMult);
+    }
+    if (drag.node) { drag.node.vx = drag.node.vy = 0; }
+    updateLive();
+    sampleTrace();
+    draw(now);
+    frames++; fpsT += real; if (fpsT >= 0.5) { fps = Math.round(frames / fpsT); frames = 0; fpsT = 0; }
+    uiTimer += real;
+    if (uiTimer > 0.12) {
+        uiTimer = 0;
+        S.KE = kinetic(); S.PE = potential();
+        updateMetrics();
+        if (!selected && now >= S.focusHoldUntil) {
+            // hysteresis: only hand the "next best" card to a new pair when it clearly wins, so the trace is not reset by jitter
+            const top = metrics.top[0] || null;
+            if (!focus || focus.connected || !metrics.top.includes(focus) || (top && top.energy > focus.energy + 0.08)) {
+                if (focus !== top) { if (focus && focus.connected) setStage('attract'); focus = top; whyOpen = whyOpen && !!top; renderWhy(); }
+            }
+        }
+        renderMetrics(); renderFocus(); renderRecs(); drawLoop(); renderDebug(fps, steps);
+    }
+    lastSteps = steps;
+    requestAnimationFrame(frame);
+}
+
+function init(newSeed) {
+    buildUniverse(newSeed);
+    selected = null; focus = null; recs = []; whyOpen = false; particles.length = 0; pulses.length = 0; trace.pair = null; trace.pts = [];
+    S.t = 0; S.days = 0;
+    accel();
+    // settle before showing, so the first frame is not a random cloud
+    const d0 = P.damping; P.damping = 2.5; for (let i = 0; i < 480; i++) step(P.DT); P.damping = d0;
+    // then set the whole system slowly turning (plus a little thermal noise): with friction 0 angular momentum and
+    // energy are conserved, so the universe keeps orbiting and the drift readout validates the integrator
+    const OMEGA = 0.08;
+    for (const n of M.nodes) { n.vx = -OMEGA * n.y + (rnd() - 0.5) * 0.04; n.vy = OMEGA * n.x + (rnd() - 0.5) * 0.04; n.settleUntil = 0; }
+    S.t = 0;
+    updateLive(); updateMetrics(); resetEnergyRef();
+    S.KE = kinetic(); S.PE = potential();
+    focus = metrics.top[0] || null;
+    fit(); setStage('attract'); updateSpeedLabel(); renderMetrics(); renderFocus(); renderWhy(); renderRecs(); drawLoop();
+}
+
+new ResizeObserver(() => { const oldMin = Math.min(W, H); resize(); if (oldMin) cam.scale *= Math.min(W, H) / oldMin; }).observe(stage);
+resize();
+init(seed);
+requestAnimationFrame(frame);
+
+// expose the live model for inspection (like Aurelith's window.__system)
+window.__laeds = { M, S, P, metrics, cam, score, updateLive, updateMetrics, recommendationsFor, explain, timingOf, tickTimings, step, kinetic, potential, resetEnergyRef, connect, select: id => select(M.nodes[id]), toScreen, pickNode, state: () => ({ selected, focus, recs, whyOpen, drag }) };
+})();
+    </script>
+</body>
+
+</html>
