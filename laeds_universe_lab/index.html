@@ -455,9 +455,8 @@ function buildPairs() {
 function score(pr, spatial, isStatic) {
     let A = nodeById(pr.a), B = nodeById(pr.b);
     if (A.kind !== 'person' && B.kind === 'person') [A, B] = [B, A];
-    const comp = { zone: 0, budget: 0, timing: 0, rel: 0, community: pr.communityName, inventory: null, trust: null, factor: 1 };
-    const relStatic = Math.min(1, pr.sharedN * 0.7);
-    comp.rel = pr.connected ? 1 : (isStatic ? relStatic : 0.5 * relStatic + 0.5 * spatial);
+    const comp = { zone: 0, budget: 0, timing: 0, rel: 0, community: pr.communityName, inventory: null, trust: null, factor: 1, spatial: isStatic ? 1 : spatial, mapFactor: 1 };
+    comp.rel = pr.connected ? 1 : Math.min(1, pr.sharedN * 0.7);
 
     if (pr.kind === 'pp') {
         comp.zone = zoneMatch(A.zone, B.zone);
@@ -495,6 +494,8 @@ function score(pr, spatial, isStatic) {
     // the ×1.5 boost can push the raw sum past 1; compress softly above the 0.75 threshold instead of hard clipping,
     // so ranking stays strictly monotonic and 100% is only asymptotic
     if (a > 0.75) a = 0.75 + 0.25 * (1 - Math.exp(-(a - 0.75) / 0.25));
+    // like gravity, the live potential falls with distance in the relationship map: far apart → up to −20%
+    if (!isStatic && !pr.connected) { comp.mapFactor = 0.8 + 0.2 * spatial; a *= comp.mapFactor; }
     if (pr.connected) a = Math.max(a, 0.8);
     a = clamp(a, 0, 1);
     return { a, comp };
@@ -627,7 +628,8 @@ function explain(pr) {
     if (A.kind === 'person') { const t = Math.round(timingOf(A)); if (t <= 7) r.push(`<b>${A.name.split(' ')[0]}</b> decide en <b>${t} día${t === 1 ? '' : 's'}</b>`); else if (c.timing >= 0.5) r.push(`decide en ${t} días`); }
     if (pr.connected) r.push('ya existe una <b>relación reciente</b>');
     else if (c.community) r.push(`coinciden en el grupo <b>"${c.community}"</b>`);
-    else if (c.rel >= 0.35) r.push('están cerca en el mapa de relaciones');
+    if (!pr.connected && c.spatial >= 0.5) r.push('están cerca en el mapa de relaciones');
+    else if (!pr.connected && c.spatial < 0.1) r.push(`están lejos en el mapa (factor ×${c.mapFactor.toFixed(2)})`);
     if (c.trust != null && c.trust >= 0.85) r.push(`la confianza del broker es <b>${pct(c.trust)}</b>`);
     if (!r.length) r.push('la afinidad estructural es baja; conviene esperar una señal');
     return `Te recomiendo conectar <b>${A.name}</b> con <b>${B.name}</b> porque ${r.join(', ')}.`;
@@ -908,12 +910,13 @@ function renderWhy() {
         : focus.kind === 'pp' ? `${fmtM(A.budget)} vs ${fmtM(B.budget)}` : 'brokers: valor neutro';
     html += row(c.budget >= 0.6, focus.kind === 'pp' ? 'Perfil / presupuesto' : 'Presupuesto y perfil', pct(c.budget), budgetSub + ' · peso 0.30');
     html += row(c.timing >= 0.5, 'Timing', pct(c.timing), (A.kind === 'person' ? `${Math.round(timingOf(A))} días para decidir` : '') + ' · peso 0.20');
-    html += row(c.rel >= 0.35, 'Relación', pct(c.rel), (focus.connected ? 'relación reciente (conectados)' : c.community ? `grupo "${c.community}"` : 'sin grupo en común; cercanía en el mapa') + ' · peso 0.20');
+    html += row(c.rel >= 0.35, 'Relación', pct(c.rel), (focus.connected ? 'relación reciente (conectados)' : c.community ? `grupo "${c.community}"` : 'sin grupo en común') + ' · peso 0.20');
     if (c.community) html += row(true, 'Misma comunidad', '×1.5', 'boost por grupo compartido');
     if (c.inventory) html += row(true, 'Inventario', '+0.15', `${c.inventory}: zona y presupuesto compatibles`);
     if (c.trust != null) html += row(c.trust >= 0.8, 'Confianza del broker', pct(c.trust), `factor ${(0.7 + 0.3 * c.trust).toFixed(2)}`);
     if (c.factor !== 1 && c.trust == null) html += row(c.factor >= 0.9, 'Complementariedad', `×${c.factor.toFixed(2)}`, 'tipo de lead / estatus de la propiedad');
-    html += row(true, 'Score', pct(focus.live), 'zona·0.3 + presupuesto·0.3 + timing·0.2 + relación·0.2, con ajustes; compresión suave sobre 0.75');
+    if (!focus.connected) html += row(c.spatial >= 0.35, 'Cercanía en el mapa', `×${c.mapFactor.toFixed(3)}`, `proximidad ${pct(c.spatial)} · arrastra un nodo y este factor cambia en vivo`);
+    html += row(true, 'Score', (clamp(focus.live, 0, 1) * 100).toFixed(1) + '%', 'zona·0.3 + presupuesto·0.3 + timing·0.2 + relación·0.2, con ajustes; compresión suave sobre 0.75');
     ul.innerHTML = html;
 }
 function renderRecs() {
