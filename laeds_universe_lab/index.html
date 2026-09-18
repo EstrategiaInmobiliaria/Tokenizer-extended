@@ -236,7 +236,7 @@
             <canvas id="c"></canvas>
             <div id="debug" hidden></div>
             <div id="clock"></div>
-            <div id="hint">Clic en un nodo para inspeccionar<br>Arrastra un nodo para moverlo · Rueda para zoom<br>Arrastra el fondo para desplazar · Espacio pausa</div>
+            <div id="hint">Clic en un nodo para inspeccionar<br>Arrastra un nodo: el universo espera y el score responde<br>Rueda para zoom · Arrastra el fondo para desplazar · Espacio pausa</div>
             <div id="tooltip" hidden></div>
         </section>
 
@@ -941,7 +941,7 @@ function renderMetrics() {
     $('eNote').textContent = P.damping > 0
         ? `Con fricción ${P.damping.toFixed(2)} el mapa se asienta y la energía se disipa (deriva negativa). Pon la fricción en 0 para comprobar que Verlet conserva la energía.`
         : 'Fricción 0: sin disipación, la deriva mide el error del integrador (velocity Verlet, simpléctico).';
-    $('clock').innerHTML = `día <b>${S.days.toFixed(1)}</b> · t <b>${S.t.toFixed(0)}s</b>${S.paused ? ' · <b>PAUSA</b>' : ''}`;
+    $('clock').innerHTML = `día <b>${S.days.toFixed(1)}</b> · t <b>${S.t.toFixed(0)}s</b>${S.paused ? ' · <b>PAUSA</b>' : ''}${drag.node ? ' · <b>EXPLORANDO</b> (física en espera)' : ''}`;
 }
 function renderDebug(fps, steps) {
     const d = $('debug'); if (d.hidden) return;
@@ -1093,7 +1093,9 @@ let last = performance.now(), acc = 0, uiTimer = 0, frames = 0, fpsT = 0, fps = 
 function frame(now) {
     const real = Math.min(0.1, (now - last) / 1000); last = now;
     let steps = 0;
-    if (!S.paused) {
+    // while a node is being dragged the universe holds still: the drag is a what-if probe, and the
+    // score responds to the new position alone; on release the forces take over again
+    if (!S.paused && !drag.node) {
         acc += real;
         steps = Math.min(Math.floor(acc / P.DT), 8);
         for (let i = 0; i < steps; i++) step(P.DT);
