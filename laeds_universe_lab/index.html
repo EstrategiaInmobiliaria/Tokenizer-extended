@@ -523,7 +523,7 @@ function updateLive() {
    3. Physics: velocity Verlet on a force-directed potential
    ===================================================================== */
 const P = { kSpring: 2.2, kRep: 0.0045, eps: 0.002, kCenter: 0.5, damping: 0, DT: 1 / 120, daysPerSec: 0.05, timeMult: 1 };   // 1 simulated day = 20 s at 1×
-const S = { t: 0, days: 0, paused: false, E0: null, KE: 0, PE: 0, steps: 0, stage: 'attract' };
+const S = { t: 0, days: 0, paused: false, E0: null, KE: 0, PE: 0, steps: 0, stage: 'attract', recalibrateAt: 0 };
 
 const restLen = a => 0.1 + 0.55 * (1 - a);
 
@@ -1036,6 +1036,7 @@ function endHold() {
     if (!drag.hold) return;
     const n = drag.hold.node; drag.hold = null;
     n.settleUntil = S.t + 6;      // local friction for a few seconds so the released node does not ring forever at friction 0
+    S.recalibrateAt = n.settleUntil;   // the local friction dissipates the energy the drag injected; re-baseline once it ends
     resetEnergyRef();
 }
 canvas.addEventListener('pointerleave', () => { hover = null; $('tooltip').hidden = true; });
@@ -1114,6 +1115,7 @@ function frame(now) {
     const real = Math.min(0.1, (now - last) / 1000); last = now;
     let steps = 0;
     if (drag.hold && now >= drag.hold.until) endHold();
+    if (S.recalibrateAt && S.t >= S.recalibrateAt) { S.recalibrateAt = 0; resetEnergyRef(); }
     // while a node is dragged or held the universe stands still: the drag is a what-if probe and the
     // score responds to the new position alone; afterwards the forces take over again
     const exploring = !!drag.node || !!drag.hold;
