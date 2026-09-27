@@ -11,6 +11,8 @@
 # database
 /prisma/db.sqlite
 /prisma/db.sqlite-journal
+sabueso_audit.db
+sabueso_audit.db-journal
 
 # next.js
 /.next/
