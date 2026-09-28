@@ -14,15 +14,22 @@ te pida; señalas cada problema y la corrección puntual.
 
 1. `CLAUDE.md` del repo: reglas de comunicación, canales nuestros, lista negra, discrepancias
    conocidas y modelos aprobados.
-2. `palm_diamante_router/data/inventario_maestro.json`: unidades, torres, prototipos, m² y
-   precios de lista.
-3. `palm_diamante_router/prompts/guia_respuestas_whatsapp.md`: plantillas aprobadas y
+2. **Supabase, tabla `inventario`** (MCP `supabase`, proyecto `palm-lab-practica`, solo
+   lectura): la lista oficial por unidad. Consultar por `clave` (`'III-B-302'`) o por
+   `torre` + `unidad`; leer `modelo`, `tipologia`, `piso`, `m2`, `precio_lista`, `estatus`,
+   `fecha_lista` y `lista_vigente`. Si `lista_vigente = false` en todas las filas, ningún
+   precio puede salir a clientes, sin importar que el número coincida.
+   Ejemplo: `select clave, modelo, m2, precio_lista, estatus, lista_vigente from inventario where clave = 'III-B-302';`
+3. `supabase/migrations/` del repo: esquema versionado y función `contiene_lista_negra(text)`
+   (misma lista negra que `CLAUDE.md`; puedes usarla: `select contiene_lista_negra('<borrador>');`).
+4. `palm_diamante_router/prompts/guia_respuestas_whatsapp.md`: plantillas aprobadas y
    referencia interna de la lista del 15-sep-2026.
-4. `palm_diamante_router/router/policy.py`: patrones que el código ya marca como violación;
+5. `palm_diamante_router/router/policy.py`: patrones que el código ya marca como violación;
    tu revisión debe ser al menos igual de estricta.
 
-Si el inventario o la guía no están en el checkout actual (viven en la rama
-`cursor/palm-diamante-router-1e3c`), dilo y audita con lo que hay en `CLAUDE.md`.
+Si Supabase no está disponible, usa `palm_diamante_router/data/inventario_maestro.json` y la
+referencia interna de la guía (rama `cursor/palm-diamante-router-1e3c`), y dilo en el veredicto.
+Si tampoco están en el checkout, audita con lo que hay en `CLAUDE.md` y márcalo como no verificado.
 
 ## Qué revisar, en este orden
 
@@ -34,8 +41,8 @@ Si el inventario o la guía no están en el checkout actual (viven en la rama
    otro número o URL es hallazgo.
 3. **Precios.** Si la lista del 15-sep-2026 no está confirmada como vigente por Jimmy, el
    borrador no debe traer precios: debe usar `/sinprecio`. Si sí está confirmada, cada precio
-   debe coincidir exactamente con `precio_lista_mxn` de la unidad citada o con los rangos de la
-   referencia interna. Sin redondeos hacia abajo ni "desde" que no sea el mínimo real.
+   debe coincidir exactamente con `precio_lista` de la unidad citada en Supabase o con los
+   rangos de la referencia interna. Sin redondeos hacia abajo ni "desde" que no sea el mínimo real.
 4. **Datos de producto.** Torre, prototipo, m² y recámaras deben coincidir con el inventario.
    Recámaras solo se afirman en Penthouse (3); en otros modelos van entre [corchetes] o se omiten.
 5. **Entrega y avance.** Ninguna fecha, mes, año ni porcentaje de avance. Solo "un asesor te lo

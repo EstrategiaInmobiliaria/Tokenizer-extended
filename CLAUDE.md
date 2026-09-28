@@ -10,10 +10,17 @@ Palm Diamante.
   Acapulco Diamante, Guerrero. Desarrolladora: Agartha Bienes Raices.
 - **Quién vende:** Estrategia Inmobiliaria. Aprobador único de todo mensaje a cliente: **Jimmy**.
 - **Sitio nuestro:** https://palm-diamante.com/es/ (versión en inglés en `/en/`).
+- **Base de datos (fuente de verdad del inventario):** Supabase, proyecto `palm-lab-practica`
+  (ref `plgfhtvzxhrdfmrlknru`). Esquema versionado en `supabase/migrations/`; datos de prueba
+  en `supabase/seed.sql`. Tablas: `inventario` (lista oficial, 605 unidades, 15-sep-2026),
+  `prospectos`, `seguimientos`, `citas`, `borradores`. Vistas `v_*` para el reporte diario.
+  `inventario.lista_vigente` solo la cambia Jimmy; mientras sea `false`, ningún precio sale a
+  clientes y la base rechaza aprobar borradores con precios.
 - **Código relacionado:** `palm_diamante_router/` (rama `cursor/palm-diamante-router-1e3c`):
-  router FastAPI de primer contacto, inventario maestro JSON, política de comunicación y guía
-  de respuestas de WhatsApp. La política vive en `palm_diamante_router/router/policy.py` y la
-  guía en `palm_diamante_router/prompts/guia_respuestas_whatsapp.md`.
+  router FastAPI de primer contacto, política de comunicación y guía de respuestas de WhatsApp.
+  La política vive en `palm_diamante_router/router/policy.py` y la guía en
+  `palm_diamante_router/prompts/guia_respuestas_whatsapp.md`. Su `inventario_maestro.json` es
+  un ejemplo de esquema, no la lista real: la lista real está en Supabase.
 
 ## Reglas de comunicación (no negociables)
 
@@ -75,8 +82,9 @@ de citas, dossier PDF con fechas de entrega y avance de obra.
 |-------------|-----------|-----|
 | `/reporte-diario` | `.claude/skills/reporte-diario/` | Resumen diario de prospectos, seguimientos vencidos y apartados |
 | `/auditar-sitio` | `.claude/skills/auditar-sitio/` | Auditoría visual, de enlaces, de datos, de canales y de velocidad de palm-diamante.com |
-| `auditor-inventario` | `.claude/agents/auditor-inventario.md` | Subagente que revisa un borrador antes de enviarlo: precios, canales, lista negra, promesas |
+| `auditor-inventario` | `.claude/agents/auditor-inventario.md` | Subagente que revisa un borrador antes de enviarlo: precios (contra `inventario` en Supabase), canales, lista negra, promesas |
 | MCP | `.mcp.json` | Supabase (OAuth), Chrome DevTools, Context7 |
+| Esquema Supabase | `supabase/migrations/`, `supabase/seed.sql` | Tablas, vistas del reporte, `contiene_lista_negra()` y trigger de cumplimiento en `borradores` |
 
 Uso manual del subagente mientras no exista el envío real de WhatsApp:
 "Usa auditor-inventario para revisar este borrador antes de enviarlo."
