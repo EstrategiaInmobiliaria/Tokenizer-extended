@@ -25,15 +25,36 @@ def test_borrador_limpio_no_tiene_violaciones(politica):
         ("WhatsApp: 744-271-3055", "telefono_prohibido:744 271 3055"),
         ("Se entrega en diciembre", "promesa_de_entrega_o_avance"),
         ("Llevamos avance de 80%", "promesa_de_entrega_o_avance"),
+        ("Quedan las últimas unidades, apúrate", "urgencia_no_respaldada"),
+        ("Como estamos en preventa, la disponibilidad cambia seguido.", "urgencia_no_respaldada"),
+        ("El precio sube el próximo mes", "urgencia_no_respaldada"),
+        ("Circulan anuncios de terceros con precios distintos", "mencion_de_terceros"),
+        ("Hay páginas falsas del proyecto", "mencion_de_terceros"),
     ],
 )
 def test_detecta_violaciones(politica, texto, esperado):
     assert esperado in politica.validar_borrador(texto)
 
 
+def test_primer_contacto_del_27_sep_ya_no_pasa(politica):
+    """La versión anterior advertía sobre anuncios de terceros; la guía del 28-sep lo prohíbe."""
+    viejo = (
+        "En Acapulco Diamante circulan anuncios con precios, fechas o torres que no coinciden "
+        "con la información actual."
+    )
+    assert "mencion_de_terceros" in politica.validar_borrador(viejo)
+
+
 def test_todas_las_plantillas_cumplen_la_politica(politica):
     for p in PLANTILLAS.values():
         assert politica.validar_borrador(p.texto) == [], p.clave
+
+
+def test_plantillas_con_corchetes_exponen_pendientes():
+    assert PLANTILLAS["cita"].pendientes == ["en el desarrollo / en oficina / por videollamada"]
+    assert PLANTILLAS["primer_contacto"].pendientes == []
+    for p in PLANTILLAS.values():
+        assert (p.estado == "con_corchetes") == bool(p.pendientes), p.clave
 
 
 def test_desde_entorno(monkeypatch):

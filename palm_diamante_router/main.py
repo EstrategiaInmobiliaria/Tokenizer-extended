@@ -104,6 +104,7 @@ class RuteoResponse(BaseModel):
     aprobador: str
     precios_incluidos: bool
     alertas_cumplimiento: List[str] = []
+    pendientes_por_confirmar: List[str] = []
     unidades: List[dict] = []
     menu: List[dict] = []
     asesor_sugerido: Optional[str] = None
@@ -172,6 +173,7 @@ async def route(payload: MensajeEntrante):
 
     Toda `respuesta` es un **BORRADOR** (`requiere_aprobacion=true`): nada se envía al cliente sin
     aprobación humana. `alertas_cumplimiento` debe venir vacío; si no, el borrador viola la guía.
+    `pendientes_por_confirmar` lista los [corchetes] que hay que confirmar o borrar antes de enviar.
     """
     resultado = orquestador.rutear(
         payload.mensaje,

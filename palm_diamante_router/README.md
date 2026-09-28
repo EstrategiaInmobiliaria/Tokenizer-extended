@@ -9,7 +9,7 @@ comprometer tiempo humano o comercial.
 palm_diamante_router/
 ├── data/inventario_maestro.json     # Parte 1: inventario normalizado (única fuente de verdad)
 ├── prompts/reglas_clasificacion.md  # Parte 2: reglas de negocio en prosa (prompt para LLM)
-├── prompts/guia_respuestas_whatsapp.md  # Guía de respuestas (27-sep-2026): reglas y textos aprobados
+├── prompts/guia_respuestas_whatsapp.md  # Guía de respuestas (28-sep-2026): reglas, respuestas rápidas, pendientes
 ├── router/
 │   ├── inventory.py                 # Carga y consulta del inventario (filtros, por id)
 │   ├── classifier.py                # Clasificador determinista por reglas + extracción de filtros
@@ -58,6 +58,35 @@ RuleBasedClassifier  ──►  COYOTE          ──►  ticket alerta ROJA + 
 El clasificador además extrae parámetros explícitos del mensaje (`torre`, `prototipo`,
 `recamaras`, `precio_max_mxn`) para consultar el inventario con precisión.
 
+## Política de comunicación (Guía de respuestas para WhatsApp)
+
+Reglas que el router aplica a **toda** salida, tomadas de `prompts/guia_respuestas_whatsapp.md`:
+
+- **Todo es borrador.** Cada respuesta trae `estado: "BORRADOR"`, `requiere_aprobacion: true` y
+  `aprobador: "Jimmy"`. Nada se envía al cliente sin aprobación humana.
+- **Sin precios hasta confirmar la lista.** Por defecto `precios_incluidos=false`. Si el prospecto
+  solo pregunta precio se responde `/sinprecio` literal; si además da características concretas
+  (torre, recámaras, m²) se describen las unidades sin precio. El precio sigue en `unidades[]` para
+  uso interno del asesor. Para liberar precios: `PALM_PRECIOS_CONFIRMADOS=1` (solo cuando Jimmy
+  confirme la lista del 15-sep-2026).
+- **Sin promesas de entrega ni avance.** Preguntas de entrega/avance responden con `/entrega`.
+- **Sin urgencia no respaldada ni mención de terceros.** El validador marca frases tipo "últimas
+  unidades", "el precio sube", "la disponibilidad cambia seguido", "anuncios de terceros".
+- **Nuestros canales.** `/hola` y `/cita` incluyen 55 4437 8776, 55 6100 0600, 55 2855 7467 y
+  palm-diamante.com/es. Los dominios y teléfonos de terceros son de uso interno: si aparecen en un
+  borrador se marcan como violación.
+- **[Corchetes] = confirmar o borrar antes de enviar.** `pendientes_por_confirmar` lista el
+  contenido de cada corchete presente en el borrador (por ejemplo, el lugar de la cita).
+- **Cierre con `/calificar`.** Si el borrador no termina en una pregunta, se añade la calificación
+  aprobada (uso, presupuesto, forma de pago). Un interés genérico ("me interesa un depa") recibe
+  solo `/calificar`, sin volcar el inventario.
+- **Listas largas.** El borrador muestra máximo 5 unidades y remite al asesor para el resto.
+- **Validación automática.** `alertas_cumplimiento` debe venir vacío; los tests lo verifican para
+  todas las plantillas.
+
+Las plantillas con su comando (`/hola`, `/calificar`, `/sinprecio`, …), estado (`aprobado` /
+`con_corchetes` / `derivado`) y pendientes se consultan en `GET /api/v1/router/plantillas`.
+
 ## Endpoints
 
 | Método | Ruta                                        | Descripción                                             |
@@ -65,13 +94,14 @@ El clasificador además extrae parámetros explícitos del mensaje (`torre`, `pr
 | POST   | `/api/v1/router/route`                      | Clasifica **y ejecuta** la acción; devuelve respuesta lista para enviar |
 | POST   | `/api/v1/router/classify`                   | Solo clasifica (auditoría / pruebas)                    |
 | GET    | `/api/v1/router/prompt`                     | Reglas de negocio en prosa (para un clasificador LLM)   |
+| GET    | `/api/v1/router/plantillas`                 | Plantillas de la guía de WhatsApp y política vigente    |
 | GET    | `/api/v1/inventario`                        | Inventario con filtros `torre`, `prototipo`, `recamaras`, `precio_min_mxn`, `precio_max_mxn` |
 | GET    | `/api/v1/inventario/{id_unidad}`            | Detalle de una unidad                                   |
 | GET    | `/api/v1/revision-manual`                   | Bandeja de tickets escalados                            |
 | POST   | `/api/v1/revision-manual/{id}/resolver`     | Cierra un ticket                                        |
 | GET    | `/health`                                   | Health check                                            |
 
-### Ejemplo: comprador real
+### Ejemplo: comprador real (precios aún no confirmados)
 
 ```bash
 curl -s -X POST localhost:8010/api/v1/router/route \
@@ -83,13 +113,23 @@ curl -s -X POST localhost:8010/api/v1/router/route \
 {
   "categoria": "COMPRADOR_REAL",
   "accion": "RESPONDER_CON_INVENTARIO",
-  "respuesta": "Con gusto. Estas son las unidades disponibles en Palm Diamante que coinciden con lo que buscas:\n- PD-T2-204 · Torre 2 · Prototipo B · 3 recámaras · 165 m² · $6,500,000 MXN\n¿Te gustaría agendar una visita o que te comparta el esquema de pago de alguna unidad?",
+  "estado": "BORRADOR",
+  "requiere_aprobacion": true,
+  "aprobador": "Jimmy",
+  "precios_incluidos": false,
+  "alertas_cumplimiento": [],
+  "pendientes_por_confirmar": [],
+  "respuesta": "Con gusto. Estas son las unidades disponibles en Palm Diamante que coinciden con lo que buscas:\n- PD-T2-204 · Torre 2 · Prototipo B · 3 recámaras · 165 m²\nEstoy confirmando la lista de precios más reciente para darte información exacta y te la comparto en cuanto la tenga.\nPara mostrarte las opciones que mejor te queden: ¿lo buscas para vivir, vacacionar o invertir? ¿Tienes un rango de presupuesto en mente? ¿Lo pagarías de contado, con plan de pagos o con crédito?",
+  "siguiente_paso": "Calificar al prospecto (uso, presupuesto, forma de pago). Precios bloqueados hasta que Jimmy confirme la lista vigente.",
   "unidades": [{ "id_unidad": "PD-T2-204", "precio_lista_mxn": 6500000, "...": "..." }],
   "asesor_sugerido": "CA",
   "filtros_aplicados": { "torre": 2, "recamaras": 3 },
   "bloqueo_datos_confidenciales": false
 }
 ```
+
+Con `PALM_PRECIOS_CONFIRMADOS=1` la misma consulta incluye `· $6,500,000 MXN` en la línea de la
+unidad y `precios_incluidos: true`.
 
 ### Ejemplo: coyote
 
@@ -103,7 +143,7 @@ curl -s -X POST localhost:8010/api/v1/router/route \
 {
   "categoria": "COYOTE",
   "accion": "ESCALAR_REVISION_MANUAL",
-  "respuesta": "Gracias por tu mensaje. Un ejecutivo de Agartha Bienes Raices revisará tu solicitud y se pondrá en contacto contigo.",
+  "respuesta": "Gracias por tu mensaje. Un ejecutivo de Estrategia Inmobiliaria revisará tu solicitud y se pondrá en contacto contigo.",
   "bloqueo_datos_confidenciales": true,
   "unidades": [],
   "ticket_revision": { "id_ticket": "REV-1A2B3C4D", "alerta": "ROJA", "estado": "PENDIENTE", "...": "..." }

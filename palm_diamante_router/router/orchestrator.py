@@ -19,6 +19,7 @@ from typing import List, Optional
 
 from .classifier import Categoria, Clasificacion, Clasificador, RuleBasedClassifier
 from .inventory import Inventario, Unidad, formatear_mxn
+from .plantillas import pendientes_en
 from .plantillas import texto as plantilla
 from .policy import ESTADO_BORRADOR, PoliticaComunicacion
 from .review_queue import ColaRevisionManual
@@ -38,8 +39,10 @@ MENU_RAPIDO = [
 
 SENALES_DE_UNIDADES = {
     "precio", "cuanto_cuesta", "metraje", "disponibilidad", "torre", "prototipo",
-    "recamaras", "parametros_explicitos", "interes_de_compra",
+    "recamaras", "parametros_explicitos",
 }
+# Con un inventario real (200+ unidades) el borrador no puede listar todo.
+MAX_UNIDADES_EN_RESPUESTA = 5
 
 
 @dataclass
@@ -57,6 +60,7 @@ class ResultadoRuteo:
     aprobador: str = ""
     precios_incluidos: bool = False
     alertas_cumplimiento: List[str] = field(default_factory=list)
+    pendientes_por_confirmar: List[str] = field(default_factory=list)
     unidades: List[dict] = field(default_factory=list)
     menu: List[dict] = field(default_factory=list)
     asesor_sugerido: Optional[str] = None
@@ -93,6 +97,7 @@ class Orquestador:
             resultado = self._desplegar_menu(clasificacion)
         resultado.aprobador = self.politica.aprobador
         resultado.alertas_cumplimiento = self.politica.validar_borrador(resultado.respuesta)
+        resultado.pendientes_por_confirmar = pendientes_en(resultado.respuesta)
         return resultado
 
     # ------------------------------------------------------------------ acciones
@@ -110,9 +115,11 @@ class Orquestador:
             if v is not None
         }
         senales = set(clasificacion.senales)
-        pide_unidades = bool(senales & SENALES_DE_UNIDADES)
         pide_precio = bool(senales & {"precio", "cuanto_cuesta"}) or filtros.precio_max_mxn is not None
         mostrar_precios = self.politica.precios_confirmados
+        # Sin lista confirmada y sin ninguna característica concreta, la guía manda /sinprecio a secas.
+        solo_pide_precio = pide_precio and not filtros_dict and not (senales & SENALES_DE_UNIDADES - {"precio", "cuanto_cuesta"})
+        pide_unidades = bool(senales & SENALES_DE_UNIDADES) and not (solo_pide_precio and not mostrar_precios)
 
         unidades: List[Unidad] = []
         alternativas_usadas = False
@@ -124,7 +131,9 @@ class Orquestador:
 
         bloques: List[str] = []
 
-        if pide_unidades:
+        if solo_pide_precio and not mostrar_precios:
+            bloques.append(plantilla("sin_precio"))
+        elif pide_unidades:
             if alternativas_usadas:
                 bloques.append(
                     "Por ahora no tenemos unidades disponibles con exactamente esas características, "
@@ -134,9 +143,12 @@ class Orquestador:
                 bloques.append("Con gusto. Estas son las unidades disponibles en Palm Diamante que coinciden con lo que buscas:")
             else:
                 bloques.append("Por el momento no hay unidades disponibles en inventario; un asesor te avisará en cuanto se libere una.")
-            bloques.extend(self._describir_unidad(u, con_precio=mostrar_precios) for u in unidades)
+            bloques.extend(self._describir_unidad(u, con_precio=mostrar_precios) for u in unidades[:MAX_UNIDADES_EN_RESPUESTA])
+            if len(unidades) > MAX_UNIDADES_EN_RESPUESTA:
+                restantes = len(unidades) - MAX_UNIDADES_EN_RESPUESTA
+                bloques.append(f"Hay {restantes} opciones más con estas características; un asesor te comparte la lista completa.")
             if pide_precio and not mostrar_precios:
-                bloques.append(plantilla("precio_sin_confirmar_con_unidades" if unidades else "precio_sin_confirmar"))
+                bloques.append(plantilla("sin_precio_con_unidades" if unidades else "sin_precio"))
 
         if "ubicacion" in senales:
             bloques.append(plantilla("ubicacion"))
@@ -149,8 +161,8 @@ class Orquestador:
             bloques.append(plantilla("cita"))
             siguiente_paso = "Agendar cita: confirmar día, horario y lugar con el prospecto."
         elif not any(b.rstrip().endswith("?") for b in bloques):
-            bloques.append(plantilla("siguiente_paso_generico"))
-            siguiente_paso = "Ofrecer cita o contacto de asesor."
+            bloques.append(plantilla("calificar"))
+            siguiente_paso = "Calificar al prospecto (uso, presupuesto, forma de pago)."
         else:
             siguiente_paso = "Esperar respuesta del prospecto a la pregunta de calificación."
 
