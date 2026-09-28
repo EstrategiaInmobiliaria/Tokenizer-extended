@@ -29,10 +29,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from router import (
+    PLANTILLAS,
     Categoria,
     ColaRevisionManual,
     Inventario,
     Orquestador,
+    PoliticaComunicacion,
     RuleBasedClassifier,
     SYSTEM_PROMPT,
 )
@@ -56,7 +58,9 @@ app.add_middleware(
 inventario = Inventario.from_json(INVENTORY_PATH)
 cola_revision = ColaRevisionManual()
 clasificador = RuleBasedClassifier()
-orquestador = Orquestador(inventario, cola_revision, clasificador)
+# PALM_PRECIOS_CONFIRMADOS=1 solo cuando Jimmy confirme que la lista vigente sigue válida.
+politica = PoliticaComunicacion.desde_entorno()
+orquestador = Orquestador(inventario, cola_revision, clasificador, politica)
 
 
 # ============================================================================ modelos
@@ -95,6 +99,11 @@ class RuteoResponse(BaseModel):
     respuesta: str
     siguiente_paso: str
     bloqueo_datos_confidenciales: bool
+    estado: str
+    requiere_aprobacion: bool
+    aprobador: str
+    precios_incluidos: bool
+    alertas_cumplimiento: List[str] = []
     unidades: List[dict] = []
     menu: List[dict] = []
     asesor_sugerido: Optional[str] = None
@@ -134,6 +143,8 @@ async def health():
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "unidades_en_inventario": len(inventario.unidades),
         "tickets_pendientes": len(cola_revision.pendientes()),
+        "precios_confirmados": politica.precios_confirmados,
+        "aprobador": politica.aprobador,
     }
 
 
@@ -158,6 +169,9 @@ async def route(payload: MensajeEntrante):
     - **COMPRADOR_REAL** → consulta inventario y devuelve `respuesta` + `unidades`.
     - **LEAD_FRIO** → devuelve `respuesta` con `menu` de calificación.
     - **COYOTE** → crea `ticket_revision` con alerta roja; `bloqueo_datos_confidenciales=true`.
+
+    Toda `respuesta` es un **BORRADOR** (`requiere_aprobacion=true`): nada se envía al cliente sin
+    aprobación humana. `alertas_cumplimiento` debe venir vacío; si no, el borrador viola la guía.
     """
     resultado = orquestador.rutear(
         payload.mensaje,
@@ -218,6 +232,21 @@ async def resolver_ticket(id_ticket: str, payload: ResolucionTicket):
 async def prompt_del_router():
     """Devuelve las reglas de negocio en prosa para inyectarlas a un clasificador LLM externo."""
     return {"system_prompt": SYSTEM_PROMPT}
+
+
+@app.get("/api/v1/router/plantillas", tags=["Router"])
+async def plantillas_de_respuesta():
+    """Plantillas de la Guía de respuestas para WhatsApp (aprobadas, derivadas y sus pendientes)."""
+    return {
+        "politica": {
+            "estado_por_defecto": "BORRADOR",
+            "aprobador": politica.aprobador,
+            "precios_confirmados": politica.precios_confirmados,
+            "canales_oficiales": politica.canales_oficiales,
+            "sitio_oficial": politica.sitio_oficial,
+        },
+        "plantillas": [vars(p) for p in PLANTILLAS.values()],
+    }
 
 
 if __name__ == "__main__":

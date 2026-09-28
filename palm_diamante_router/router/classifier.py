@@ -95,7 +95,8 @@ REGLAS_COMPRADOR = _compilar(
         ("recamaras", r"\b(recamara|recamaras|habitacion|habitaciones|cuarto|cuartos|dormitorio|dormitorios)\b|\b\d\s*rec\b"),
         ("esquema_de_pago", r"\b(enganche|mensualidad|mensualidades|esquema(s)? de pago|plan(es)? de pago|forma(s)? de pago|financiamiento|credito|hipoteca|hipotecario|infonavit|fovissste|apartado|apartar|contado)\b"),
         ("cita_o_visita", r"\b(cita|visita|visitar|agendar|agenda|recorrido|conocerlo|conocerlos|conocer el|ir a ver|pasar a ver|showroom|departamento muestra)\b"),
-        ("entrega", r"\b(fecha de entrega|entregan|cuando entregan|preventa)\b"),
+        ("entrega", r"\b(fecha de entrega|entrega|entregan|cuando entregan|avance de obra|avance|preventa)\b"),
+        ("ubicacion", r"\b(ubicacion|ubicado|ubicada|donde esta|donde queda|donde se encuentra|direccion|como llego|zona)\b"),
         ("interes_de_compra", r"\b(comprar|compra|adquirir|invertir|inversion|rendimiento|plusvalia|me interesa)\b"),
         ("costos_asociados", r"\b(mantenimiento|cuota|cuotas|escrituras|escrituracion|notario|predial|gastos notariales)\b"),
     ]

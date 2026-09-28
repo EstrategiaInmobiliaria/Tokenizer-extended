@@ -3,6 +3,8 @@
 from .classifier import Categoria, Clasificacion, RuleBasedClassifier, SYSTEM_PROMPT
 from .inventory import Inventario, Unidad
 from .orchestrator import Orquestador, ResultadoRuteo
+from .plantillas import PLANTILLAS, Plantilla
+from .policy import PoliticaComunicacion
 from .review_queue import ColaRevisionManual
 
 __all__ = [
@@ -14,5 +16,8 @@ __all__ = [
     "Unidad",
     "Orquestador",
     "ResultadoRuteo",
+    "PLANTILLAS",
+    "Plantilla",
+    "PoliticaComunicacion",
     "ColaRevisionManual",
 ]

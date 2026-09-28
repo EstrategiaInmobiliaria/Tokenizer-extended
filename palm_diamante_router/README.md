@@ -9,10 +9,13 @@ comprometer tiempo humano o comercial.
 palm_diamante_router/
 ├── data/inventario_maestro.json     # Parte 1: inventario normalizado (única fuente de verdad)
 ├── prompts/reglas_clasificacion.md  # Parte 2: reglas de negocio en prosa (prompt para LLM)
+├── prompts/guia_respuestas_whatsapp.md  # Guía de respuestas (27-sep-2026): reglas y textos aprobados
 ├── router/
 │   ├── inventory.py                 # Carga y consulta del inventario (filtros, por id)
 │   ├── classifier.py                # Clasificador determinista por reglas + extracción de filtros
-│   ├── orchestrator.py              # Categoría -> acción de negocio -> respuesta al prospecto
+│   ├── policy.py                    # Política de comunicación: borrador, precios, canales, prohibidos
+│   ├── plantillas.py                # Textos de la guía (aprobados / derivados / pendientes)
+│   ├── orchestrator.py              # Categoría -> acción de negocio -> borrador de respuesta
 │   └── review_queue.py              # Bandeja de revisión manual (alerta roja)
 ├── main.py                          # API FastAPI
 ├── tests/                           # pytest (clasificador, inventario, API)
