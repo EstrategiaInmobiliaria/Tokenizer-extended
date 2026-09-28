@@ -1,0 +1,27 @@
+{
+  "proyecto": "Palm Diamante",
+  "desarrolladora": "Agartha Bienes Raices",
+  "actualizado": "2026-09-28",
+  "inventario": [
+    {
+      "id_unidad": "PD-T1-101",
+      "torre": "Torre 1",
+      "prototipo": "A",
+      "recamaras": 2,
+      "superficie_m2": 120.5,
+      "precio_lista_mxn": 4850000,
+      "estatus": "Disponible",
+      "asesor_asignado_defecto": "MT"
+    },
+    {
+      "id_unidad": "PD-T2-204",
+      "torre": "Torre 2",
+      "prototipo": "B",
+      "recamaras": 3,
+      "superficie_m2": 165.0,
+      "precio_lista_mxn": 6500000,
+      "estatus": "Disponible",
+      "asesor_asignado_defecto": "CA"
+    }
+  ]
+}
