@@ -88,6 +88,7 @@ Unidades por estatus: disponible 204, apartado 7, reservado 6, vendido 388. `lis
 
 ## Índice
 
+- [Paquete operativo v1 (SQL, RLS, contratos, plantillas, n8n, purga, RACI)](paquete-operativo-v1.md)
 - [Registro de brechas](registro-brechas.md)
 - [Mapa 01 — Arquitectura del ecosistema](mapas/01-arquitectura-del-ecosistema.md)
 - [Mapa 02 — Funnel de monetización](mapas/02-funnel-de-monetizacion.md)

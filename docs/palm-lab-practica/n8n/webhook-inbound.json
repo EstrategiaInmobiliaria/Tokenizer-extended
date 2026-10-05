@@ -1,0 +1,185 @@
+{
+  "name": "palm-lab WhatsApp inbound",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "meta-whatsapp",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "c0ffee00-0001-4000-8000-000000000001",
+      "name": "Webhook Meta",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "palm-meta-whatsapp"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const crypto = require('crypto');\nconst item = $input.first();\nconst headers = item.json.headers || {};\nconst signature = String(headers['x-hub-signature-256'] || '');\nconst rawBody = item.json.rawBody || item.binary?.data?.data && Buffer.from(item.binary.data.data, 'base64').toString('utf8');\nconst appSecret = $env.META_APP_SECRET;\n\nif (!appSecret || !rawBody || !signature) {\n  return [{ json: { valid: false, reason: 'missing_signature_or_body' } }];\n}\n\nconst expected = 'sha256=' + crypto.createHmac('sha256', appSecret).update(rawBody).digest('hex');\nconst a = Buffer.from(expected);\nconst b = Buffer.from(signature);\nconst valid = a.length === b.length && crypto.timingSafeEqual(a, b);\n\nlet payload = null;\ntry { payload = JSON.parse(rawBody); } catch (e) { payload = null; }\n\nreturn [{ json: { valid, reason: valid ? 'ok' : 'bad_signature', payload } }];"
+      },
+      "id": "c0ffee00-0001-4000-8000-000000000002",
+      "name": "Validar HMAC",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "firma-ok",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "c0ffee00-0001-4000-8000-000000000003",
+      "name": "Firma valida",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"error\": \"unauthorized\" } }}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "id": "c0ffee00-0001-4000-8000-000000000004",
+      "name": "Responder 401",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [960, 480]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "language": "javaScript",
+        "jsCode": "const payload = $json.payload || {};\nconst change = payload.entry?.[0]?.changes?.[0]?.value || {};\nconst message = change.messages?.[0];\nif (!message) {\n  return [{ json: { skip: true, reason: 'sin_mensaje' } }];\n}\nconst crudo = String(message.from || '');\nconst digitos = crudo.replace(/\\D/g, '');\nconst e164 = digitos.length === 10 ? `+52${digitos}` : digitos.startsWith('52') ? `+${digitos}` : `+${digitos}`;\nconst texto = message.text?.body || message.type || '';\nreturn [{\n  json: {\n    skip: false,\n    message_id: message.id,\n    e164,\n    telefono_normalizado: digitos,\n    texto,\n    ocurrido_at: message.timestamp ? new Date(Number(message.timestamp) * 1000).toISOString() : new Date().toISOString()\n  }\n}];"
+      },
+      "id": "c0ffee00-0001-4000-8000-000000000005",
+      "name": "Normalizar mensaje",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 160]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $env.SUPABASE_URL + '/rest/v1/leads?telefono_normalizado=eq.' + $json.telefono_normalizado + '&select=id,prospecto_id,estado,temperatura' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Authorization", "value": "={{ 'Bearer ' + $env.SUPABASE_SERVICE_ROLE_KEY }}" },
+            { "name": "Accept", "value": "application/json" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c0ffee00-0001-4000-8000-000000000006",
+      "name": "Buscar lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 160]
+    },
+    {
+      "parameters": {
+        "content": "## Contrato de escritura (no enviar desde este workflow)\n\n1. Insertar `webhook_eventos` con `clave_idempotencia = message_id`, `proveedor = meta_whatsapp`, `estado = recibido`.\n2. Si el GET de leads vuelve `[]`: insertar `prospectos.telefono` en E.164, luego `leads.telefono` con el mismo valor y `prospecto_id`. El trigger escribe `telefono_normalizado`.\n3. Si el lead existe: actualizar `ultimo_msg_cliente_at` en `prospectos` y en `leads`.\n4. Insertar `interacciones` con `canal = whatsapp`, `direccion = entrante`, `estado = recibido`, `id_externo = message_id`.\n5. Calificar y escribir `scoring` vigente y `leads.temperatura`. Copiar la temperatura a `prospectos` en la misma transacción.\n6. El borrador se inserta en `borradores` con `prospecto_id` y `estado = pendiente`. Este workflow no marca `enviado`.\n7. No llamar a la Edge Function `lead-alert-email`: solo acepta INSERT de `leads_prueba_formulario`.\n\nEl workflow está inactivo. La llave `service_role` vive en variables de entorno de n8n, nunca en este JSON.",
+        "height": 420,
+        "width": 520
+      },
+      "id": "c0ffee00-0001-4000-8000-000000000007",
+      "name": "Contrato",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1460, 80]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"ok\": true } }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "c0ffee00-0001-4000-8000-000000000008",
+      "name": "Responder 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1440, 160]
+    }
+  ],
+  "connections": {
+    "Webhook Meta": {
+      "main": [
+        [
+          { "node": "Validar HMAC", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Validar HMAC": {
+      "main": [
+        [
+          { "node": "Firma valida", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Firma valida": {
+      "main": [
+        [
+          { "node": "Normalizar mensaje", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Responder 401", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Normalizar mensaje": {
+      "main": [
+        [
+          { "node": "Buscar lead", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Buscar lead": {
+      "main": [
+        [
+          { "node": "Responder 200", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {},
+  "tags": []
+}
