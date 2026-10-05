@@ -19,6 +19,13 @@ Proporcionar una herramienta profesional para la evaluación de proyectos inmobi
 - ✅ Realiza **análisis DCF** (Discounted Cash Flow) completo con VPN, TIR, y análisis de escenarios
 - ✅ Optimiza el **mix de productos** bajo restricciones de recursos y demanda
 - ✅ Expone todos los cálculos como **API REST** accesible en tiempo real
+- ✅ Calcula el **Læds Opportunity Score v1** sobre inventario normalizado
+
+La fórmula, las 12 variables y el modo de probarla con un libro tipo Palm Diamante están en [docs/OPPORTUNITY_SCORE_V1.md](docs/OPPORTUNITY_SCORE_V1.md).
+
+```bash
+python example_opportunity_score.py
+```
 
 ---
 

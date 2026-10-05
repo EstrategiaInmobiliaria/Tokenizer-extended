@@ -17,6 +17,16 @@ from .ops_optimizer import (
     ResourceConstraint,
     DemandConstraint
 )
+from .opportunity_score import (
+    FORMULA_VERSION,
+    InvestmentThesis,
+    Listing,
+    OpportunityEngine,
+    ScoreAssumptions,
+    load_book,
+    score_inventory,
+)
+from .easybroker_adapter import from_easybroker_property
 
 __version__ = "1.0.0"
 __author__ = "Master Blueprint Project"
@@ -41,4 +51,14 @@ __all__ = [
     "Product",
     "ResourceConstraint",
     "DemandConstraint",
+
+    # Læds Opportunity Score
+    "FORMULA_VERSION",
+    "InvestmentThesis",
+    "Listing",
+    "OpportunityEngine",
+    "ScoreAssumptions",
+    "load_book",
+    "score_inventory",
+    "from_easybroker_property",
 ]

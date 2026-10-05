@@ -391,30 +391,19 @@ class OperationsOptimizer:
         # Para función lineal, el gradiente es constante
         return np.array([-product.contribution_margin for product in self.products])
     
-    def optimize_linear_programming(self) -> Dict[str, any]:
-        """
-        Optimización usando programación lineal (scipy.optimize.linprog)
-        
-        Método: Simplex o Interior Point
-        
-        Returns:
-            Dict con solución óptima y métricas
-        """
-        # Coeficientes de la función objetivo (negativo para maximizar)
+    def _solve_linear_program(self) -> Dict[str, any]:
+        """Resuelve el LP sin precios sombra. Los precios sombra reoptimizan por aquí."""
         c = np.array([-product.contribution_margin for product in self.products])
-        
-        # Matriz de restricciones de desigualdad (A_ub * x <= b_ub)
+
         A_ub = []
         b_ub = []
-        
         for constraint in self.resource_constraints:
             A_ub.append(constraint.consumption_rates)
             b_ub.append(constraint.total_available)
-        
+
         A_ub = np.array(A_ub) if A_ub else None
         b_ub = np.array(b_ub) if b_ub else None
-        
-        # Bounds para cada variable (demanda mín/máx)
+
         bounds = []
         for i in range(self.n_products):
             min_bound = (
@@ -428,16 +417,15 @@ class OperationsOptimizer:
                 else None
             )
             bounds.append((min_bound, max_bound))
-        
-        # Resolver
+
         result = linprog(
             c=c,
             A_ub=A_ub,
             b_ub=b_ub,
             bounds=bounds,
-            method='highs'  # Método moderno de programación lineal
+            method='highs'
         )
-        
+
         if not result.success:
             return {
                 "success": False,
@@ -445,15 +433,32 @@ class OperationsOptimizer:
                 "optimal_quantities": None,
                 "optimal_profit": None
             }
+
+        return {
+            "success": True,
+            "optimal_quantities": result.x.tolist(),
+            "optimal_profit": float(-result.fun - self.fixed_costs),
+        }
+
+    def optimize_linear_programming(self) -> Dict[str, any]:
+        """
+        Optimización usando programación lineal (scipy.optimize.linprog)
         
-        optimal_quantities = result.x
-        optimal_profit = -result.fun - self.fixed_costs
+        Método: Simplex o Interior Point
         
+        Returns:
+            Dict con solución óptima y métricas
+        """
+        solved = self._solve_linear_program()
+        if not solved["success"]:
+            return solved
+
+        optimal_quantities = np.array(solved["optimal_quantities"])
         return {
             "success": True,
             "method": "Linear Programming (Simplex)",
-            "optimal_quantities": optimal_quantities.tolist(),
-            "optimal_profit": optimal_profit,
+            "optimal_quantities": solved["optimal_quantities"],
+            "optimal_profit": solved["optimal_profit"],
             "products": [p.name for p in self.products],
             "detailed_breakdown": self._get_detailed_breakdown(optimal_quantities),
             "shadow_prices": self._calculate_shadow_prices(optimal_quantities),
@@ -588,7 +593,7 @@ class OperationsOptimizer:
                 "used": used,
                 "slack": slack,
                 "utilization_percentage": utilization,
-                "is_binding": abs(slack) < 1e-6  # Restricción activa
+                "is_binding": bool(abs(slack) < 1e-6)  # Restricción activa
             })
         
         return {
@@ -624,8 +629,8 @@ class OperationsOptimizer:
             original_available = constraint.total_available
             constraint.total_available += epsilon
             
-            # Re-optimizar
-            temp_result = self.optimize_linear_programming()
+            # Re-optimizar sin volver a entrar a los precios sombra
+            temp_result = self._solve_linear_program()
             
             if temp_result["success"]:
                 new_profit = temp_result["optimal_profit"]
