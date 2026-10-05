@@ -88,7 +88,9 @@ Unidades por estatus: disponible 204, apartado 7, reservado 6, vendido 388. `lis
 
 ## Índice
 
-- [Manual de procesos PLP-MAN-001](iso/PLP-MAN-001-manual-de-procesos.md)
+- [SGC PD-SGC-MAN-001](iso/PD-SGC-MAN-001.md)
+- [Auditoría trimestral PDCA](iso/PD-SGC-PDCA-001-auditoria-trimestral.md)
+- [Manual de procesos PLP-MAN-001 (antecedente)](iso/PLP-MAN-001-manual-de-procesos.md)
 - [Paquete operativo v1 (SQL, RLS, contratos, plantillas, n8n, purga, RACI)](paquete-operativo-v1.md)
 - [Registro de brechas](registro-brechas.md)
 - [Mapa 01 — Arquitectura del ecosistema](mapas/01-arquitectura-del-ecosistema.md)

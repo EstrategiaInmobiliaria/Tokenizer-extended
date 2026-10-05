@@ -6,11 +6,11 @@
 | Revisión | 01 |
 | Fecha | 2026-10-05 |
 | Proceso | Sistema de preventa Palm Diamante en `palm-lab-practica` |
-| Estado del documento | Vigente para el laboratorio |
+| Estado del documento | Sustituido en códigos por PD-SGC-MAN-001 |
 | Dueño del documento | Backend Lead |
 | Aprobador | CTO |
 
-Estos códigos ordenan el trabajo. Son control documental interno, alineado a la forma de una norma ISO 9001:2015. Un organismo certificador todavía no ha emitido un certificado sobre este sistema. La columna «Cláusula de referencia» dice qué requisito de la norma cubre cada proceso cuando el sistema se audite.
+A partir del 2026-10-05 los códigos vigentes del sistema son los de [PD-SGC-MAN-001](PD-SGC-MAN-001.md). Este archivo conserva el protocolo técnico anterior (`PLP-PRO-*`) como antecedente de la revisión 01.
 
 El detalle de columnas, reglas y la primera pasada de auditoría está en `docs/palm-lab-practica/paquete-operativo-v1.md` (código PLP-REG-001).
 
