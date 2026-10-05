@@ -322,7 +322,7 @@ class RealEstateDCF:
             "average_annual_cash_flow": np.mean(net_flows) if net_flows else 0,
             
             # Decisión de inversión
-            "accept_project": npv > 0 and irr > self.assumptions.discount_rate,
+            "accept_project": bool(npv > 0 and irr > self.assumptions.discount_rate),
             "decision_rationale": self._get_decision_rationale(npv, irr),
             
             # Desglose anual

@@ -10,6 +10,7 @@ Endpoints Principales:
 - POST /api/v1/wacc/calculate - Cálculo de WACC
 - POST /api/v1/dcf/analyze - Análisis DCF de proyecto inmobiliario
 - POST /api/v1/optimize/mix - Optimización de mix de productos
+- POST /api/v1/opportunity/score - Læds Opportunity Score v1
 - GET /health - Health check del servicio
 - GET /docs - Documentación interactiva (Swagger UI)
 """
@@ -18,7 +19,7 @@ from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, validator
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 import uvicorn
 from datetime import datetime
 
@@ -29,7 +30,8 @@ from core import (
     WACCEngine, MarketParameters, CapitalStructure,
     RealEstateDCF, ProjectAssumptions, RealEstateCashFlows, TerminalValueAssumptions,
     scenario_analysis,
-    OperationsOptimizer, Product, ResourceConstraint, DemandConstraint
+    OperationsOptimizer, Product, ResourceConstraint, DemandConstraint,
+    score_inventory,
 )
 
 
@@ -110,7 +112,7 @@ class DCFRequest(BaseModel):
     operating_costs: List[float]
     capex: List[float]
     taxes: List[float]
-    terminal_value_method: str = Field("perpetuity", regex="^(perpetuity|exit_multiple)$")
+    terminal_value_method: str = Field("perpetuity", pattern="^(perpetuity|exit_multiple)$")
     perpetual_growth_rate: float = Field(0.02, ge=0, le=0.1)
     exit_cap_rate: float = Field(0.08, ge=0, le=1)
     include_scenarios: bool = Field(False, description="Incluir análisis de escenarios")
@@ -214,6 +216,16 @@ class OptimizationRequest(BaseModel):
         }
 
 
+class OpportunityScoreRequest(BaseModel):
+    """Inventario normalizado y, opcionalmente, la tesis del inversionista."""
+    listings: List[Dict[str, Any]] = Field(..., description="Inmuebles en el esquema del Opportunity Score")
+    thesis: Optional[Dict[str, Any]] = None
+    assumptions: Optional[Dict[str, Any]] = None
+    price_index: Optional[List[Dict[str, Any]]] = None
+    as_of: Optional[str] = None
+    top_n: Optional[int] = Field(None, ge=1, le=500)
+
+
 class OptimizationResponse(BaseModel):
     """Response de optimización"""
     success: bool
@@ -242,7 +254,8 @@ async def root():
             "docs": "/docs",
             "wacc": "/api/v1/wacc/calculate",
             "dcf": "/api/v1/dcf/analyze",
-            "optimization": "/api/v1/optimize/mix"
+            "optimization": "/api/v1/optimize/mix",
+            "opportunity": "/api/v1/opportunity/score"
         }
     }
 
@@ -444,6 +457,40 @@ async def optimize_product_mix(request: OptimizationRequest):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Error en optimización: {str(e)}"
+        )
+
+
+@app.post(
+    "/api/v1/opportunity/score",
+    status_code=status.HTTP_200_OK,
+    tags=["Læds Opportunity Score"]
+)
+async def score_opportunities(request: OpportunityScoreRequest):
+    """
+    Calcula el Læds Opportunity Score v1 sobre un inventario ya normalizado.
+
+    Devuelve cinco puntajes (propiedad, plusvalía, inversión, liquidez y
+    oportunidad), el descuento contra comparables y la renta estimada.
+    La fórmula y los pesos viajan en la respuesta.
+    """
+    if not request.listings:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Se necesita al menos un inmueble"
+        )
+    try:
+        return score_inventory(
+            listings=request.listings,
+            thesis=request.thesis,
+            assumptions=request.assumptions,
+            price_index=request.price_index,
+            as_of=request.as_of,
+            top_n=request.top_n,
+        )
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Error en Opportunity Score: {exc}"
         )
 
 
