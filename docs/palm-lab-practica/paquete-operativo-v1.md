@@ -485,7 +485,7 @@ Estas plantillas no incluyen precio. Con `lista_vigente = false` en las 605 unid
 
 ## Bloque 5. Flujo n8n — webhook inbound
 
-El workflow importable, inactivo, está en [n8n/webhook-inbound.json](n8n/webhook-inbound.json). Usa los nombres reales de tablas y columnas. No contiene secretos.
+El workflow canónico, inactivo y sin secretos, es [n8n/PD-WF-001_meta-inbound.json](n8n/PD-WF-001_meta-inbound.json) (PD-WF-001, versión del manual 1.1). Valida HMAC, responde 401 si la firma falla y normaliza el teléfono. El nodo de búsqueda de lead queda deshabilitado hasta cerrar PD-P10 §6.1. [n8n/webhook-inbound.json](n8n/webhook-inbound.json) es el esqueleto anterior, con la misma ruta `meta-inbound`.
 
 ### 5.1 Nodos
 

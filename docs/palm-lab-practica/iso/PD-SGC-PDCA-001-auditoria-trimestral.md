@@ -1,56 +1,67 @@
-# PD-SGC-PDCA-001 Auditoría trimestral
+# PD-EV-CHECK-2026-W41 Auditoría de arranque
+
+Plantilla vigente: PD-SGC-PDCA-001. Esta copia es la primera pasada de PD-CTRL-001 a PD-CTRL-012, ejecutada el 2026-10-05 con rol de lectura sobre `palm-lab-practica`. No sustituye la firma del CTO.
+
+## 1. Identificación
 
 | Campo | Valor |
 | --- | --- |
 | Código | PD-SGC-PDCA-001 |
-| Versión | 1.0 |
-| Fecha de plantilla | 2026-10-05 |
-| Periodo a auditar | ____-__-__ a ____-__-__ |
-| Auditor | |
-| Aprobador | CTO |
-| Manual de referencia | PD-SGC-MAN-001 |
+| Periodo | 2026-09-28 a 2026-10-05 |
+| Semana ISO | 2026-W41 |
+| Auditor | Backend Lead |
+| Aprobó CTO | Pendiente |
 
-Completar una fila por proceso. «Check» usa la consulta de la sección 4 del manual. Un cero vacío se anota como abierto.
+## 2. Alcance
 
-| Proceso | Plan: liga y KPI | Do: evidencia del periodo | Check: filas | Act: versión y acción | Dueño | Cierre |
-| --- | --- | --- | --- | --- | --- | --- |
-| PD-P01 | PD-ING-010 / PD-KPI-001 | PD-EV-001 | | | Backend Lead | |
-| PD-P02 | Vistas de etapa / PD-KPI-002 | PD-EV-002 | | | Comercial Lead | |
-| PD-P03 | PD-ING-012 / PD-KPI-003 | PD-EV-003 | | | Backend Lead | |
-| PD-P04 | Cloud API / PD-KPI-004 | PD-EV-004 | | | Comercial Lead | |
-| PD-P05 | Esquema / PD-KPI-005 | PD-EV-005 | | | Backend Lead | |
-| PD-P06 | Huérfanos / PD-KPI-006 | PD-EV-006 | | | Backend Lead | |
-| PD-P07 | PD-ING-031 / PD-KPI-007 | PD-EV-007 | | | Backend y Comercial | |
-| PD-P08 | Tres funciones / PD-KPI-008 | PD-EV-008 | | | Backend Lead | |
-| PD-P09 | Policies / PD-KPI-009 | PD-EV-009 | | | Backend Lead | |
-| PD-P10 | PD-EV-010 / PD-KPI-010 | PD-EV-010 | | | CTO | |
-| PD-P11 | Tablero / PD-KPI-011 | PD-EV-011 | | | Comercial Lead | |
-| PD-P12 | Aislamiento / PD-KPI-012 | PD-EV-012 | | | Backend Lead | |
+Procesos PD-P01 a PD-P12. Controles PD-CTRL-001 a PD-CTRL-012. El SQL reproducible está en PD-SGC-MAN-001 versión 1.1.
 
-## Lectura de línea base — 2026-10-05
+## 3. Resultados
 
-Esta fila no sustituye la auditoría del trimestre. Fija el punto de partida de la versión 1.0.
+| Proceso | Control | Esperado en producción | Obtenido | Cumple hoy | Hallazgo |
+| --- | --- | --- | --- | --- | --- |
+| PD-P01 | PD-CTRL-001 | Interacciones con tráfico | prospectos 15, leads 15, interacciones 0 | No | Cero vacío en el canal |
+| PD-P02 | PD-CTRL-002 | Conversión con historial de etapa | 15 leads; etapa actual exclusiva | Parcial | El estado no acumula etapas |
+| PD-P03 | PD-CTRL-003 | 0 mensajes sin firma | webhook_eventos 0 | No | Control de firma sin filas y sin columna `metadata` |
+| PD-P04 | PD-CTRL-004 | 0 envíos sin aprobación | 0 enviados sin aprobador | Vacío | No existe `draft_id` ni `es_plantilla` |
+| PD-P05 | PD-CTRL-005 | FK del ERD 1.1 | Citas, seguimientos y borradores → prospectos; comisiones → matches | Sí | El ERD que cuelga esas tablas de leads no coincide |
+| PD-P06 | PD-CTRL-006 | 0 huérfanos y 0 divergencias | 0, 0 y 0 | Sí | El espejo no tiene trigger |
+| PD-P07 | PD-CTRL-007 | 0 tibios o calientes sin match | 12 | No | matches = 0 |
+| PD-P08 | PD-CTRL-008 | Secreto ausente rechaza sin escribir | sync 503 `SYNC_SECRET missing`; alerta 401 | Parcial | Sync apagado por falta de secreto |
+| PD-P09 | PD-CTRL-009 | 0 tablas sin RLS y 0 grants anon al núcleo | 0 y 0 | Sí | Policies de asesor siguen sin crear |
+| PD-P10 | §6.1 a §6.6 | Seis requisitos cerrados | Abiertos | No | Ver sección 6 del manual |
+| PD-P11 | PD-CTRL-011 | Comisión por fuente | 0 comisiones; 12 respuestas > 5 min | No | Métrica reina sin numerador |
+| PD-P12 | PD-CTRL-012 | 0 demo antes de pauta | E.164 0 excepciones; formulario 3; lab 4/8/16/224; campañas 0 | No | Purga pendiente |
 
-| Proceso | Check | Lectura | Riesgo |
-| --- | --- | --- | --- |
-| PD-P01 | RLS apagado en `public` | 0 | PD-RIE-001 abierto en webhook y n8n |
-| PD-P02 | Leads sin fuente | 0 | 15 sin campaña, P2 |
-| PD-P03 | Eventos e interacciones | 0 y 0, vacío | PD-RIE-003 abierto |
-| PD-P04 | Enviados sin aprobador | 0 | Ventana de 24 h sin evaluador |
-| PD-P05 | Llaves del diagrama | Presentes | PD-RIE-005 controlado en esta versión |
-| PD-P06 | Huérfanos | 0 | El espejo no tiene trigger |
-| PD-P07 | Tibios y calientes sin match | 12 | PD-KPI-007 = 0 % |
-| PD-P08 | Funciones con secreto en código | 2 de 2 activas con JWT falso | Cron ausente |
-| PD-P09 | Tablas sin RLS | 0 | Policies de asesor sin aplicar |
-| PD-P10 | Hitos | Abiertos desde P1 de Meta | PD-RIE-010 |
-| PD-P11 | Comisión sin traza | 0 vacío | PD-KPI-011 sin numerador |
-| PD-P12 | Teléfonos fuera de E.164 | 0 | Semilla de 15 sin acta |
+## 4. Hallazgos y acciones
 
-## Cierre del auditor
+| # | Hallazgo | Proceso | Severidad | Acción | Responsable | Compromiso | Estado |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Webhook sin host y sin eventos | PD-P03 | P0 | Publicar PD-ING-012 y pasar PD-CTRL-008 del sync a secreto configurado | Backend Lead | 2026-11-05 | Abierto |
+| 2 | 12 leads tibios o calientes sin match | PD-P07 | P0 | No abrir pauta. Cerrar lista vigente y el motor | Backend y Comercial | 2026-11-05 | Abierto |
+| 3 | Ventana 24 h y `draft_id` sin columna | PD-P04 | P0 | Migración de trazabilidad antes del primer envío | Backend Lead | 2026-11-05 | Abierto |
+| 4 | `SYNC_SECRET` ausente: la función responde 503 | PD-P08 | P1 | Configurar secreto y repetir PD-CTRL-008 | Backend Lead | 24 h tras decisión | Abierto |
+| 5 | Laboratorio poblado y semilla de 15 leads | PD-P12 | P1 | PD-EV-012 antes de producción | Backend Lead | 2026-11-05 | Abierto |
 
-| Pregunta | Respuesta |
+## 5. Acciones preventivas
+
+El control SQL de la versión 1.1 usa solo columnas que existen. Una consulta con `interacciones.message_id`, `direccion = 'out'` o `comisiones.lead_id` no se programa: fallaría al ejecutarla.
+
+## 6. Actualizaciones al manual
+
+| Campo | Valor |
 | --- | --- |
-| ¿Algún P0 quedó sin acción fechada? | |
-| ¿La bitácora de PD-SGC-MAN-001 subió de versión? | |
-| ¿El CTO aprobó el acta? | |
-| Fecha del siguiente Plan | |
+| Versión anterior | 1.0 |
+| Versión nueva | 1.1 |
+| Cambios | Controles PD-CTRL, requisitos de salida PD-P10 y workflow PD-WF-001 |
+
+## 7. Firma
+
+| Rol | Nombre | Fecha |
+| --- | --- | --- |
+| Auditor | Backend Lead | 2026-10-05 |
+| CTO | Pendiente | |
+
+## Plantilla del siguiente trimestre
+
+Copiar este archivo como `PD-EV-CHECK-Q_AAAA-QQ_auditoria-trimestral.md` y vaciar la columna «Obtenido».

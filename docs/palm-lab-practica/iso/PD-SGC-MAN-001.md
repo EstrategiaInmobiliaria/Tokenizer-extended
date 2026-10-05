@@ -1,73 +1,58 @@
-# Manual de Sistema de Gestión de Procesos (SGC)
+# PD-SGC-MAN-001 Manual del Sistema de Gestión de Procesos
 
-Proyecto: Palm Diamante — `palm-lab-practica`
+Palm Diamante — `palm-lab-practica`
 
-Marco de referencia: ISO 9001:2015 (enfoque a procesos), ISO/IEC 27001 (seguridad de la información) y PDCA. Este manual es el sistema documental interno. Un organismo certificador no ha emitido certificado sobre él.
+Nota de integración: la versión 1.1 incorpora la revisión externa y el orden SQL por proceso, manual, PDCA y workflow. Los controles se reescribieron contra el catálogo real. Donde el borrador nombraba una columna que no existe, el control usa la columna vigente y el hueco queda como requisito de salida de PD-P10. La primera pasada se ejecutó el 2026-10-05.
+
+Marco de referencia: ISO 9001:2015, ISO/IEC 27001 y PDCA. Este documento es control interno. Un organismo certificador no ha emitido un certificado.
 
 ## Control del documento
 
 | Campo | Valor |
 | --- | --- |
 | Código | PD-SGC-MAN-001 |
-| Versión | 1.0 |
+| Versión | 1.1 |
 | Fecha | 2026-10-05 |
-| Estado | Vigente |
+| Estado | Vigente — pendiente de aprobación del CTO |
 | Autor | Backend Lead |
 | Aprobador | CTO |
 | Próxima revisión | 2026-11-05 |
 | Clasificación | Interno — Confidencial |
-| Idioma | es-MX |
-
-### Convención de códigos
-
-| Prefijo | Uso |
-| --- | --- |
-| `PD-SGC-*` | Documento del sistema de gestión |
-| `PD-P##` | Proceso del 01 al 12 |
-| `PD-P##.##` | Subproceso |
-| `PD-EV-*` | Evidencia o registro |
-| `PD-KPI-*` | Indicador |
-| `PD-RIE-*` | Riesgo |
-| `PD-ING-*` | Liga de ingreso |
-
-Una liga se llama **verificada** cuando el endpoint respondió en el corte 2026-10-05. Se llama **declarada** cuando el protocolo la exige y el proyecto todavía no la publica. La regla de oro exige liga verificable: una liga declarada mantiene abierto el proceso.
+| Fuentes de verdad | Supabase para datos operativos. Git para migraciones, funciones y este manual. |
 
 ## 1. Objetivo y alcance
 
-**Objetivo.** Estandarizar los 12 procesos del CRM de preventa Palm Diamante con códigos únicos, ligas de ingreso y un ciclo de mejora que se pueda auditar.
+**Objetivo.** Estandarizar los 12 procesos del CRM con códigos, ligas, controles SQL y PDCA.
 
-**Alcance.** Del mensaje entrante de WhatsApp a la comisión cobrada. Cubre el proyecto Supabase `palm-lab-practica`, las Edge Functions desplegadas, el catálogo EasyBroker y la operación de los asesores de Estrategia Inmobiliaria. n8n y los agentes de lenguaje están dentro del alcance como procesos a cerrar: en este corte no hay host de n8n ni corrida de modelo registrada en la base.
+**Alcance.** Del mensaje de WhatsApp a la comisión cobrada.
 
-**Exclusiones.** Diseño de campañas creativas, contratos legales de compraventa y financiamiento hipotecario externo.
+**Fuera de alcance.** Diseño creativo de campañas, contratos de compraventa e hipotecas externas.
 
-## 2. Definiciones
+## 2. Convenciones
 
-| Término | Definición |
+| Prefijo | Uso |
 | --- | --- |
-| Proceso | Actividades que convierten entradas en salidas con evidencia. |
-| Liga de ingreso | URL o endpoint que abre el proceso. |
-| Temperatura | Cualificación del lead: `frio`, `tibio`, `caliente`. |
-| Fuente de verdad | Supabase. El estado de negocio vive en sus tablas. |
-| Ventana 24 h | Periodo de Meta en el que se puede responder con texto libre. La base todavía no calcula ese intervalo. |
-| PDCA | Plan, Do, Check, Act. |
-| Cero vacío | Una auditoría que devuelve 0 filas porque la tabla no tiene tráfico. No cierra un riesgo. |
+| `PD-P##` | Proceso |
+| `PD-P##.#` | Subproceso |
+| `PD-EV-###` | Evidencia |
+| `PD-KPI-###` | Indicador |
+| `PD-RIE-###` | Riesgo |
+| `PD-CTRL-###` | Control SQL o prueba de aceptación |
+| `PD-ING-###` | Liga de ingreso |
+| `PD-WF-001` | Workflow n8n |
 
-## 3. Mapa de procesos
+Una liga **verificada** respondió en el corte. Una liga **declarada** sigue abierta. No quedan marcas `-- VERIFICAR` en este manual: lo no confirmado está en la columna Estado.
+
+Los controles se corren con `service_role` o un rol de lectura, en el SQL Editor. `pg_cron` no está instalado. n8n no tiene host. `anon` no lee el CRM.
+
+## 3. Mapa de códigos
 
 ```mermaid
 flowchart TB
   subgraph ESTRATEGICOS[Procesos estratégicos]
     E1[PD-P10 Producción]
     E2[PD-P11 Métricas]
-    E3[PD-P12 Lab vs Producción]
-  end
-  subgraph OPERATIVOS[Cadena de valor]
-    O3[PD-P03 Inbound]
-    O6[PD-P06 Prospecto y lead]
-    O2[PD-P02 Funnel]
-    O7[PD-P07 Matching]
-    O4[PD-P04 Outbound]
-    O3 --> O6 --> O2 --> O7 --> O4
+    E3[PD-P12 Lab vs Prod]
   end
   subgraph SOPORTE[Soporte]
     S0[PD-P01 Arquitectura]
@@ -75,229 +60,203 @@ flowchart TB
     S8[PD-P08 Edge Functions]
     S1[PD-P09 Seguridad]
   end
+  subgraph OPERATIVOS[Cadena de valor]
+    O3[PD-P03 Inbound] --> O6[PD-P06 Par]
+    O6 --> O2[PD-P02 Funnel]
+    O2 --> O7[PD-P07 Matching]
+    O7 --> O4[PD-P04 Outbound]
+  end
   ESTRATEGICOS -. gobierna .-> OPERATIVOS
   SOPORTE -. habilita .-> OPERATIVOS
 ```
 
-PD-P01, PD-P05, PD-P08 y PD-P09 habilitan la cadena. PD-P03 abre el valor. El orden de los códigos sigue la numeración de los mapas; el orden de ejecución es el de la flecha.
+La numeración PD-P01 a PD-P12 conserva el orden de los mapas. La flecha de la cadena de valor es el orden de ejecución.
 
 ## 4. Protocolos
 
-Cada proceso trae objetivo, liga, entradas, salidas, diagrama, pasos, consulta de verificación, evidencia, indicador y riesgo. Las consultas se ejecutan con `service_role` o con un rol de lectura. `anon` no lee el CRM.
+### PD-P01 — Arquitectura
 
-### PD-P01 — Arquitectura del ecosistema
+**Objetivo.** Supabase guarda el dato operativo. Git guarda migraciones, funciones y documentos.
 
-**Objetivo.** Supabase es el tránsito obligatorio de cualquier dato de negocio.
+**Ligas**
 
-**Ligas de ingreso**
-
-| Código | Liga | Estado en el corte |
+| Código | Liga | Estado |
 | --- | --- | --- |
-| PD-ING-001 | [https://wa.me/525540180018](https://wa.me/525540180018) | Verificada como chat. El número 55 4018 0018 no está guardado en el esquema y no tiene webhook. |
-| PD-ING-010 | [https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru](https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru) | Studio del proyecto. |
-| PD-ING-011 | `https://plgfhtvzxhrdfmrlknru.supabase.co` | API del proyecto. |
-| PD-ING-012 | `https://<n8n-host>/webhook/meta-inbound` | Declarada. No hay host de n8n en el proyecto. El JSON inactivo está en `docs/palm-lab-practica/n8n/webhook-inbound.json`. |
+| PD-ING-001 | [https://wa.me/525540180018](https://wa.me/525540180018) | Chat verificado. Webhook no desplegado. |
+| PD-ING-010 | [https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru](https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru) | Studio. |
+| PD-ING-011 | `https://plgfhtvzxhrdfmrlknru.supabase.co` | API. |
+| PD-ING-012 | `https://<n8n-host>/webhook/meta-inbound` | Declarada. Requisito PD-P10 §6.1. JSON en `n8n/PD-WF-001_meta-inbound.json`. |
 
-**Entradas.** Mensajes de WhatsApp, sync de EasyBroker, aprobaciones de asesores.
+**Entradas.** Mensajes, sync EasyBroker, aprobaciones.
 
-**Salidas.** Filas en Supabase. El HTTP a Meta y el correo de lead caliente del núcleo siguen declarados.
+**Salidas.** Filas en Supabase. HTTP a Meta y correo de lead caliente del núcleo: declarados.
 
 ```mermaid
 flowchart LR
-  C[Cliente] -->|mensaje| WA[Meta WhatsApp]
-  WA -->|webhook declarado| WH[PD-ING-012]
+  C[Cliente] -->|mensaje| WA[Meta]
+  WA -->|PD-ING-012 declarada| WH[Webhook]
   WH -->|service_role| SB[(Supabase)]
-  EB[EasyBroker] -->|PD-ING-031| SB
+  EB[EasyBroker] --> SB
   SB --> AS[Asesor vía backend]
   AS --> SB
 ```
 
-**Pasos**
+**Pasos.** Escribir en `public` con actor y tiempo. Guardar `service_role` en secretos. Clasificar cada liga. Anotar PD-EV-001.
 
-1. Escribir el dato en una tabla de `public` con actor y marca de tiempo.
-2. Usar `service_role` solo desde secretos de backend.
-3. Confirmar cada liga de la tabla anterior y anotar si es verificada o declarada.
-4. Registrar el resultado en PD-EV-001.
+**Evidencia.** PD-EV-001. **KPI.** PD-KPI-001 tránsito por Supabase, objetivo 100 %. **Riesgo.** PD-RIE-001 escritura que no deja fila.
 
-**Verificación**
+**PD-CTRL-001**
 
 ```sql
-select schemaname, tablename
-from pg_tables
-where schemaname = 'public'
-  and rowsecurity = false;
+select 'prospectos' as tabla, count(*) as filas, max(created_at) as ultimo_evento
+from public.prospectos
+union all
+select 'leads', count(*), max(created_at) from public.leads
+union all
+select 'interacciones', count(*), max(created_at) from public.interacciones
+union all
+select 'webhook_eventos', count(*), max(recibido_at) from public.webhook_eventos;
 ```
 
-Corte: 0 filas.
+Primera pasada: prospectos 15 (2026-09-28), leads 15 (2026-10-05), interacciones 0, webhook_eventos 0. En operación real las cuatro tablas tienen fila reciente. Hoy el canal está en cero vacío.
 
-**Evidencia.** PD-EV-001 bitácora de conectividad.
+### PD-P02 — Funnel
 
-**KPI.** PD-KPI-001 componentes de la cadena con Supabase como tránsito. Objetivo 100 %. Hoy el webhook y n8n están fuera de ese tránsito.
+**Objetivo.** Cada etapa tiene fila. El estado es la etapa actual, no el historial.
 
-**Riesgo.** PD-RIE-001 escritura de negocio que no deja fila en Supabase.
+**Liga.** No existe `v_funnel_*`. Lectura verificada: `v_leads_temperatura`, `v_prospectos_nuevos`, `v_leads_frios`. Editor: [https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru/editor](https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru/editor)
 
-### PD-P02 — Funnel de monetización
-
-**Objetivo.** Ninguna etapa avanza sin fila.
-
-**Liga de ingreso.** No existe la vista `v_funnel_*`. La lectura verificada es:
-
-- `v_leads_temperatura`
-- `v_prospectos_nuevos`
-- `v_leads_frios`
-
-Studio: [https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru/editor](https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru/editor)
-
-**Entradas.** Fuente, conversación, perfil de inversión, disponibilidad.
-
-**Salidas.** `leads.estado`, citas, historial de unidad, comisiones. Estados reales: `nuevo`, `contactado`, `calificado`, `cita`, `apartado`, `cerrado`, `descartado`.
+**Salidas.** `leads.estado` en `nuevo`, `contactado`, `calificado`, `cita`, `apartado`, `cerrado`, `descartado`. Citas en `citas`. Comisión desde `matches`.
 
 ```mermaid
 flowchart TD
-  A[Fuente] --> B[Lead nuevo]
+  A[Fuente] --> B[Lead]
   B --> C[Calificación]
   C --> T{Temperatura}
   T -->|frio| N[Nutrición]
   N --> C
   T -->|tibio o caliente| D[Match]
   D --> E[Cita]
-  E --> F[Apartado y cierre]
-  F --> G[Comisión vía match]
+  E --> F[Cierre]
+  F --> G[Comisión]
 ```
 
-**Pasos**
-
-1. Exigir `fuente_id` antes de considerar el lead atribuido.
-2. Exigir `campana_id` cuando exista la primera campaña. Hoy las 15 filas tienen fuente y cero campañas: eso es P2, no una etapa fantasma.
-3. Mover `leads.estado` solo con la fila que lo justifica.
-4. Liquidar en `comisiones` desde `match_id`.
-
-**Verificación**
+**PD-CTRL-002.** Contar solo `estado = 'calificado'` deja fuera a quien ya está en cita. El control usa la etapa actual y, aparte, el acumulado.
 
 ```sql
-select id, fuente_id, campana_id, estado, created_at
+select estado::text, count(*) as n
 from public.leads
-where fuente_id is null;
+group by 1
+order by 1;
+
+select
+  count(*) as total,
+  count(*) filter (where estado in ('calificado','cita','apartado','cerrado')) as llegaron_a_calificado,
+  count(*) filter (where estado in ('cita','apartado','cerrado')) as llegaron_a_cita,
+  count(*) filter (where estado = 'cerrado') as cerrados,
+  (select count(*) from public.matches) as matches_total,
+  (select count(*) from public.comisiones) as comisiones_total
+from public.leads;
 ```
 
-Corte: 0 sin fuente. 15 con fuente y sin campaña.
+Primera pasada: nuevo 5, contactado 3, calificado 1, cita 3, apartado 1, cerrado 1, descartado 1. Acumulado a calificado 6 de 15. Matches 0. Comisiones 0.
 
-**Evidencia.** PD-EV-002 reporte de funnel. En el corte: nuevo 5, contactado 3, calificado 1, cita 3, apartado 1, cerrado 1, descartado 1.
+**Evidencia.** PD-EV-002. **KPI.** PD-KPI-002 conversión por etapa acumulada. **Riesgo.** PD-RIE-002 avance sin fila que lo explique.
 
-**KPI.** PD-KPI-002 conversión por etapa. PD-KPI-011 es la comisión por fuente y hoy no tiene filas.
+### PD-P03 — Inbound
 
-**Riesgo.** PD-RIE-002 lead que cambia de etapa sin interacción, cita, match o comisión que lo explique.
+**Objetivo.** Integridad del mensaje antes de automatizar.
 
-### PD-P03 — WhatsApp inbound
+**Liga.** PD-ING-001 y PD-ING-012.
 
-**Objetivo.** El mensaje queda íntegro antes de cualquier automatización.
-
-**Liga de ingreso.** PD-ING-001 para el cliente. PD-ING-012 para el sistema, declarada.
-
-**Entradas.** Payload de Meta Cloud API.
-
-**Salidas previstas.** `webhook_eventos`, `prospectos`, `leads`, `interacciones`. Borrador, seguimiento o cita son el proceso siguiente, no la escritura mínima.
+**Salida mínima.** `webhook_eventos`, `prospectos`, `leads`, `interacciones`. `interacciones` no tiene `origen`, `metadata`, `message_id` ni `telefono`. El id de Meta va en `id_externo`. La dirección válida es `entrante`.
 
 ```mermaid
 flowchart TD
   M[Mensaje] --> V{Firma válida}
-  V -->|no| X[401 y sin lead]
+  V -->|no| X[401 sin lead]
   V -->|sí| D{message_id nuevo}
-  D -->|no| OK[200 ya procesado]
+  D -->|no| OK[200]
   D -->|sí| Q{Lead por dígitos}
-  Q -->|no| P[Prospecto E.164 y lead]
+  Q -->|no| P[Prospecto y lead]
   Q -->|sí| U[ultimo_msg_cliente_at]
   P --> I[Interacción entrante]
   U --> I
-  I --> A[Calificador]
 ```
 
-**Pasos**
+**Pasos.** HMAC sobre el cuerpo crudo. `webhook_eventos.clave_idempotencia = message_id`. Teléfono E.164 en `prospectos.telefono`. El trigger llena `telefono_normalizado` con dígitos. Interacción `canal = whatsapp`, `direccion = entrante`, `estado = recibido`. La alerta `lead-alert-email` no sirve para el lead caliente del núcleo.
 
-1. Validar `x-hub-signature-256` contra el cuerpo crudo y `META_APP_SECRET`.
-2. Guardar `webhook_eventos.clave_idempotencia` con el id del mensaje.
-3. Guardar `prospectos.telefono` en E.164 (`+52` y 10 dígitos). El trigger escribe `leads.telefono_normalizado` solo con dígitos.
-4. Buscar por `telefono_normalizado`.
-5. Alta: prospecto, luego lead con `prospecto_id`, luego interacción `direccion = entrante`, `canal = whatsapp`, `estado = recibido`.
-6. Lead existente: actualizar `ultimo_msg_cliente_at` en las dos tablas y registrar la interacción.
-7. Calificar y copiar la temperatura al prospecto en la misma transacción.
-8. Enrutar en PD-P02. El correo `lead-alert-email` no es la alerta del lead caliente: solo acepta el formulario de práctica.
-
-**Verificación**
+**PD-CTRL-003.** La consulta con `metadata ->> firma_validada` no se puede ejecutar. El control vigente es:
 
 ```sql
-select count(*) as eventos from public.webhook_eventos;
-select count(*) as interacciones from public.interacciones;
+select
+  count(*) as eventos,
+  count(*) filter (where estado = 'error') as con_error,
+  count(*) filter (where estado = 'recibido' and procesado_at is null) as sin_procesar
+from public.webhook_eventos;
+
+select count(*) as interacciones_entrantes
+from public.interacciones
+where canal = 'whatsapp'
+  and direccion = 'entrante';
 ```
 
-Corte: 0 y 0. Cero vacío. PD-RIE-003 sigue abierto.
+Primera pasada: 0 eventos y 0 interacciones. Cero vacío. PD-RIE-003 sigue abierto. Guardar `firma_validada` exige una columna nueva; hasta entonces la firma se exige antes del insert.
 
-**Evidencia.** PD-EV-003 log de webhook.
-
-**KPI.** PD-KPI-003 mensajes aceptados con firma válida. Objetivo 100 % de los que entren. Hoy no entra ninguno.
-
-**Riesgo.** PD-RIE-003 procesar un mensaje sin firma o sin fila de interacción.
+**Evidencia.** PD-EV-003. **KPI.** PD-KPI-003 firmas válidas sobre mensajes aceptados, objetivo 100 %. **Riesgo.** PD-RIE-003 procesar sin firma.
 
 ### PD-P04 — Outbound
 
-**Objetivo.** Proteger el número y la regla de 24 horas de Meta.
+**Objetivo.** Separar borrador aprobado de evento aceptado por Meta.
 
-**Liga de ingreso.** Declarada. El envío de la Cloud API es `POST https://graph.facebook.com/{version}/{phone-number-id}/messages`. El `phone-number-id` no está en el esquema. `https://api.whatsapp.com/v1/messages` no es el contrato vigente de esta cuenta.
-
-**Entradas.** Borrador, decisión del asesor, `ultimo_msg_cliente_at`.
-
-**Salidas.** HTTP a Meta, interacción saliente, `ultimo_msg_asesor_at`, `proximo_seguimiento_at`.
+**Liga.** Declarada: `POST https://graph.facebook.com/{version}/{phone-number-id}/messages`. El id del número no está en el esquema. `https://api.whatsapp.com/v1/messages` no es el contrato de esta cuenta.
 
 ```mermaid
 flowchart LR
-  T[Disparador] --> B[Borrador pendiente]
-  B --> C{Lista negra y precio}
-  C -->|rechazo| X[La base no guarda]
-  C -->|pasa| R{Asesor aprueba}
-  R -->|edita| B
-  R -->|sí| V{Ventana 24 h}
+  B[Borrador pendiente] --> C{Cumplimiento}
+  C -->|no| X[La base rechaza]
+  C -->|sí| R{Asesor aprueba}
+  R --> V{Ventana 24 h}
   V -->|abierta| S[Texto libre]
-  V -->|cerrada| TP[Plantilla approved]
+  V -->|cerrada| TP[Plantilla]
   S --> I[Interacción saliente]
   TP --> I
 ```
 
-**Pasos**
-
-1. Insertar `borradores` con `prospecto_id` y `estado = pendiente`.
-2. El trigger `borradores_cumplimiento` bloquea canales prohibidos y precios mientras la lista no esté vigente.
-3. El asesor llena `aprobado_por` y pasa a `aprobado`.
-4. Comparar `now()` con `ultimo_msg_cliente_at`.
-5. Dentro de 24 horas, texto libre. Fuera, plantilla con nombre en `borradores.plantilla`.
-6. Al marcar `enviado`, crear la interacción `saliente` / `enviado` con el id de Meta.
-7. Programar `proximo_seguimiento_at`.
-
-**Verificación**
+**PD-CTRL-004**
 
 ```sql
 select id, prospecto_id, estado, aprobado_por, aprobado_at
 from public.borradores
 where estado = 'enviado'
   and aprobado_por is null;
+
+select i.id, i.lead_id, i.ocurrido_at, i.estado
+from public.interacciones i
+join public.leads l on l.id = i.lead_id
+left join public.prospectos p on p.id = l.prospecto_id
+where i.direccion = 'saliente'
+  and i.estado = 'enviado'
+  and i.ocurrido_at > coalesce(p.ultimo_msg_cliente_at, l.ultimo_msg_cliente_at, '-infinity'::timestamptz) + interval '24 hours'
+  and not exists (
+    select 1 from public.borradores b
+    where b.prospecto_id = p.id
+      and b.plantilla is not null
+      and b.estado = 'enviado'
+  );
 ```
 
-Corte: 0. Hay 1 pendiente y 1 aprobado. Ningún enviado. La ventana de 24 horas no tiene evaluador en la base.
+No existe `borradores.lead_id`, `interacciones.direccion = 'out'`, `es_plantilla` ni `draft_id`. El tercer control del borrador externo queda como requisito §6.3, no como query.
 
-**Evidencia.** PD-EV-004 registro de envíos.
+Primera pasada: 0 borradores enviados sin aprobador. 0 interacciones, cero vacío.
 
-**KPI.** PD-KPI-004 envíos con borrador aprobado. Objetivo 100 %.
+**Evidencia.** PD-EV-004. **KPI.** PD-KPI-004 envíos con borrador aprobado, objetivo 100 %. **Riesgo.** PD-RIE-004 envío sin aprobación o fuera de ventana.
 
-**Riesgo.** PD-RIE-004 envío sin `aprobado_por` o texto libre fuera de la ventana.
+### PD-P05 — ERD
 
-### PD-P05 — ERD fuente de verdad
+**Objetivo.** Las llaves del diagrama existen en la base. Git versiona las migraciones.
 
-**Objetivo.** La integridad relacional se puede recorrer con llaves reales.
-
-**Liga de ingreso.** [https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru/database/schemas](https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru/database/schemas)
-
-**Entradas.** Migraciones `crm_erd_fuente_verdad_*` y `crm_hardening_upsert_webhook_vista_comision`, aplicadas al 2026-10-05.
-
-**Salidas.** Esquema con RLS y llaves.
+**Liga.** [https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru/database/schemas](https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru/database/schemas)
 
 ```mermaid
 erDiagram
@@ -319,106 +278,88 @@ erDiagram
   prospectos ||--o{ borradores : prepara
 ```
 
-Citas, seguimientos y borradores cuelgan de `prospectos`. Las comisiones cuelgan de `matches`. `comisiones` no tiene `lead_id`.
+Citas, seguimientos y borradores no cuelgan de `leads`. Las comisiones no tienen `lead_id`.
 
-**Pasos**
+**PD-CTRL-005**
 
-1. Revisar el catálogo antes de nombrar una columna en un proceso.
-2. Confirmar la llave foránea del diagrama.
-3. Aplicar migraciones en el orden ya registrado en `supabase_migrations`.
-4. Versionar el diagrama en PD-EV-005 cuando cambie una llave.
+```sql
+select tc.table_name, kcu.column_name,
+       ccu.table_name as tabla_referenciada,
+       ccu.column_name as columna_referenciada
+from information_schema.table_constraints tc
+join information_schema.key_column_usage kcu
+  on tc.constraint_name = kcu.constraint_name
+ and tc.table_schema = kcu.table_schema
+join information_schema.constraint_column_usage ccu
+  on ccu.constraint_name = tc.constraint_name
+ and ccu.table_schema = tc.table_schema
+where tc.constraint_type = 'FOREIGN KEY'
+  and tc.table_schema = 'public'
+order by 1, 2;
+```
 
-**Verificación.** El diagrama de esta sección es la evidencia del corte. Una columna que no esté en `list_tables` no entra a producción.
-
-**Evidencia.** PD-EV-005 este diagrama, versión 1.0.
-
-**KPI.** PD-KPI-005 llaves del diagrama presentes en el catálogo. Corte: 100 % de las relaciones dibujadas aquí.
-
-**Riesgo.** PD-RIE-005 documentar una llave que la base no tiene, como `borradores.lead_id` o `comisiones.lead_id`.
+**Evidencia.** PD-EV-005, este diagrama en la versión 1.1. **KPI.** PD-KPI-005 relaciones dibujadas presentes en el catálogo. **Riesgo.** PD-RIE-005 documentar una FK que no existe.
 
 ### PD-P06 — Prospectos y leads
 
-**Objetivo.** Un cliente de canal tiene un prospecto y un lead, y la temperatura no se parte.
+**Objetivo.** Cero huérfanos y cero temperaturas distintas en el par.
 
-**Liga de ingreso.** La consulta de esta sección. No existe la vista `v_prospectos_sin_lead`.
-
-**Entradas.** Eventos de canal y cambios de estado.
-
-**Salidas.** Par sincronizado. `prospectos` guarda lo declarado. `leads` manda etapa, fuente y teléfono normalizado.
+**Liga.** PD-CTRL-006. No existe la vista `v_prospectos_sin_lead`.
 
 ```mermaid
 flowchart TD
   E[Evento] --> W1[Prospecto]
   W1 --> W2[Lead con prospecto_id]
-  W2 --> W3[Perfil, scoring o interacción]
+  W2 --> W3[Hijas del lead o del prospecto]
   W3 --> S{Cambió temperatura o estado}
-  S -->|sí| W4[Copiar al prospecto en la misma transacción]
-  S -->|no| FIN[Cierre]
+  S -->|sí| W4[Misma transacción hacia el prospecto]
 ```
 
-**Pasos**
-
-1. Escribir el prospecto.
-2. Escribir el lead con `prospecto_id` en la misma transacción.
-3. Dejar el teléfono normalizado al trigger.
-4. Escribir la temperatura en el lead y copiarla al prospecto.
-5. Correr la verificación cada día.
-
-**Verificación**
+**PD-CTRL-006**
 
 ```sql
-select p.id
+select p.id as prospecto_id, p.created_at
 from public.prospectos p
 left join public.leads l on l.prospecto_id = p.id
 where l.id is null;
 
-select l.id
+select l.id, l.prospecto_id
 from public.leads l
 left join public.prospectos p on p.id = l.prospecto_id
-where l.prospecto_id is null
-   or p.id is null;
+where l.prospecto_id is null or p.id is null;
+
+select l.id, l.temperatura::text as temp_lead, p.temperatura as temp_prospecto
+from public.leads l
+join public.prospectos p on p.id = l.prospecto_id
+where l.temperatura::text is distinct from p.temperatura;
 ```
 
-Corte: 0 y 0. La divergencia de temperatura y estado en los 15 pares también es 0. No hay trigger que mantenga ese espejo: el proceso lo hace la transacción.
+Primera pasada: 0, 0 y 0. El listado operativo puede añadir `telefono` en el SQL Editor. Este manual no archiva teléfonos.
 
-**Evidencia.** PD-EV-006 reporte de huérfanos.
-
-**KPI.** PD-KPI-006 prospectos sin lead = 0.
-
-**Riesgo.** PD-RIE-006 huérfano o temperaturas distintas en el par.
+**Evidencia.** PD-EV-006. **KPI.** PD-KPI-006 = 0. **Riesgo.** PD-RIE-006 huérfano. No hay trigger de espejo.
 
 ### PD-P07 — Inventario y matching
 
-**Objetivo.** Un lead tibio o caliente recibe de 1 a 3 unidades disponibles.
+**Objetivo.** Un tibio o caliente recibe de 1 a 3 unidades disponibles. Nunca una unidad no disponible.
 
-**Liga de ingreso.** El sync no es el motor de match. Su liga verificada es PD-ING-031: `POST https://plgfhtvzxhrdfmrlknru.supabase.co/functions/v1/easybroker-sync` con `x-webhook-secret`. El motor que inserta `matches` está declarado y no desplegado.
+**Liga.** `POST https://plgfhtvzxhrdfmrlknru.supabase.co/functions/v1/easybroker-sync` sincroniza el catálogo. No inserta `matches`.
 
-**Entradas.** `perfiles_inversion`, `scoring`, `unidades` con `estatus = disponible`. `easybroker_propiedades` es referencia: 365 filas, sin llave hacia `unidades`.
-
-**Salidas.** `matches` y, después, un borrador. Hoy `matches` tiene 0 filas.
+`unidades` es el inventario del match. `inventario` sigue sincronizado por trigger: 605 y 605, cero huérfanas. No está deprecado.
 
 ```mermaid
 flowchart LR
   EB[EasyBroker] --> EBP[easybroker_propiedades]
   UN[unidades disponibles] --> MT[Motor declarado]
   PI[perfiles_inversion] --> MT
-  SC[scoring vigente] --> MT
-  MT --> M[matches propuesto]
-  M --> BR[borrador pendiente]
+  SC[scoring] --> MT
+  MT --> M[matches]
+  M --> BR[borrador]
 ```
 
-**Pasos**
-
-1. Sincronizar el catálogo externo sin borrar filas locales.
-2. Ofrecer solo `v_unidades_ofertables`.
-3. Dejar el precio vacío mientras `lista_vigente` sea falso. En el corte lo es en las 605 unidades.
-4. Insertar como máximo 3 matches `propuesto` para temperatura `tibio` o `caliente`, con `score` y `explicacion`.
-5. Confiar en `private.match_reglas`: una unidad que no está `disponible` no se ofrece, y `aceptado` la aparta.
-
-**Verificación**
+**PD-CTRL-007**
 
 ```sql
-select l.id, l.temperatura, l.estado
+select l.id, l.temperatura::text, l.estado::text
 from public.leads l
 where l.temperatura in ('tibio', 'caliente')
   and not exists (
@@ -426,29 +367,37 @@ where l.temperatura in ('tibio', 'caliente')
     where m.lead_id = l.id
       and m.estado in ('propuesto', 'ofrecido', 'aceptado')
   );
+
+select m.id, m.estado::text, u.estatus::text
+from public.matches m
+join public.unidades u on u.id = m.unidad_id
+where m.estado in ('propuesto', 'ofrecido')
+  and u.estatus <> 'disponible';
+
+select
+  (select count(*) from public.inventario i
+    left join public.unidades u on u.clave = i.clave
+   where u.id is null) as inventario_sin_unidad,
+  (select count(*) from public.unidades u
+    left join public.inventario i on i.clave = u.clave
+   where i.id is null) as unidad_sin_inventario;
 ```
 
-Corte: 12 filas.
+Un `full outer join` de claves presentes devuelve los 605 pares conciliados, no las duplicidades. El control de conciliación son los dos conteos de huérfanos.
 
-**Evidencia.** PD-EV-007 reporte de matches.
+Primera pasada: 12 sin match, 0 matches sobre unidad no disponible, 0 y 0 huérfanas. `lista_vigente` es falso en las 605.
 
-**KPI.** PD-KPI-007 cobertura de match en tibios y calientes. Objetivo ≥ 95 %. Corte: 0 de 12.
-
-**Riesgo.** PD-RIE-007 ofrecer una unidad apartada, reservada o vendida, o fijar precio con lista no vigente.
+**Evidencia.** PD-EV-007. **KPI.** PD-KPI-007 cobertura ≥ 95 %. Corte: 0 de 12. **Riesgo.** PD-RIE-007.
 
 ### PD-P08 — Edge Functions
 
-**Objetivo.** Cada función expuesta tiene una autorización explícita.
+**Ligas**, base `https://plgfhtvzxhrdfmrlknru.supabase.co`:
 
-**Ligas de ingreso**
-
-| Función | Liga | `verify_jwt` | Corte |
-| --- | --- | --- | --- |
-| `easybroker-load` | `POST /functions/v1/easybroker-load` | verdadero | Responde 410. Retirar. |
-| `easybroker-sync` | `POST /functions/v1/easybroker-sync` | falso | Exige `SYNC_SECRET`. Upsert del catálogo. |
-| `lead-alert-email` | `POST /functions/v1/lead-alert-email` | falso | Exige secreto de Vault. Solo insert de `leads_prueba_formulario`. |
-
-Base: `https://plgfhtvzxhrdfmrlknru.supabase.co`.
+| Función | `verify_jwt` | Corte 2026-10-05 |
+| --- | --- | --- |
+| `/functions/v1/easybroker-load` | verdadero | HTTP 410. Retirar. |
+| `/functions/v1/easybroker-sync` | falso | Sin `SYNC_SECRET` responde 503 y no escribe. Cabecera real: `x-webhook-secret`. |
+| `/functions/v1/lead-alert-email` | falso | Sin secreto, o con secreto corto, responde 401. Solo acepta insert de `leads_prueba_formulario`. |
 
 ```mermaid
 flowchart TD
@@ -456,144 +405,148 @@ flowchart TD
   FORM[Insert de práctica] --> F3[lead-alert-email]
   F2 --> EBP[(easybroker_propiedades)]
   F3 --> MAIL[Correo de laboratorio]
-  F1[easybroker-load] --> G[HTTP 410]
+  F1[easybroker-load] --> G[410]
 ```
 
-**Pasos**
+**PD-CTRL-008.** No usar `x-shared-secret`. No enviar un secreto válido en la prueba de rechazo.
 
-1. Confirmar `verify_jwt` de cada función.
-2. Mantener el secreto fuera del repositorio. Si falta, la función responde 503.
-3. Rotar secretos cada 90 días y anotarlo en PD-EV-008 sin copiar el valor.
-4. Instalar el calendario del sync. `pg_cron` no está en el proyecto.
-5. No usar `lead-alert-email` como alerta de temperatura caliente.
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" -X POST \
+  https://plgfhtvzxhrdfmrlknru.supabase.co/functions/v1/easybroker-sync
 
-**Verificación.** Listado de funciones del proyecto: tres slugs, los de la tabla.
+curl -s -o /dev/null -w "%{http_code}\n" -X POST \
+  https://plgfhtvzxhrdfmrlknru.supabase.co/functions/v1/lead-alert-email
+```
 
-**Evidencia.** PD-EV-008 bitácora de rotación. No guarda el secreto, guarda fecha, función y responsable.
+Primera pasada: sync `503` con cuerpo `not_configured` / `SYNC_SECRET missing`, también con cabecera inválida, porque el secreto se evalúa antes que la firma. Alerta `401`. Ninguna escribió filas. El criterio «secreto incorrecto → 401» del sync se cumple cuando el secreto exista. Hoy el sync está apagado.
 
-**KPI.** PD-KPI-008 funciones con `verify_jwt = false` que rechazan la llamada sin secreto. Objetivo 100 %. Las dos funciones activas de ese tipo lo hacen en código.
+**Evidencia.** PD-EV-008, fecha y responsable, sin el valor del secreto. **KPI.** PD-KPI-008 funciones JWT-false que no escriben sin secreto. **Riesgo.** PD-RIE-008.
 
-**Riesgo.** PD-RIE-008 endpoint que ejecuta trabajo sin JWT y sin secreto.
+### PD-P09 — Seguridad
 
-### PD-P09 — Seguridad y acceso
-
-**Objetivo.** El teléfono, el presupuesto y el perfil no salen por `anon`.
-
-**Liga de ingreso.** [https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru/auth/policies](https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru/auth/policies)
+**Liga.** [https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru/auth/policies](https://supabase.com/dashboard/project/plgfhtvzxhrdfmrlknru/auth/policies)
 
 ```mermaid
 flowchart LR
-  ANON[anon] -->|sin lectura de CRM| DB[(Tablas)]
-  AGENT[crm_agent] -->|agente_permisos| DB
+  ANON[anon] -->|sin lectura del núcleo| DB[(Tablas)]
+  AG[crm_agent] -->|agente_permisos| DB
   SR[service_role] -->|bypass RLS| DB
-  SR --> SEC[Solo secretos de backend]
+  SR --> SEC[Solo secretos]
 ```
 
-**Pasos**
-
-1. Confirmar RLS activo con la consulta de PD-P01.
-2. Correr `get_advisors` de seguridad. El corte tiene 11 avisos `rls_enabled_no_policy`: son tablas cerradas a propósito, no tablas abiertas.
-3. Mantener `service_role` fuera del navegador.
-4. Abrir policies de `authenticated` solo cuando `asignado_a` sea un usuario de Auth. Hoy es texto libre. El borrador de esas policies está en PLP-REG-001 y no se aplicó.
-5. Revisar las funciones con `verify_jwt = false` en PD-P08.
-
-**Verificación**
+**PD-CTRL-009**
 
 ```sql
-select grantee, table_name, privilege_type
+select tablename
+from pg_tables
+where schemaname = 'public' and rowsecurity = false;
+
+select tablename, policyname, roles::text, cmd
+from pg_policies
+where schemaname = 'public'
+order by 1, 2;
+
+select table_name, privilege_type
 from information_schema.role_table_grants
 where grantee = 'anon'
-  and table_schema = 'public';
+  and table_schema = 'public'
+  and table_name in (
+    'leads','prospectos','interacciones','comisiones',
+    'scoring','matches','perfiles_inversion'
+  );
 ```
 
-Resultado esperado: solo `INSERT` en `leads_prueba_formulario`.
+Primera pasada: 0 tablas sin RLS. 0 grants de `anon` sobre esas tablas. El único insert anónimo sigue siendo `leads_prueba_formulario`. Los avisos `rls_enabled_no_policy` cierran tablas al rol sin bypass.
 
-**Evidencia.** PD-EV-009 reporte de advisors y de grants.
+**Evidencia.** PD-EV-009. **KPI.** PD-KPI-009 tablas sin RLS = 0. **Riesgo.** PD-RIE-009.
 
-**KPI.** PD-KPI-009 tablas de `public` con RLS apagado = 0.
+### PD-P10 — Producción
 
-**Riesgo.** PD-RIE-009 lectura anónima del CRM o llave de servicio en un cliente.
+**Objetivo.** La pauta espera a los hitos y a los seis requisitos de salida.
 
-Referencia ISO/IEC 27001: control de acceso y gestión de secretos. La referencia no sustituye una certificación.
-
-### PD-P10 — Salida a producción
-
-**Objetivo.** La pauta empieza después de la captura y la respuesta.
-
-**Liga de ingreso.** PD-EV-010, el checklist de esta sección.
+**Liga.** PD-EV-010 en Git, esta sección.
 
 ```mermaid
 flowchart TD
-  P1[Número verificado en Meta] --> P2[Plantillas approved]
-  P2 --> P3[Webhook con firma]
-  P3 --> P4[Prospecto, lead e interacción]
-  P4 --> P5[Funciones con secreto]
-  P5 --> P6[Lista vigente y cruce de inventario]
-  P6 --> P7[Calificación distinta de la migración]
-  P7 --> P8[1 a 3 matches]
-  P8 --> P9[Borrador aprobado y ventana 24 h]
-  P9 --> P10[Primera campaña]
-  P10 --> P11[Comisión de prueba en potencial]
+  P1[Meta verificado] --> P2[Plantillas]
+  P2 --> P3[Webhook]
+  P3 --> P4[Escritura ordenada]
+  P4 --> P5[Funciones]
+  P5 --> P6[Inventario]
+  P6 --> P7[Calificación viva]
+  P7 --> P8[Matches]
+  P8 --> P9[Outbound trazable]
+  P9 --> P10[Campaña]
+  P10 --> P11[Comisión]
 ```
 
-**Pasos.** Cerrar cada caja con una fila o una respuesta HTTP de prueba. La primera fila de `campanas` nace después de P9.
+**Evidencia.** PD-EV-010 firmado. **KPI.** PD-KPI-010 hitos cerrados. **Riesgo.** PD-RIE-010 pauta con webhook vacío.
 
-**Verificación.** PD-P03, PD-P04 y PD-P07 en cero problemas con tráfico real, no con cero vacío.
+#### Requisitos de salida
 
-**Evidencia.** PD-EV-010 checklist con fecha y responsable por hito.
-
-**KPI.** PD-KPI-010 hitos cerrados / 11.
-
-**Riesgo.** PD-RIE-010 abrir presupuesto de pauta con `webhook_eventos` vacío.
+| # | Área | Requisito | Criterio | Corte |
+| --- | --- | --- | --- | --- |
+| 6.1 | Webhook Meta | HTTPS público y verificación del challenge | Firma inválida no crea lead. Host real sustituye a `<n8n-host>`. | Abierto |
+| 6.2 | Funciones sin JWT | Secreto antes de escribir | Sync hoy responde 503 por secreto ausente. Alerta responde 401. Cabecera del sync: `x-webhook-secret`. | Parcial |
+| 6.3 | Outbound | Borrador aprobado distinto del acuse de Meta | Hace falta persistir borrador, id de Meta, estatus HTTP y tiempo. `draft_id` no existe. | Abierto |
+| 6.4 | Fuentes de verdad | Dato en Supabase. Cambio de esquema en Git. | Migración versionada y versión de este manual. | Vigente para el esquema actual |
+| 6.5 | Inventario | Reserva transaccional | `private.match_reglas` rechaza unidad no disponible y aparta al aceptar. Sigue en cero matches. | Regla activa, motor ausente |
+| 6.6 | Privacidad | Retención, minimización y acceso por rol | RLS probado en PD-CTRL-009. La retención por plazo todavía no está escrita. | Parcial |
 
 ### PD-P11 — Métricas
 
-**Objetivo.** Decidir presupuesto con comisión por fuente.
+**Objetivo.** Comisión por fuente. Vacía mientras no haya comisiones.
 
-**Liga de ingreso.** Studio del proyecto y las vistas `v_leads_temperatura`, `v_prospectos_nuevos`, `v_leads_frios`, `v_seguimientos_vencidos`, `v_citas_semana`, `v_borradores_pendientes`, `v_unidades_ofertables`.
+**Liga.** Vistas de la sección PD-P02 y Studio.
 
-```mermaid
-flowchart LR
-  F[fuentes_lead] --> CPL[Costo cuando haya campaña]
-  L[leads] --> MIX[Mix y etapas]
-  I[interacciones] --> TR[Tiempo de respuesta]
-  M[matches] --> MR[Cobertura de propuesta]
-  CO[comisiones] --> ING[Comisión por fuente]
-```
-
-**Pasos**
-
-1. Contar temperatura y etapa cada semana.
-2. Medir la primera respuesta con las marcas de mensaje. Umbral de este SGC: 5 minutos. Corte: 12 de 12 con mensaje de cliente quedan fuera.
-3. Publicar comisión por fuente solo cuando haya `comisiones` unidas al lead por `match_id` y a `fuentes_lead`.
-4. Excluir `leads_prueba_formulario` y `lab_meta_demo`.
-5. Mostrar el indicador vacío mientras el numerador sea cero.
-
-**Verificación**
+**PD-CTRL-011.** `citas` no tiene `lead_id`. `comisiones` no tiene `lead_id` ni estado `confirmada`. Estados de dinero: `devengada` y `pagada`.
 
 ```sql
-select count(*) as comisiones_sin_traza
-from public.comisiones c
-left join public.matches m on m.id = c.match_id
-left join public.leads l on l.id = m.lead_id
-where m.id is null
-   or l.id is null
-   or l.fuente_id is null;
+with base as (
+  select l.fuente_id,
+         count(*) as leads_total,
+         count(*) filter (where l.temperatura in ('tibio','caliente')) as tibios_o_calientes,
+         count(*) filter (where exists (
+           select 1 from public.matches m where m.lead_id = l.id
+         )) as con_match,
+         count(*) filter (where exists (
+           select 1 from public.citas c
+           where c.prospecto_id = l.prospecto_id
+         )) as con_cita
+  from public.leads l
+  where l.created_at >= now() - interval '7 days'
+  group by l.fuente_id
+),
+dinero as (
+  select l.fuente_id, sum(co.monto) as comision_total
+  from public.comisiones co
+  join public.matches m on m.id = co.match_id
+  join public.leads l on l.id = m.lead_id
+  where co.estado in ('devengada', 'pagada')
+  group by l.fuente_id
+)
+select b.fuente_id, b.leads_total, b.tibios_o_calientes, b.con_match, b.con_cita,
+       coalesce(d.comision_total, 0) as comision_total
+from base b
+left join dinero d on d.fuente_id = b.fuente_id
+order by comision_total desc;
+
+select count(*) as fuera_de_5_min
+from public.prospectos p
+where p.ultimo_msg_cliente_at is not null
+  and (p.ultimo_msg_asesor_at is null
+       or p.ultimo_msg_asesor_at > p.ultimo_msg_cliente_at + interval '5 minutes');
 ```
 
-Corte: 0, con la tabla vacía.
+Primera pasada: comisiones 0. Respuestas fuera de 5 minutos: 12. Los leads de semilla no nacieron todos en los últimos 7 días.
 
-**Evidencia.** PD-EV-011 tablero semanal.
+**Evidencia.** PD-EV-011, semana ISO. **KPI.** PD-KPI-011. **Riesgo.** PD-RIE-011 decidir sin fuente o con datos de laboratorio.
 
-**KPI.** PD-KPI-011 comisión por fuente. PD-KPI-002 y PD-KPI-007 alimentan la lectura.
+### PD-P12 — Laboratorio
 
-**Riesgo.** PD-RIE-011 mover presupuesto sin fuente o mezclando el laboratorio.
+**Objetivo.** La demo no entra en PD-KPI-011.
 
-### PD-P12 — Laboratorio y producción
-
-**Objetivo.** La demo no entra en la comisión ni en la cola del asesor.
-
-**Liga de ingreso.** Esquema `lab_meta_demo`, sin `USAGE` para `anon` ni `authenticated`. Formulario: `POST https://plgfhtvzxhrdfmrlknru.supabase.co/rest/v1/leads_prueba_formulario` (PD-ING-002).
+**Liga.** Esquema `lab_meta_demo`. Formulario `POST /rest/v1/leads_prueba_formulario`.
 
 ```mermaid
 flowchart LR
@@ -603,104 +556,123 @@ flowchart LR
   end
   subgraph PROD[Núcleo]
     PR[prospectos y leads]
-    INV[unidades]
     CRM[matches y comisiones]
   end
   LAB -.-x PROD
 ```
 
-No hay flecha de lectura del núcleo hacia el laboratorio. Un join entre ambos contamina PD-P11.
-
-**Pasos**
-
-1. Exportar y vaciar `lab_meta_demo` antes del arranque, o dejarlo sin grants como está y fuera de todo reporte.
-2. Exportar y vaciar las 3 filas de `leads_prueba_formulario`.
-3. Revisar los 15 leads de semilla uno por uno. El formato `+52` no los vuelve clientes.
-4. Confirmar `campanas` en cero antes de cargar las reales.
-5. Rotar secretos y anotarlo en PD-EV-008.
-
-**Verificación**
+**PD-CTRL-012**
 
 ```sql
-select count(*) as prospectos_fuera_de_e164_mx
+select count(*) as fuera_de_e164
 from public.prospectos
 where telefono !~ '^\+52[0-9]{10}$';
+
+select count(*) as formulario from public.leads_prueba_formulario;
+
+select 'campaigns' as t, count(*) from lab_meta_demo.campaigns
+union all select 'adsets', count(*) from lab_meta_demo.adsets
+union all select 'ads', count(*) from lab_meta_demo.ads
+union all select 'insights_daily', count(*) from lab_meta_demo.insights_daily;
+
+select count(*) as campanas from public.campanas;
 ```
 
-Corte del formato: 0. El conteo de semilla de prueba sigue siendo una decisión de PD-EV-012, no un regex.
+Primera pasada: E.164 conforme en los 15. Formulario 3. Laboratorio 4, 8, 16 y 224. Campañas 0. Antes de la pauta, formulario y laboratorio en 0 y campañas reales mayores a 0. El formato telefónico no cierra la semilla: eso es PD-EV-012.
 
-**Evidencia.** PD-EV-012 acta de purga, con conteos antes y después.
-
-**KPI.** PD-KPI-012 filas de demo usadas en PD-KPI-011 = 0.
-
-**Riesgo.** PD-RIE-012 métrica o alerta de asesor alimentada por el laboratorio.
+**Evidencia.** PD-EV-012. **KPI.** PD-KPI-012 demo dentro de la comisión = 0. **Riesgo.** PD-RIE-012.
 
 ### Subprocesos
 
-| Código | Padre | Actividad |
-| --- | --- | --- |
-| PD-P03.1 | PD-P03 | Validación HMAC |
-| PD-P03.2 | PD-P03 | Deduplicación por `message_id` |
-| PD-P03.3 | PD-P03 | Alta o actualización del par prospecto–lead |
-| PD-P04.1 | PD-P04 | Aprobación humana del borrador |
-| PD-P04.2 | PD-P04 | Decisión de ventana de 24 h |
-| PD-P07.1 | PD-P07 | Sync EasyBroker |
-| PD-P07.2 | PD-P07 | Selección de 1 a 3 unidades |
-| PD-P12.1 | PD-P12 | Purga de formulario y esquema demo |
-| PD-P12.2 | PD-P12 | Revisión de la semilla de 15 leads |
+| Código | Actividad |
+| --- | --- |
+| PD-P03.1 | HMAC |
+| PD-P03.2 | Idempotencia por `message_id` |
+| PD-P03.3 | Alta del par |
+| PD-P04.1 | Aprobación del borrador |
+| PD-P04.2 | Ventana de 24 h |
+| PD-P07.1 | Sync EasyBroker |
+| PD-P07.2 | Uno a tres matches |
+| PD-P12.1 | Purga de laboratorio |
+| PD-P12.2 | Revisión de la semilla |
 
-## 5. Mejora continua
+## 5. PDCA
 
 ```mermaid
 flowchart LR
-  P[Plan: objetivo, KPI y riesgo] --> D[Do: protocolo y fila]
-  D --> C[Check: SQL y advisors]
-  C --> A[Act: corrección y versión]
-  A --> P
+  P[Plan] --> D[Do] --> C[Check] --> A[Act] --> P
 ```
 
 | Fase | Acción | Evidencia | Frecuencia |
 | --- | --- | --- | --- |
-| Plan | Confirmar objetivo, KPI, riesgo y liga | PD-EV-PLAN en [PD-SGC-PDCA-001](PD-SGC-PDCA-001-auditoria-trimestral.md) | Trimestral, y el 2026-11-05 |
-| Do | Ejecutar los pasos | Bitácora del proceso | Cuando hay tráfico |
-| Check | Correr el SQL de la sección 4 | PD-EV-CHECK | Semanal |
-| Act | Corregir, subir versión y pedir aprobación del CTO | PD-EV-ACT | Al hallazgo |
+| Plan | Objetivo, KPI, riesgo y liga | PD-SGC-PDCA-001 | Trimestral y 2026-11-05 |
+| Do | Protocolo | Bitácora | Con tráfico |
+| Check | PD-CTRL-* | PD-EV-CHECK | Semanal |
+| Act | Corrección y versión | PD-EV-ACT | Al hallazgo |
 
-Un P0 se actúa el mismo día. Un P1, en menos de 24 horas. Un P2, en la revisión semanal. Ningún proceso cambia de versión sin registro en la bitácora de este manual y sin aprobación del CTO.
+P0 el mismo día. P1 en menos de 24 horas. P2 en la semana. El cambio de versión lo aprueba el CTO.
 
-Hallazgos abiertos al emitir la versión 1.0: PD-RIE-003, PD-RIE-004 en su parte de ventana, PD-RIE-007 con 12 leads, PD-RIE-010 y las 8 agendas vencidas de PD-P02.
+La pasada 2026-W41 está en [PD-SGC-PDCA-001](PD-SGC-PDCA-001-auditoria-trimestral.md).
 
-## 6. Escalabilidad
+## 6. Nomenclatura de evidencias
 
-| Proceso | Hoy | Objetivo de crecimiento | Acción |
-| --- | --- | --- | --- |
-| PD-P03 | Webhook declarado, 0 eventos | Cola que absorba reintentos de Meta | n8n o cola, con la misma idempotencia de `webhook_eventos` |
-| PD-P07 | Reglas de integridad, 0 matches | Selección de 1 a 3 con explicación | Servicio que inserte `matches`; la base sigue rechazando la unidad no disponible |
-| PD-P08 | 3 funciones, sin cron | Sync en calendario | Programador verificable y PD-EV-008 |
-| PD-P11 | Vistas operativas | Tablero repetible | Consultas de este manual publicadas; Metabase u otro lector cuando haya comisiones |
-| PD-P12 | Mismo proyecto, esquema aparte | Proyecto o rama separada | `create_branch` o proyecto nuevo antes de la pauta |
+```text
+PD-EV-003_2026-10-05_webhook-meta-validacion.csv
+PD-EV-006_2026-10-05_prospectos-sin-lead.csv
+PD-EV-009_2026-10-05_rls-advisors.pdf
+PD-EV-011_2026-W41_tablero-semanal-funnel.pdf
+PD-EV-ACT-08_2026-10-05_sync-secret.md
+```
 
-## 7. Índice de códigos
+Cada evidencia lleva código, proceso, periodo, responsable, consulta o workflow, esperado, obtenido, hallazgo, acción y, cuando aplica, aprobación del CTO. Los CSV de huérfanos se generan en el SQL Editor y no se suben al repositorio si contienen teléfonos.
 
-| Código | Tipo | Dónde |
-| --- | --- | --- |
-| PD-SGC-MAN-001 | Manual | Este documento |
-| PD-SGC-PDCA-001 | Plantilla de auditoría | Sección 5 y archivo hermano |
-| PD-P01 … PD-P12 | Proceso | Sección 4 |
-| PD-P03.1 … PD-P12.2 | Subproceso | Cierre de la sección 4 |
-| PD-ING-001, 010, 011, 012, 002, 031 | Liga | Secciones 4 y PD-P08 |
-| PD-EV-001 … PD-EV-012 | Evidencia | Sección 4 |
-| PD-KPI-001 … PD-KPI-012 | Indicador | Sección 4 |
-| PD-RIE-001 … PD-RIE-012 | Riesgo | Sección 4 |
+## 7. Plantilla trimestral
 
-El paquete SQL extendido, los contratos de columnas y el workflow n8n siguen en `docs/palm-lab-practica/paquete-operativo-v1.md` y `docs/palm-lab-practica/n8n/webhook-inbound.json`.
+El formato de `PD-EV-CHECK-Q_AAAA-QQ_auditoria-trimestral.md` está en PD-SGC-PDCA-001, con la pasada de arranque ya llena y la firma del CTO pendiente.
 
-## 8. Bitácora de cambios
+## 8. RACI
+
+| Proceso | R | A | C | I |
+| --- | --- | --- | --- | --- |
+| PD-P01 | Backend Lead | CTO | Asesores | Dirección |
+| PD-P02 | Comercial Lead | Dirección | Backend | Asesores |
+| PD-P03 | Backend Lead | CTO | Comercial | Asesores |
+| PD-P04 | Comercial Lead | Dirección | Backend | Asesores |
+| PD-P05 | Backend Lead | CTO | Comercial | Dirección |
+| PD-P06 | Backend Lead | CTO | Comercial | Asesores |
+| PD-P07 | Backend y Comercial | CTO | Asesores | Dirección |
+| PD-P08 | Backend Lead | CTO | — | Dirección |
+| PD-P09 | Backend Lead | CTO | Legal | Dirección |
+| PD-P10 | CTO | Dirección | Comercial | Todos |
+| PD-P11 | Comercial Lead | Dirección | Backend | Asesores |
+| PD-P12 | Backend Lead | CTO | Comercial | Dirección |
+
+## 9. Workflow PD-WF-001
+
+Archivo: `docs/palm-lab-practica/n8n/PD-WF-001_meta-inbound.json`. Inactivo. Sin secretos.
+
+El esqueleto valida la firma y normaliza el teléfono. La búsqueda Postgres está en el archivo y queda deshabilitada hasta asignar la credencial del backend. Los insert usan estas columnas, no las del borrador externo:
+
+| Tabla | Columnas reales |
+| --- | --- |
+| `prospectos` | `nombre`, `telefono` E.164, `origen`, `ultimo_msg_cliente_at` |
+| `leads` | `prospecto_id`, `nombre`, `telefono`. El trigger escribe `telefono_normalizado`. |
+| `interacciones` | `lead_id`, `canal`, `direccion = entrante`, `estado = recibido`, `contenido`, `id_externo` |
+| `webhook_eventos` | `clave_idempotencia = message_id` |
+
+`timingSafeEqual` compara longitudes antes, para no convertir una firma de otro tamaño en error 500. La firma inválida responde 401.
+
+Importar en n8n, asignar `META_APP_SECRET` y la credencial Postgres, y repetir PD-CTRL-003 con un payload de prueba.
+
+## 10. Bitácora
 
 | Versión | Fecha | Cambio | Autor | Aprobó |
 | --- | --- | --- | --- | --- |
-| 1.0 | 2026-10-05 | Emisión. Códigos PD-SGC, ligas clasificadas, SQL de verificación y PDCA. | Backend Lead | CTO |
+| 1.0 | 2026-10-05 | Emisión de códigos y protocolos | Backend Lead | Pendiente |
+| 1.1 | 2026-10-05 | PD-CTRL ejecutados, requisitos §6 de PD-P10, PDCA y PD-WF-001 | Backend Lead | Pendiente |
 
-## 9. Regla de oro
+## 11. Regla de oro
 
-Un proceso entra al SGC con código, liga, evidencia, indicador y riesgo. La liga declarada se anota como abierta. El cambio de versión lleva fecha, autor y aprobación del CTO.
+Un proceso del SGC tiene código, liga, control, evidencia, indicador y riesgo. La liga declarada permanece abierta. El cambio lleva versión, commit y aprobación del CTO.
+
+Siguiente ciclo: configurar `SYNC_SECRET`, publicar el host de PD-ING-012, y volver a correr PD-CTRL-003, PD-CTRL-007 y PD-CTRL-008. La pauta espera el cierre de PD-P10 §6.1 a §6.6.
