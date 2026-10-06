@@ -1,0 +1,6 @@
+{
+  "name": "Web Research Agent",
+  "user": "ubuntu",
+  "egressMode": "allow_all",
+  "install": "pip install --quiet requests beautifulsoup4 lxml markdown matplotlib numpy"
+}

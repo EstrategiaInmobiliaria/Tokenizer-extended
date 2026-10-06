@@ -1,0 +1,22 @@
+flowchart TD
+    A[Recepción de materia prima] --> B[/"⚠️ INVENTARIO<br/>stock por si acaso"/]
+    B --> C[Preparación de línea]
+    C --> D[/"⚠️ ESPERA<br/>setup no planeado"/]
+    D --> E[Alimentación de blíster]
+    E --> F[/"⚠️ SOBREPROCESO<br/>doble verificación"/]
+    F --> G[Sellado]
+    G --> H[/"⚠️ DEFECTOS<br/>retrabajo por temperatura"/]
+    H --> I[Empaque primario]
+    I --> J[/"⚠️ MOVIMIENTO<br/>operario busca herramienta"/]
+    J --> K[Transporte a almacén]
+    K --> L[/"⚠️ TRANSPORTE<br/>movimiento innecesario"/]
+    L --> M[Almacén producto terminado]
+    M --> N[/"⚠️ INVENTARIO<br/>sobreproducción"/]
+
+    style D fill:#ffcccc
+    style F fill:#ffe0cc
+    style H fill:#ffcccc
+    style J fill:#fff3cc
+    style K fill:#fff3cc
+    style B fill:#e6e6e6
+    style M fill:#e6e6e6
