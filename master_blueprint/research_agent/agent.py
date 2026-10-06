@@ -37,9 +37,9 @@ from .synthesis import (
     content_words,
     dedupe_sources,
     extract_evidence,
+    is_on_topic,
     score_relevance,
     summarize_finding,
-    term_overlap_ratio,
 )
 
 ProgressCallback = Callable[[str], None]
@@ -55,16 +55,20 @@ class AgentConfig:
     max_sources_per_subquestion: int = 12
     min_sources_per_subquestion: int = 2
     target_sources_per_subquestion: int = 6
-    # Fracción mínima de los términos núcleo de la pregunta que una fuente debe
-    # contener para entrar. Sin este filtro el informe se llena de trabajos que
+    min_groups_per_subquestion: int = 3
+    # Filtro temático de entrada. Sin él el informe se llena de trabajos que
     # comparten una palabra con la pregunta y nada más.
-    min_term_overlap: float = 0.34
+    min_term_overlap: float = 0.30
+    min_matched_terms: int = 2
     novelty_window_years: int = 3
     evidence_per_subquestion: int = 8
     lang: str = "en"
     cache_dir: Optional[str] = None
     offline: bool = False
     kinds: Optional[Sequence[SubQuestionKind]] = None
+    # Términos de búsqueda explícitos; útil para preguntar en un idioma y
+    # buscar en otro.
+    core_terms: Optional[Sequence[str]] = None
     current_year: int = field(default_factory=lambda: datetime.now(timezone.utc).year)
 
 
@@ -112,7 +116,7 @@ class ResearchAgent:
                 "de red o define al menos uno (TAVILY_API_KEY, BRAVE_API_KEY…)."
             )
 
-        planner = ResearchPlanner(question)
+        planner = ResearchPlanner(question, core_terms=self.config.core_terms)
         plan = planner.initial_plan(self.config.kinds)
         report = ResearchReport(question=question, sub_questions=plan)
         self._question_terms = set(planner.core_terms)
@@ -123,7 +127,7 @@ class ResearchAgent:
         assignments: Dict[int, Set[str]] = {index: set() for index in range(len(plan))}
 
         for round_number in range(1, self.config.rounds + 1):
-            pending = self._pending_subquestions(plan, round_number)
+            pending = self._pending_subquestions(plan, round_number, catalog, assignments)
             if not pending:
                 emit(f"Ronda {round_number}: cobertura completa, no hace falta seguir buscando.")
                 break
@@ -139,7 +143,12 @@ class ResearchAgent:
                         sub_question.queries.append(query)
                     found = self._run_query(query, sub_question, round_number, report)
                     for source in found:
-                        if term_overlap_ratio(source, self._question_terms) < self.config.min_term_overlap:
+                        if not is_on_topic(
+                            source,
+                            self._question_terms,
+                            self.config.min_term_overlap,
+                            self.config.min_matched_terms,
+                        ):
                             continue
                         catalog[source.source_id] = source
                         assignments[index].add(source.source_id)
@@ -168,22 +177,42 @@ class ResearchAgent:
 
     # ── pasos internos ───────────────────────────────────────────────────────
 
-    def _pending_subquestions(self, plan: Sequence[SubQuestion], round_number: int) -> List[int]:
+    def _pending_subquestions(
+        self,
+        plan: Sequence[SubQuestion],
+        round_number: int,
+        catalog: Dict[str, Source],
+        assignments: Dict[int, Set[str]],
+    ) -> List[int]:
         """
-        En la primera ronda se atienden todas; después, sólo las que no llegaron
-        al objetivo de fuentes temáticamente pertinentes.
+        En la primera ronda se atienden todas; después, sólo las que siguen flojas.
 
-        El umbral se mide sobre fuentes que pasaron el filtro de solapamiento, no
-        sobre resultados brutos: cualquier consulta devuelve decenas de títulos,
-        y contarlos daría por cubierta una sub-pregunta sin material utilizable.
+        Una sub-pregunta se reabre por dos motivos distintos:
+
+        - **Volumen**: no llegó al objetivo de fuentes pertinentes. El umbral se
+          mide sobre fuentes que pasaron el filtro temático, no sobre resultados
+          brutos; cualquier consulta devuelve decenas de títulos y contarlos daría
+          por cubierta una sub-pregunta sin material utilizable.
+        - **Diversidad**: tiene fuentes de sobra pero casi todas del mismo grupo
+          autoral. Buscar más de lo mismo no ayuda, pero seguir con el vocabulario
+          aprendido sí puede alcanzar a otros equipos, y sin varios grupos la
+          triangulación es imposible por construcción.
         """
         if round_number == 1:
             return list(range(len(plan)))
-        return [
-            index
-            for index, sub_question in enumerate(plan)
-            if sub_question.sources_found < self.config.target_sources_per_subquestion
-        ]
+
+        pending = []
+        for index, sub_question in enumerate(plan):
+            groups = {
+                catalog[sid].independence_key
+                for sid in assignments.get(index, set())
+                if sid in catalog
+            }
+            too_few = sub_question.sources_found < self.config.target_sources_per_subquestion
+            too_uniform = len(groups) < self.config.min_groups_per_subquestion
+            if too_few or too_uniform:
+                pending.append(index)
+        return pending
 
     def _queries_for_round(
         self,

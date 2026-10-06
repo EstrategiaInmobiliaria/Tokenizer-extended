@@ -44,6 +44,14 @@ def build_parser() -> argparse.ArgumentParser:
         choices=[kind.value for kind in SubQuestionKind],
         help="Limita los tipos de sub-pregunta (def. los cinco)",
     )
+    parser.add_argument(
+        "--terms",
+        nargs="+",
+        help=(
+            "Términos de búsqueda explícitos. Permite preguntar en español y "
+            "buscar en inglés, que es donde está indexada la literatura."
+        ),
+    )
     parser.add_argument("--lang", default="en", help="Idioma de Wikipedia (def. en)")
     parser.add_argument("--title", help="Título del informe")
     parser.add_argument("--out", type=Path, help="Archivo Markdown de salida")
@@ -69,6 +77,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         cache_dir=args.cache_dir,
         offline=args.offline,
         kinds=kinds,
+        core_terms=args.terms,
     )
 
     def progress(message: str) -> None:

@@ -1,0 +1,1770 @@
+{
+  "question": "¿Qué evidencia existe sobre la reducción de tiempos de setup mediante secuenciación y agrupamiento de productos en líneas de empaque farmacéutico?",
+  "started_at": "2026-10-06T20:00:14+00:00",
+  "finished_at": "2026-10-06T20:00:14+00:00",
+  "coverage_ratio": 1.0,
+  "sub_questions": [
+    {
+      "text": "¿Cómo se define y delimita «setup sequencing packaging pharmaceutical changeover» en la literatura?",
+      "kind": "definicion",
+      "queries": [
+        "setup sequencing packaging pharmaceutical changeover definition framework",
+        "setup sequencing packaging pharmaceutical changeover concept review"
+      ],
+      "sources_found": 12,
+      "covered": true
+    },
+    {
+      "text": "¿Qué evidencia empírica cuantificada existe sobre «setup sequencing packaging pharmaceutical changeover»?",
+      "kind": "evidencia",
+      "queries": [
+        "setup sequencing packaging pharmaceutical changeover case study empirical results",
+        "setup sequencing packaging pharmaceutical changeover quantitative impact measured"
+      ],
+      "sources_found": 12,
+      "covered": true
+    },
+    {
+      "text": "¿Qué métodos y formulaciones se usan para abordar «setup sequencing packaging pharmaceutical changeover»?",
+      "kind": "metodo",
+      "queries": [
+        "setup sequencing packaging pharmaceutical changeover model formulation methodology",
+        "setup sequencing packaging pharmaceutical changeover algorithm implementation"
+      ],
+      "sources_found": 13,
+      "covered": true
+    },
+    {
+      "text": "¿Qué limitaciones, críticas o enfoques alternativos se reportan sobre «setup sequencing packaging pharmaceutical changeover»?",
+      "kind": "contraste",
+      "queries": [
+        "setup sequencing packaging pharmaceutical changeover limitations criticism",
+        "setup sequencing packaging pharmaceutical changeover comparison alternative approach"
+      ],
+      "sources_found": 9,
+      "covered": true
+    },
+    {
+      "text": "¿Qué hay de nuevo o en discusión activa sobre «setup sequencing packaging pharmaceutical changeover»?",
+      "kind": "novedad",
+      "queries": [
+        "setup sequencing packaging pharmaceutical changeover recent advances",
+        "setup sequencing packaging pharmaceutical changeover state of the art"
+      ],
+      "sources_found": 8,
+      "covered": true
+    }
+  ],
+  "findings": [
+    {
+      "sub_question": {
+        "text": "¿Cómo se define y delimita «setup sequencing packaging pharmaceutical changeover» en la literatura?",
+        "kind": "definicion",
+        "queries": [
+          "setup sequencing packaging pharmaceutical changeover definition framework",
+          "setup sequencing packaging pharmaceutical changeover concept review"
+        ],
+        "sources_found": 12,
+        "covered": true
+      },
+      "summary": "Sobre la delimitación del concepto, se consolidaron 7 afirmación(es) a partir de 7 grupo(s) independiente(s), con 8 respaldo(s) de literatura revisada por pares. Ninguna está triangulada: cada afirmación descansa en un solo grupo autoral, así que son indicios, no consenso.",
+      "claims": [
+        {
+          "text": "This study formulates the sequencing of pharmaceutical products on packaging lines as a prescriptive analytics problem to enhance operational efficiency in healthcare manufacturing systems.",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:montes-orozco"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.1016/j.health.2026.100496",
+              "quote": "This study formulates the sequencing of pharmaceutical products on packaging lines as a prescriptive analytics problem to enhance operational efficiency in healthcare manufacturing systems.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover definition framework",
+              "relevance": 0.5992
+            }
+          ]
+        },
+        {
+          "text": "This review examines operational excellence in Saudi pharmaceutical manufacturing through three connected lenses: capacity utilization, bottleneck reduction, and production performance.",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:taqiuddin"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.64388/irev10i2-1722586",
+              "quote": "This review examines operational excellence in Saudi pharmaceutical manufacturing through three connected lenses: capacity utilization, bottleneck reduction, and production performance.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover comparison alternative approach",
+              "relevance": 0.5533
+            },
+            {
+              "source_id": "doi:10.18623/rvd.v23.8098",
+              "quote": "This review examines how production planning and capacity optimization can strengthen pharmaceutical manufacturing localization in Saudi Arabia.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover recent advances",
+              "relevance": 0.5533
+            }
+          ]
+        },
+        {
+          "text": "Systematic digital framework for optimizing changeover cleaning in pharmaceutical industries",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:das"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.1016/j.clet.2026.101164",
+              "quote": "Systematic digital framework for optimizing changeover cleaning in pharmaceutical industries",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover definition framework",
+              "relevance": 0.5075
+            }
+          ]
+        },
+        {
+          "text": "One common challenge is the lengthy setup changeover time, which leads to downtime and reduced productivity.",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:amalia"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.46923/ijets.v7i2.521",
+              "quote": "One common challenge is the lengthy setup changeover time, which leads to downtime and reduced productivity.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+              "relevance": 0.4569
+            }
+          ]
+        },
+        {
+          "text": "Applying SMED to Reduce Changeover and Setup Time in Plastic Injection Molding for Automotive Parts",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:srithorn"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.46254/ap05.20240036",
+              "quote": "Applying SMED to Reduce Changeover and Setup Time in Plastic Injection Molding for Automotive Parts",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+              "relevance": 0.4521
+            }
+          ]
+        },
+        {
+          "text": "Estimation of machine setup and changeover times by survival analysis",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:abonyi"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.1016/j.cie.2020.107026",
+              "quote": "Estimation of machine setup and changeover times by survival analysis",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+              "relevance": 0.4461
+            }
+          ]
+        },
+        {
+          "text": "Setup and Quick Changeover",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:ortiz"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.1201/b19520-1",
+              "quote": "Setup and Quick Changeover",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover comparison alternative approach",
+              "relevance": 0.4137
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sub_question": {
+        "text": "¿Qué evidencia empírica cuantificada existe sobre «setup sequencing packaging pharmaceutical changeover»?",
+        "kind": "evidencia",
+        "queries": [
+          "setup sequencing packaging pharmaceutical changeover case study empirical results",
+          "setup sequencing packaging pharmaceutical changeover quantitative impact measured"
+        ],
+        "sources_found": 12,
+        "covered": true
+      },
+      "summary": "Sobre la evidencia cuantificada, se consolidaron 8 afirmación(es) a partir de 8 grupo(s) independiente(s), con 8 respaldo(s) de literatura revisada por pares. Ninguna está triangulada: cada afirmación descansa en un solo grupo autoral, así que son indicios, no consenso.",
+      "claims": [
+        {
+          "text": "Using Samarra Drug Industry (SDI) as a case study, this research creates and implements a discrete-event simulation (DES) to find and fix production bottlenecks in Iraq's pharmaceutical manufacturing sector.",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:abduljalil"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.21533/pen.v13.i4.1430",
+              "quote": "Using Samarra Drug Industry (SDI) as a case study, this research creates and implements a discrete-event simulation (DES) to find and fix production bottlenecks in Iraq's pharmaceutical manufacturing sector.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+              "relevance": 0.5371
+            }
+          ]
+        },
+        {
+          "text": "The final results improved the 33% overall changeover time, from 58.36 to 39.22 minutes.",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:ikhwan"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.1088/1757-899x/598/1/012026",
+              "quote": "The final results improved the 33% overall changeover time, from 58.36 to 39.22 minutes.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover case study empirical results",
+              "relevance": 0.5095
+            }
+          ]
+        },
+        {
+          "text": "Small and medium-sized enterprises in Peru's flexible packaging sector have faced persistent inefficiencies due to long setup times, unplanned downtime, and suboptimal job sequencing.",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:meza-ortiz"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.14445/23497157/ijres-v12i5p101",
+              "quote": "Small and medium-sized enterprises in Peru's flexible packaging sector have faced persistent inefficiencies due to long setup times, unplanned downtime, and suboptimal job sequencing.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover recent advances",
+              "relevance": 0.5027
+            }
+          ]
+        },
+        {
+          "text": "However, with a simplified case study, we demonstrate how the classic sequencing problem in paint shop can be formulated and solved using quantum computing and demonstrate the potential of quantum computing in solving real problems in manufacturing systems.",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:chang"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.55092/am20240002",
+              "quote": "However, with a simplified case study, we demonstrate how the classic sequencing problem in paint shop can be formulated and solved using quantum computing and demonstrate the potential of quantum computing in solving real problems in manufacturing systems.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+              "relevance": 0.4987
+            }
+          ]
+        },
+        {
+          "text": "This paper deals with the basic over view of a reduction in set up time in a sub assembly stage of an auto sector by Setup Changeover Time Reduction (SMED).",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "dominio:doi.org"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.35940/ijeat.a1075.1291s419",
+              "quote": "This paper deals with the basic over view of a reduction in set up time in a sub assembly stage of an auto sector by Setup Changeover Time Reduction (SMED).",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover case study empirical results",
+              "relevance": 0.4395
+            }
+          ]
+        },
+        {
+          "text": "Applying SMED to Reduce Changeover and Setup Time in Plastic Injection Molding for Automotive Parts",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:srithorn"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.46254/ap05.20240036",
+              "quote": "Applying SMED to Reduce Changeover and Setup Time in Plastic Injection Molding for Automotive Parts",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+              "relevance": 0.4291
+            }
+          ]
+        },
+        {
+          "text": "Estimation of machine setup and changeover times by survival analysis",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:abonyi"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.1016/j.cie.2020.107026",
+              "quote": "Estimation of machine setup and changeover times by survival analysis",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+              "relevance": 0.4231
+            }
+          ]
+        },
+        {
+          "text": "Setup and Quick Changeover",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:ortiz"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.1201/b19520-1",
+              "quote": "Setup and Quick Changeover",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover comparison alternative approach",
+              "relevance": 0.3907
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sub_question": {
+        "text": "¿Qué métodos y formulaciones se usan para abordar «setup sequencing packaging pharmaceutical changeover»?",
+        "kind": "metodo",
+        "queries": [
+          "setup sequencing packaging pharmaceutical changeover model formulation methodology",
+          "setup sequencing packaging pharmaceutical changeover algorithm implementation"
+        ],
+        "sources_found": 13,
+        "covered": true
+      },
+      "summary": "Sobre los métodos empleados, se consolidaron 6 afirmación(es) a partir de 8 grupo(s) independiente(s), con 6 respaldo(s) de literatura revisada por pares. 2 están trianguladas, es decir, confirmadas por más de un grupo autoral.",
+      "claims": [
+        {
+          "text": "Small and medium-sized enterprises in Peru's flexible packaging sector have faced persistent inefficiencies due to long setup times, unplanned downtime, and suboptimal job sequencing.",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:meza-ortiz"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.14445/23497157/ijres-v12i5p101",
+              "quote": "Small and medium-sized enterprises in Peru's flexible packaging sector have faced persistent inefficiencies due to long setup times, unplanned downtime, and suboptimal job sequencing.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover recent advances",
+              "relevance": 0.5616
+            }
+          ]
+        },
+        {
+          "text": "In this paper, we combine a tailored Evolutionary Algorithm with a high-fidelity simulation model in a Simulation–Optimization approach in order to obtain optimized executable production schedules.",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:engell"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.1016/j.cie.2022.108760",
+              "quote": "In this paper, we combine a tailored Evolutionary Algorithm with a high-fidelity simulation model in a Simulation–Optimization approach in order to obtain optimized executable production schedules.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+              "relevance": 0.5548
+            }
+          ]
+        },
+        {
+          "text": "This study explores the job sequencing and tool switching problem with sequence-dependent setup times on non-identical parallel machines (SDSSP-NPM).",
+          "confidence": "alta",
+          "triangulated": true,
+          "independent_groups": [
+            "autor:rifai",
+            "autor:tanhaie"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.4995/ijpme.2026.23073",
+              "quote": "This study explores the job sequencing and tool switching problem with sequence-dependent setup times on non-identical parallel machines (SDSSP-NPM).",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+              "relevance": 0.5271
+            },
+            {
+              "source_id": "doi:10.21203/rs.3.rs-2327903/v1",
+              "quote": "In the present research, we have presented a balancing and sequencing problem and proper times to setup the machines between tasks.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+              "relevance": 0.4377
+            }
+          ]
+        },
+        {
+          "text": "One common challenge is the lengthy setup changeover time, which leads to downtime and reduced productivity.",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:amalia"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.46923/ijets.v7i2.521",
+              "quote": "One common challenge is the lengthy setup changeover time, which leads to downtime and reduced productivity.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+              "relevance": 0.5223
+            }
+          ]
+        },
+        {
+          "text": "Consequently, dedicated methodology groups have emerged in mid-size and large pharmaceutical companies and CROs.",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:akacha"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "url:67d548bba169",
+              "quote": "Consequently, dedicated methodology groups have emerged in mid-size and large pharmaceutical companies and CROs.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover model formulation methodology",
+              "relevance": 0.4521
+            }
+          ]
+        },
+        {
+          "text": "Application of genetic algorithm in integrated setup planning and operation sequencing",
+          "confidence": "baja",
+          "triangulated": true,
+          "independent_groups": [
+            "autor:chastel",
+            "autor:joshi"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.1063/1.3552384",
+              "quote": "Application of genetic algorithm in integrated setup planning and operation sequencing",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+              "relevance": 0.4159
+            },
+            {
+              "source_id": "doi:10.1109/itng.2008.94",
+              "quote": "Setup Planning and Operation Sequencing Using Neural Network and Genetic Algorithm",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+              "relevance": 0.4019
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sub_question": {
+        "text": "¿Qué limitaciones, críticas o enfoques alternativos se reportan sobre «setup sequencing packaging pharmaceutical changeover»?",
+        "kind": "contraste",
+        "queries": [
+          "setup sequencing packaging pharmaceutical changeover limitations criticism",
+          "setup sequencing packaging pharmaceutical changeover comparison alternative approach"
+        ],
+        "sources_found": 9,
+        "covered": true
+      },
+      "summary": "Sobre limitaciones y alternativas, se consolidaron 6 afirmación(es) a partir de 6 grupo(s) independiente(s), con 6 respaldo(s) de literatura revisada por pares. Ninguna está triangulada: cada afirmación descansa en un solo grupo autoral, así que son indicios, no consenso.",
+      "claims": [
+        {
+          "text": "This study explores the job sequencing and tool switching problem with sequence-dependent setup times on non-identical parallel machines (SDSSP-NPM).",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:rifai"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.4995/ijpme.2026.23073",
+              "quote": "This study explores the job sequencing and tool switching problem with sequence-dependent setup times on non-identical parallel machines (SDSSP-NPM).",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+              "relevance": 0.48
+            }
+          ]
+        },
+        {
+          "text": "Applying SMED to Reduce Changeover and Setup Time in Plastic Injection Molding for Automotive Parts",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:srithorn"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.46254/ap05.20240036",
+              "quote": "Applying SMED to Reduce Changeover and Setup Time in Plastic Injection Molding for Automotive Parts",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+              "relevance": 0.4337
+            }
+          ]
+        },
+        {
+          "text": "Estimation of machine setup and changeover times by survival analysis",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:abonyi"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.1016/j.cie.2020.107026",
+              "quote": "Estimation of machine setup and changeover times by survival analysis",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+              "relevance": 0.4277
+            }
+          ]
+        },
+        {
+          "text": "Setup and Quick Changeover",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:ortiz"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.1201/b19520-1",
+              "quote": "Setup and Quick Changeover",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover comparison alternative approach",
+              "relevance": 0.3953
+            }
+          ]
+        },
+        {
+          "text": "They were used to formulate the setup/changeover of items in the production line.",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:garn"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "url:b68e43c13197",
+              "quote": "They were used to formulate the setup/changeover of items in the production line.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+              "relevance": 0.3395
+            }
+          ]
+        },
+        {
+          "text": "Regulatory aspects of pharmaceutical packaging",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "dominio:doi.org"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.1201/b12651-9",
+              "quote": "Regulatory aspects of pharmaceutical packaging",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+              "relevance": 0.3233
+            },
+            {
+              "source_id": "doi:10.1201/b12651-7",
+              "quote": "An introduction to pharmaceutical packaging",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+              "relevance": 0.3233
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sub_question": {
+        "text": "¿Qué hay de nuevo o en discusión activa sobre «setup sequencing packaging pharmaceutical changeover»?",
+        "kind": "novedad",
+        "queries": [
+          "setup sequencing packaging pharmaceutical changeover recent advances",
+          "setup sequencing packaging pharmaceutical changeover state of the art"
+        ],
+        "sources_found": 8,
+        "covered": true
+      },
+      "summary": "Sobre los desarrollos recientes, se consolidaron 5 afirmación(es) a partir de 5 grupo(s) independiente(s), con 5 respaldo(s) de literatura revisada por pares. Ninguna está triangulada: cada afirmación descansa en un solo grupo autoral, así que son indicios, no consenso.",
+      "claims": [
+        {
+          "text": "A structured integrative review was conducted using recent peer-reviewed literature on Saudi pharmaceutical manufacturing, production and capacity planning, pharmaceutical supply-chain resilience, operational excellence, and Pharma 4.0, together with official Saudi, WHO, ICH, and regulatory policy documents.",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:taqiuddin"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.18623/rvd.v23.8098",
+              "quote": "A structured integrative review was conducted using recent peer-reviewed literature on Saudi pharmaceutical manufacturing, production and capacity planning, pharmaceutical supply-chain resilience, operational excellence, and Pharma 4.0, together with official Saudi, WHO, ICH, and regulatory policy documents.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover recent advances",
+              "relevance": 0.52
+            }
+          ]
+        },
+        {
+          "text": "This study explores the job sequencing and tool switching problem with sequence-dependent setup times on non-identical parallel machines (SDSSP-NPM).",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:rifai"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.4995/ijpme.2026.23073",
+              "quote": "This study explores the job sequencing and tool switching problem with sequence-dependent setup times on non-identical parallel machines (SDSSP-NPM).",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+              "relevance": 0.52
+            }
+          ]
+        },
+        {
+          "text": "Small and medium-sized enterprises in Peru's flexible packaging sector have faced persistent inefficiencies due to long setup times, unplanned downtime, and suboptimal job sequencing.",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:meza-ortiz"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.14445/23497157/ijres-v12i5p101",
+              "quote": "Small and medium-sized enterprises in Peru's flexible packaging sector have faced persistent inefficiencies due to long setup times, unplanned downtime, and suboptimal job sequencing.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover recent advances",
+              "relevance": 0.5152
+            }
+          ]
+        },
+        {
+          "text": "One common challenge is the lengthy setup changeover time, which leads to downtime and reduced productivity.",
+          "confidence": "media",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:amalia"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.46923/ijets.v7i2.521",
+              "quote": "One common challenge is the lengthy setup changeover time, which leads to downtime and reduced productivity.",
+              "locator": "resumen",
+              "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+              "relevance": 0.4652
+            }
+          ]
+        },
+        {
+          "text": "Applying SMED to Reduce Changeover and Setup Time in Plastic Injection Molding for Automotive Parts",
+          "confidence": "baja",
+          "triangulated": false,
+          "independent_groups": [
+            "autor:srithorn"
+          ],
+          "contradictions": [],
+          "evidence": [
+            {
+              "source_id": "doi:10.46254/ap05.20240036",
+              "quote": "Applying SMED to Reduce Changeover and Setup Time in Plastic Injection Molding for Automotive Parts",
+              "locator": "título",
+              "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+              "relevance": 0.4604
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "title": "A prescriptive analytics framework for product sequencing in pharmaceutical packaging lines",
+      "url": "https://doi.org/10.1016/j.health.2026.100496",
+      "provider": "crossref",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Esbeydi Villicaña-García",
+        "Edwin Montes-Orozco",
+        "Luis Eduardo Urbán-Rivero",
+        "Isidro Soria-Arguello"
+      ],
+      "year": 2026,
+      "venue": "Healthcare Analytics",
+      "doi": "10.1016/j.health.2026.100496",
+      "abstract": "This study formulates the sequencing of pharmaceutical products on packaging lines as a prescriptive analytics problem to enhance operational efficiency in healthcare manufacturing systems. A two-stage optimization framework is developed that integrates descriptive analytics, through similarity-based product clustering, with prescriptive optimization based on a Traveling Salesman Problem (TSP) sequencing model to minimize setup times and related inefficiencies. The problem is solved using both an exact optimization approach implemented in Gurobi and a metaheuristic ant system algorithm. The methodology is evaluated on four real-world production lines in a pharmaceutical company, where results show that as product complexity increases, the Ant System achieves solutions comparable to or better than those obtained by the exact solver for full-set sequencing. Clustering products into homogeneous families prior to sequencing yields additional reductions in setup times, underscoring the value of structured segmentation in operational decision-making. Numerical and graphical analyses further reveal stable transition patterns within product families, enabling more standardized and predictable sequencing strategies. Compared with the company’s existing manual scheduling practices, the proposed analytics-driven framework reduces setup times by up to 19.3% and is readily adaptable to other healthcare and life sciences manufacturing environments where setup minimization is critical to operational performance.",
+      "cited_by_count": 0,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover definition framework",
+      "extra": {
+        "publisher": "Elsevier BV",
+        "type": "journal-article",
+        "confirmed_by": [
+          "crossref"
+        ]
+      },
+      "source_id": "doi:10.1016/j.health.2026.100496",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Operational Excellence in Saudi Pharmaceutical Manufacturing: Capacity Utilization, Bottleneck Reduction, and Production Performance",
+      "url": "https://doi.org/10.64388/irev10i2-1722586",
+      "provider": "openalex",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Mohammed Taqiuddin"
+      ],
+      "year": 2026,
+      "venue": "Iconic Research and Engineering Journals",
+      "doi": "https://doi.org/10.64388/irev10i2-1722586",
+      "abstract": "Saudi Arabia is expanding local pharmaceutical manufacturing as part of Vision 2030, the National Industrial Strategy, health-sector transformation, and biotechnology development. As installed capacity grows, the strategic question shifts from whether factories exist to whether regulated manufacturing assets can convert demand into reliable, high-quality output at competitive cost. This review examines operational excellence in Saudi pharmaceutical manufacturing through three connected lenses: capacity utilization, bottleneck reduction, and production performance. An integrative review of recent pharmaceutical operations, Lean Six Sigma, overall equipment effectiveness (OEE), total productive maintenance, production planning, capacity-management, supply-chain, and Pharma 4.0 literature is combined with Saudi policy and regulatory sources. The synthesis shows that pharmaceutical productivity cannot be represented by equipment utilization alone because validated process limits, cleaning and changeovers, material availability, quality-control release, maintenance, workforce capability, deviations, and technology-transfer activities all consume effective capacity. The paper proposes a six-stage operational excellence framework that begins with value-stream and capacity baselining, identifies the system constraint, removes dominant losses through focused improvement, synchronizes planning with finite capacity, integrates quality and reliability into performance control, and then uses digital technologies to sustain gains. A balanced KPI architecture is developed around OEE, schedule adherence, right-first-time performance, batch-release lead time, changeover efficiency, capacity utilization, on-time-in-full delivery, and deviation closure. The framework is translated into a phased 2026–2030 roadmap for Saudi manufacturers. The paper argues that operational excellence should be treated as industrial capability infrastructure: it raises usable capacity without unnecessary capital, strengthens medicine availability, improves the economics of localization, develops local technical skills, and creates a more resilient platform for future biologics and advanced manufacturing.",
+      "cited_by_count": 0,
+      "is_open_access": true,
+      "language": "en",
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover comparison alternative approach",
+      "extra": {
+        "openalex_id": "https://openalex.org/W7204888017",
+        "type": "article",
+        "topics": [
+          "Management and Optimization Techniques",
+          "Operations Management Techniques",
+          "Quality and Supply Management"
+        ]
+      },
+      "source_id": "doi:10.64388/irev10i2-1722586",
+      "domain": "doi.org"
+    },
+    {
+      "title": "STRENGTHENING PHARMACEUTICAL MANUFACTURING LOCALIZATION IN SAUDI ARABIA THROUGH PRODUCTION PLANNING AND CAPACITY OPTIMIZATION",
+      "url": "https://doi.org/10.18623/rvd.v23.8098",
+      "provider": "openalex",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Mohammed Taqiuddin"
+      ],
+      "year": 2026,
+      "venue": "Veredas do Direito Direito Ambiental e Desenvolvimento Sustentável",
+      "doi": "https://doi.org/10.18623/rvd.v23.8098",
+      "abstract": "Saudi Arabia is pursuing pharmaceutical localization as part of a wider transformation of healthcare, industrial capability, supply-chain resilience, and the non-oil economy under Vision 2030. Yet localization is not achieved simply by constructing plants or transferring product licenses. It depends on the ability of domestic manufacturers to translate demand into executable production plans, allocate constrained resources, absorb new products, maintain regulatory compliance, and expand capacity at the right time. This review examines how production planning and capacity optimization can strengthen pharmaceutical manufacturing localization in Saudi Arabia. A structured integrative review was conducted using recent peer-reviewed literature on Saudi pharmaceutical manufacturing, production and capacity planning, pharmaceutical supply-chain resilience, operational excellence, and Pharma 4.0, together with official Saudi, WHO, ICH, and regulatory policy documents. The synthesis identifies five mutually reinforcing localization capabilities: demand-linked master production scheduling, integrated material and capacity planning, bottleneck and asset-performance management, technology-transfer readiness, and digital decision support. The paper proposes a Saudi pharmaceutical localization planning framework that connects national localization priorities with plant-level sales and operations planning, finite capacity decisions, quality systems, workforce development, and investment triggers. The analysis argues that localization performance should be measured not only by local content or the number of domestically produced products, but also by service level, schedule adherence, utilization, changeover performance, right-first-time quality, lead time, and resilience to supply disruptions. A phased implementation roadmap is proposed for 2026-2030. The review concludes that production planning and capacity optimization can function as strategic localization infrastructure, allowing Saudi manufacturers to convert installed assets, technology transfer, and policy incentives into reliable, scalable, and competitive domestic medicine supply.",
+      "cited_by_count": 0,
+      "is_open_access": true,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover recent advances",
+      "extra": {
+        "openalex_id": "https://openalex.org/W7211958492",
+        "type": "article",
+        "topics": [
+          "Management and Optimization Techniques",
+          "Pharmaceutical Economics and Policy",
+          "Operations Management Techniques"
+        ],
+        "confirmed_by": [
+          "openalex"
+        ]
+      },
+      "source_id": "doi:10.18623/rvd.v23.8098",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Statistical Methodology Groups in the Pharmaceutical Industry",
+      "url": "http://arxiv.org/abs/2603.11240v2",
+      "provider": "arxiv",
+      "tier": "preprint",
+      "authors": [
+        "Jenny Devenport",
+        "Tobias Mielke",
+        "Mouna Akacha",
+        "Kaspar Rufibach",
+        "Alex Ocampo",
+        "Vivian Lanius",
+        "Marc Vandemeulebroecke",
+        "Philip Hougaard",
+        "Pierre Collin",
+        "David Wright",
+        "Jurgen Hummel",
+        "Cornelia Ursula Kunz",
+        "Mike Krams"
+      ],
+      "year": 2026,
+      "venue": "arXiv",
+      "doi": null,
+      "abstract": "Research and Development is the largest budget position in the pharmaceutical industry, with clinical trials being a critical, yet costly and time-consuming component to inform decisions. Beyond drug efficacy, the probability of success and efficiency of research and development are highly dependent on the approaches used for designing, analyzing, and interpreting clinical trials. Deep understanding of statistical methodology and quantitative approaches is therefore essential. Consequently, dedicated methodology groups have emerged in mid-size and large pharmaceutical companies and CROs. Their remit is to lead the conception and implementation of innovative quantitative methodologies in order to improve drug development, often by addressing complexities or offering more efficient designs. To achieve this, they collaborate internally and externally (e.g., with academics, regulators) to identify common challenges and tear down silos in order to invest in methods with the highest impact on efficiency and value to the portfolio. Given the immense financial stakes of drug development -- where delays carry massive implications -- these groups represent a critical strategic investment. However, to realize this business impact, statistical innovations must be rigorously validated and seamlessly integrated. This manuscript explores the setup, remit, and value of dedicated methodology groups, alongside the critical organizational considerations and success factors required to maximize their impact on the speed, efficiency, and probability of success.",
+      "cited_by_count": null,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover model formulation methodology",
+      "extra": {},
+      "source_id": "url:67d548bba169",
+      "domain": "arxiv.org"
+    },
+    {
+      "title": "Systematic digital framework for optimizing changeover cleaning in pharmaceutical industries",
+      "url": "https://doi.org/10.1016/j.clet.2026.101164",
+      "provider": "crossref",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Megha Das",
+        "Gintaras V. Reklaitis",
+        "Zoltan K. Nagy"
+      ],
+      "year": 2026,
+      "venue": "Cleaner Engineering and Technology",
+      "doi": "10.1016/j.clet.2026.101164",
+      "abstract": null,
+      "cited_by_count": 0,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover definition framework",
+      "extra": {
+        "publisher": "Elsevier BV",
+        "type": "journal-article"
+      },
+      "source_id": "doi:10.1016/j.clet.2026.101164",
+      "domain": "doi.org"
+    },
+    {
+      "title": "The sequence-dependent job sequencing and tool switching problem with non-identical parallel machines",
+      "url": "https://doi.org/10.4995/ijpme.2026.23073",
+      "provider": "openalex",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Achmad Pratama Rifai",
+        "Wangi Pandan Sari"
+      ],
+      "year": 2026,
+      "venue": "International journal of production management and engineering",
+      "doi": "https://doi.org/10.4995/ijpme.2026.23073",
+      "abstract": "This study explores the job sequencing and tool switching problem with sequence-dependent setup times on non-identical parallel machines (SDSSP-NPM). The problem involves diverse parallel machines with varying tool magazine capacities, processing times, and sequence-dependent setup times. This extension is particularly relevant in manufacturing, where production lines consist of machines capable of handling different job requirements. The model addresses three objectives: minimizing total setup time, total flow time, and makespan. To tackle the SDSSP-NPM, a two-stage metaheuristic approach is introduced, combining adaptive large neighborhood search (ALNS) and simulated annealing (SA). ALNS is employed to solve the job sequencing subproblem (SP), while SA, coupled with the keep tool needed soonest (KTNS) algorithm, handles the tool switching subproblem (TP). The proposed method is rigorously tested across 640 instances with varying complexities. Additionally, sensitivity analysis is conducted to assess the impact of two key parameters: the number of required tools for each job and the duration of switching time on the method's performance. The experimental results demonstrate the effectiveness of the proposed method, outperforming other recent approaches by generating solutions with superior objectives.",
+      "cited_by_count": 0,
+      "is_open_access": true,
+      "language": "en",
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover state of the art",
+      "extra": {
+        "openalex_id": "https://openalex.org/W7171964575",
+        "type": "article",
+        "topics": [
+          "Scheduling and Optimization Algorithms",
+          "Advanced Manufacturing and Logistics Optimization",
+          "Assembly Line Balancing Optimization"
+        ]
+      },
+      "source_id": "doi:10.4995/ijpme.2026.23073",
+      "domain": "doi.org"
+    },
+    {
+      "title": "A Lean-Based Simulation Approach to Setup Changeover Improvement on the Flexo 8 Machine Using Single-Minute Exchange of Dies (SMED) Method",
+      "url": "https://doi.org/10.46923/ijets.v7i2.521",
+      "provider": "openalex",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Nanda Dwi Febrian",
+        "Amalia Amalia"
+      ],
+      "year": 2025,
+      "venue": "International Journal of Engineering Technology and Natural Sciences",
+      "doi": "https://doi.org/10.46923/ijets.v7i2.521",
+      "abstract": "Production efficiency is a crucial element in enhancing the competitiveness of manufacturing industries. One common challenge is the lengthy setup changeover time, which leads to downtime and reduced productivity. This study aims to propose an improvement to the setup changeover process on the Flexo 8 machine at PT APP Purinusa Eka Persada-Semarang by implementing the Single-Minute Exchange of Die (SMED) method combined with Arena simulation software. The research was conducted through direct observation, data collection of setup times during January–March 2024, and analysis using the SMED approach, which includes separation of internal and external activities, conversion of internal to external activities, and simplification of setup tasks. Subsequently, a simulation model was developed using Arena software to compare the conditions before and after SMED implementation. The simulation results indicate that the SMED method successfully reduced the average setup changeover time from 52.67 minutes to 35.13 minutes, representing a 33.3% reduction. These findings confirm that the SMED approach can simplify setup processes, reduce downtime, and improve resource efficiency. The study recommends integrating SMED with simulation as an effective strategy for optimizing production processes. However, this research is limited by the exclusion of external activities in the simulation and the reliance on the accuracy of observational data. Future studies may expand the analysis to examine the impact of SMED on cost and product quality.",
+      "cited_by_count": 0,
+      "is_open_access": true,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover state of the art",
+      "extra": {
+        "openalex_id": "https://openalex.org/W7128378739",
+        "type": "article",
+        "topics": [
+          "Management and Optimization Techniques",
+          "Quality and Supply Management",
+          "Digital Transformation in Industry"
+        ]
+      },
+      "source_id": "doi:10.46923/ijets.v7i2.521",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Overcoming Operational Inefficiencies through Lean Tools and Change Management: Evidence from a Peruvian Flexible Packaging SME",
+      "url": "https://doi.org/10.14445/23497157/ijres-v12i5p101",
+      "provider": "openalex",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Diana Carolina Paredes-Loli",
+        "Rodrigo Fernando Torres-Marocho",
+        "Richard Nicholas Meza-Ortiz"
+      ],
+      "year": 2025,
+      "venue": "International Journal of Recent Engineering Science",
+      "doi": "https://doi.org/10.14445/23497157/ijres-v12i5p101",
+      "abstract": "Small and medium-sized enterprises in Peru's flexible packaging sector have faced persistent inefficiencies due to long setup times, unplanned downtime, and suboptimal job sequencing. While Lean and TPM tools have improved isolated processes, previous studies seldom addressed the cultural resistance that often undermines implementation. This study proposed an integrated model combining ADKAR-Lewin change management, Johnson's Rule, SMED, and dual maintenance strategies to address these challenges holistically. When implemented at a small-to-medium-sized enterprise in Peru, the model elevated overall production efficiency from 63.85 percent to 72.10 percent, slashed setup times by more than 33 percent, cut processing duration by 18 percent, and boosted equipment reliability, pushing the mean time between failures up to 17.7 percent. These gains underpin the expected synergy between targeted technical upgrades and a disciplined program of behavioral change. Beyond its theoretical merit, the framework delivered clear socio-economic returns, including less scrap material and better use of labor and raw inputs. Continued investigation in other sectors is recommended to test the approach´s generality and to examine its durability under shifting market and technological conditions.",
+      "cited_by_count": 0,
+      "is_open_access": true,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover recent advances",
+      "extra": {
+        "openalex_id": "https://openalex.org/W4415432085",
+        "type": "article",
+        "topics": [
+          "Management and Optimization Techniques",
+          "Quality and Supply Management",
+          "Digital Transformation in Industry"
+        ]
+      },
+      "source_id": "doi:10.14445/23497157/ijres-v12i5p101",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Production rate optimization through discrete-event simulation: A case study at pharmaceutical industry in Iraq",
+      "url": "https://doi.org/10.21533/pen.v13.i4.1430",
+      "provider": "openalex",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Mayyadah Mohammed Ridha Naser",
+        "Mohammed Saadoun AbdulJalil",
+        "Ayad Taha"
+      ],
+      "year": 2025,
+      "venue": "Periodicals of Engineering and Natural Sciences (PEN)",
+      "doi": "https://doi.org/10.21533/pen.v13.i4.1430",
+      "abstract": "Using Samarra Drug Industry (SDI) as a case study, this research creates and implements a discrete-event simulation (DES) to find and fix production bottlenecks in Iraq's pharmaceutical manufacturing sector. The goal is to reduce cycle time, regulate work-in-process (WIP), and increase sustainable throughput without sacrificing regulatory compliance. By fitting distributions and doing goodness-of-fit tests, we can predict stochastic processing, setup, failure, and cleaning behaviors using detailed time-study observations and historical production records from critical phases such as granulation, tablet compression, coating, and packing. A two-stage experimental technique is supported by a verified baseline model that is in accordance with seen key performance metrics (throughput, WIP, cycle time, resource utilization, and overall equipment effectiveness). Prior to that, a screening design is used to find high-leverage elements in buffer capacity, setup time reductions, personnel configurations, and preventive maintenance schedules. Also, under realistic shift schedules and demand unpredictability, simulation-optimization (genetic algorithm/Pareto search) investigates the trade-offs between throughput maximization, work-in-progress limitations, and lead-time goals. The reliability is tested by conducting sensitivity studies to factors including cleaning intervals, product mix, and equipment downtime. The results show that the production rate may be significantly increased without sacrificing quality control or regulatory standards. They also show how the timing of maintenance, setup efficiency, and buffer location interact critically. By expanding DES practice through the integration of bottleneck analytics with optimization under industry-specific operational limitations, this article presents a realistic improvement roadmap for Iraq's Samarra Drug Industry. For quick use, we offer managerial implications and a roadmap for gradual deployment.",
+      "cited_by_count": 0,
+      "is_open_access": true,
+      "language": "en",
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+      "extra": {
+        "openalex_id": "https://openalex.org/W7116982437",
+        "type": "article",
+        "topics": [
+          "Simulation Techniques and Applications",
+          "Simulation and Modeling Applications",
+          "Operations Management Techniques"
+        ]
+      },
+      "source_id": "doi:10.21533/pen.v13.i4.1430",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Applying SMED to Reduce Changeover and Setup Time in Plastic Injection Molding for Automotive Parts",
+      "url": "https://doi.org/10.46254/ap05.20240036",
+      "provider": "crossref",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Nattachai Thummalukkit",
+        "Jongkol Srithorn"
+      ],
+      "year": 2024,
+      "venue": "Proceedings of the International Conference on Industrial Engineering and Operations Management",
+      "doi": "10.46254/ap05.20240036",
+      "abstract": null,
+      "cited_by_count": 0,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover state of the art",
+      "extra": {
+        "publisher": "IEOM Society International",
+        "type": "proceedings-article"
+      },
+      "source_id": "doi:10.46254/ap05.20240036",
+      "domain": "doi.org"
+    },
+    {
+      "title": "ONT Sequencing IT/Compute Pop!_OS 22.04 Setup v3",
+      "url": "https://doi.org/10.17504/protocols.io.14egn7kzmv5d/v3",
+      "provider": "crossref",
+      "tier": "preprint",
+      "authors": [
+        "Stephen Douglas Russell"
+      ],
+      "year": 2024,
+      "venue": "",
+      "doi": "10.17504/protocols.io.14egn7kzmv5d/v3",
+      "abstract": "The IT requirements for processing MinION data should be carefully reviewed before purchasing a MinION device. You will want to go with a Linux system. System76 is really the primary/best vendor for laptops. Pay careful attention to the GPU. It is probably the most important component for fast processing of the data. Here is is a link to a Facebook thread of some discussion when first considering the specs required. Setting up all of the programs/dependencies, particularly for utilizing the GPU during the analytical workflows is the next important step. You will want to get all of this in place before you start with the lab workflows, as there are many things that could go wrong or that you will need to work through in order for you to be able to actually begin a run.",
+      "cited_by_count": 0,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover state of the art",
+      "extra": {
+        "publisher": "Springer Science and Business Media LLC",
+        "type": "posted-content"
+      },
+      "source_id": "doi:10.17504/protocols.io.14egn7kzmv5d/v3",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Paint shop vehicle sequencing based on quantum computing considering color changeover and painting quality",
+      "url": "https://doi.org/10.55092/am20240002",
+      "provider": "crossref",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Jing Huang",
+        "Qing Chang",
+        "Hua-Tzu Fan"
+      ],
+      "year": 2024,
+      "venue": "Advanced Manufacturing",
+      "doi": "10.55092/am20240002",
+      "abstract": "As customer demands become increasingly diverse, the colors and styles of vehicles offered by automotive companies have also grown substantially. It poses great challenges to design and management of automotive manufacturing system, among which is the proper sequencing of vehicles in everyday operation of the paint shop. With typically hundreds of vehicles in one shift, the paint shop sequencing problem is intractable in classical computing. In this paper, we propose to solve a general paint shop sequencing problem using state-of-the-art quantum computing algorithms. Most existing works are solely focused on reducing color changeover costs, i.e., costs incurred by different colors between consecutive vehicles. This work reveals that different sequencing of vehicles also significantly affects the quality performance of the painting process. We use a machine learning model pretrained on historical data to predict the probability of painting defect. The problem is formulated as a combinational optimization problem with two cost components, i.e., color changeover cost and repair cost. The problem is further converted to a quantum optimization problem and solved with Quantum Approximation Optimization Algorithm (QAOA). As a matter of fact, current quantum computers are still limited in accuracy and scalability. However, with a simplified case study, we demonstrate how the classic sequencing problem in paint shop can be formulated and solved using quantum computing and demonstrate the potential of quantum computing in solving real problems in manufacturing systems.",
+      "cited_by_count": 2,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover state of the art",
+      "extra": {
+        "publisher": "ELS Publishing Co. Limited",
+        "type": "journal-article",
+        "confirmed_by": [
+          "arxiv",
+          "crossref"
+        ]
+      },
+      "source_id": "doi:10.55092/am20240002",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Applying multi objective particle swarm optimization algorithm for sequencing and balancing mixed model assembly line problem with setup times between tasks",
+      "url": "https://doi.org/10.21203/rs.3.rs-2327903/v1",
+      "provider": "crossref",
+      "tier": "preprint",
+      "authors": [
+        "fahimeh tanhaie"
+      ],
+      "year": 2023,
+      "venue": "",
+      "doi": "10.21203/rs.3.rs-2327903/v1",
+      "abstract": "Abstract Mixed-model assembly is a particular set of production lines assembling a family of product models, with similar specifications. Designing paced assembly lines face two primary problems, Balancing and sequencing. The balancing quality is closely associated with the described production sequence. Although these two are problems of one assembly method but they do not take place at the same time, balancing pose a problem during the line designing, whereas sequencing becomes problematic at fluctuating demand of market. In the present research, we have presented a balancing and sequencing problem and proper times to setup the machines between tasks. Unlike a majority of published studies, this paper contains two successive tasks’ setup times in dynamic periods, in which periods also impact the flowing period. A mathematical description with a number of objective functions containing: reducing the inappropriate assembly lines sequence, reducing setup cost, and reducing the inappropriate products balance and the impact of this situation on incomplete tasks. This problem has a combinatorial nature, therefore, the exact techniques, for example combined integer linear programming cannot solve large-sized problems. Thus, the literature have presented several metaheuristic algorithms to solve the problems nearly optimal. This study uses multi-objective particle swarm optimization algorithm, a suitable approach, to create models and solutions. Various problems are designed in different sizes and compared, the decision variables sensitivity is investigated to prepare managerial intuitions. The findings propose that presented algorithm can solve the research problems more efficiently.",
+      "cited_by_count": 0,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+      "extra": {
+        "publisher": "Springer Science and Business Media LLC",
+        "type": "posted-content"
+      },
+      "source_id": "doi:10.21203/rs.3.rs-2327903/v1",
+      "domain": "doi.org"
+    },
+    {
+      "title": "ONT Sequencing IT/Compute Pop!_OS 22.04 Setup v2",
+      "url": "https://doi.org/10.17504/protocols.io.14egn7kzmv5d/v2",
+      "provider": "crossref",
+      "tier": "preprint",
+      "authors": [
+        "Stephen Douglas Russell"
+      ],
+      "year": 2023,
+      "venue": "",
+      "doi": "10.17504/protocols.io.14egn7kzmv5d/v2",
+      "abstract": "The IT requirements for processing MinION data should be carefully reviewed before purchasing a MinION device. You will want to go with a Linux system. System76 is really the primary/best vendor for laptops. Pay careful attention to the GPU. It is probably the most important component for fast processing of the data. Here is is a link to a Facebook thread of some discussion when first considering the specs required. Setting up all of the programs/dependencies, particularly for utilizing the GPU during the analytical workflows is the next important step. You will want to get all of this in place before you start with the lab workflows, as there are many things that could go wrong or that you will need to work through in order for you to be able to actually begin a run.",
+      "cited_by_count": 0,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover state of the art",
+      "extra": {
+        "publisher": "Springer Science and Business Media LLC",
+        "type": "posted-content"
+      },
+      "source_id": "doi:10.17504/protocols.io.14egn7kzmv5d/v2",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Scheduling and batching with evolutionary algorithms in simulation–optimization of an industrial formulation plant",
+      "url": "https://doi.org/10.1016/j.cie.2022.108760",
+      "provider": "openalex",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Christian Klanke",
+        "Sebastian Engell"
+      ],
+      "year": 2022,
+      "venue": "Computers & Industrial Engineering",
+      "doi": "https://doi.org/10.1016/j.cie.2022.108760",
+      "abstract": "Industrial scheduling problems are usually characterized by a high complexity and in many, if not all cases, a detailed representation of many specific features of the production process and of the constraints is necessary to ensure that the resulting schedules are feasible when they are executed. Such detailed representations are provided by commercial discrete-event simulation programs which are often employed in the planning phase to detect bottlenecks and to validate design decisions, but usually do not provide optimized schedules. In this paper, we combine a tailored Evolutionary Algorithm with a high-fidelity simulation model in a Simulation–Optimization approach in order to obtain optimized executable production schedules. The industrial production process considered here is a formulation plant that consists of a formulation stage and a filling stage with optional intermediate storage in a set of buffer tanks. The operational constraints include limited operator availability and shift constraints, sequence-dependent changeover times in both stages, product- and line-dependent processing rates, and the need for synchronization of operations. The objective is to minimize the tardiness of a set of orders some of which have long operation times and small slack between the earliest possible end times and the due dates. The orders consist of a certain number of batches, but if all the batches of an order are processed on the same equipment, meeting the due dates is not possible. Therefore the orders have to be decomposed into sub-orders (production orders) to realize parallel processing of urgent orders on several units with the goal to meet due dates. The decision to distribute the total demand of the individual customer orders to production orders is also called batching decision in the literature. A distinctive feature of our approach is that three independent encodings of the batching, allocation and sequencing decisions are used. The batching decisions lead to variable-length chromosomes for the allocation and sequencing encodings. For the treatment of variable-length chromosomes, new crossover and mutation operators, as well as repair algorithms are presented. The results for three test cases show that the introduction of the batching decisions significantly improves the tardiness of the production schedules. A thorough tuning of the categorical parameters of the Evolutionary Algorithm has been performed and it is shown that the resulting parameter setting yields reproducible results, while outperforming simpler approaches.",
+      "cited_by_count": 19,
+      "is_open_access": true,
+      "language": "en",
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+      "extra": {
+        "openalex_id": "https://openalex.org/W4307399045",
+        "type": "article",
+        "topics": [
+          "Scheduling and Optimization Algorithms",
+          "Simulation Techniques and Applications",
+          "Healthcare Operations and Scheduling Optimization"
+        ]
+      },
+      "source_id": "doi:10.1016/j.cie.2022.108760",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Estimation of machine setup and changeover times by survival analysis",
+      "url": "https://doi.org/10.1016/j.cie.2020.107026",
+      "provider": "crossref",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Tamas Ruppert",
+        "Robert Csalodi",
+        "Janos Abonyi"
+      ],
+      "year": 2021,
+      "venue": "Computers &amp; Industrial Engineering",
+      "doi": "10.1016/j.cie.2020.107026",
+      "abstract": null,
+      "cited_by_count": 21,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+      "extra": {
+        "publisher": "Elsevier BV",
+        "type": "journal-article"
+      },
+      "source_id": "doi:10.1016/j.cie.2020.107026",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Dynamic lot size MIPs for multiple products and ELSPs with shortages, capacity and changeover limits",
+      "url": "http://arxiv.org/abs/2004.02740v1",
+      "provider": "arxiv",
+      "tier": "preprint",
+      "authors": [
+        "Wolfgang Garn"
+      ],
+      "year": 2020,
+      "venue": "arXiv",
+      "doi": null,
+      "abstract": "Scheduling multiple products with limited resources and varying demands remain a critical challenge for many industries. This work presents mixed integer programs (MIPs) that solve the Economic Lot Sizing Problem (ELSP) and other Dynamic Lot-Sizing (DLS) models with multiple items. DLS systems are classified, extended and formulated as MIPs. Especially, logical constraints are a key ingredient in succeeding in this endeavour. They were used to formulate the setup/changeover of items in the production line. Minimising the holding, shortage and setup costs is the primary objective for ELSPs. This is achieved by finding an optimal production schedule taking into account the limited manufacturing capacity. Case studies for a production plants are used to demonstrate the functionality of the MIPs. Optimal DLS and ELSP solutions are given for a set of test-instances. Insights into the runtime and solution quality are given.",
+      "cited_by_count": null,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+      "extra": {},
+      "source_id": "url:b68e43c13197",
+      "domain": "arxiv.org"
+    },
+    {
+      "title": "Setup Changeover Time Reduction in 4 Wheel Drive Front Axle Differential Case Cone Bearing Pressing Process – SMED Method",
+      "url": "https://doi.org/10.35940/ijeat.a1075.1291s419",
+      "provider": "crossref",
+      "tier": "peer_reviewed",
+      "authors": [],
+      "year": 2019,
+      "venue": "International Journal of Engineering and Advanced Technology",
+      "doi": "10.35940/ijeat.a1075.1291s419",
+      "abstract": "Single minute Exchange of Die is one of the LEAN approach to reduce the set up change over time and seven kind of losses due to the weakness in the initial process customization. Manufacturing organizations faces problem in reduction of cost and increasing the efficiency or productivity which is real challenge in the manufacturing operations. In the highly competitive or globalized society the manufacturer need to find a method to reduce the cost and production time to reduce the operating cost and Quality of product and Reliability. This paper deals with the basic over view of a reduction in set up time in a sub assembly stage of an auto sector by Setup Changeover Time Reduction (SMED). It is definitely possible to reduce the set up times and cost of sub assembly production considerably by simple modifications or improvements. The reduction of set up time can be done with the help of SMED methodology. Various types of industries can apply the SMED Methodology to reduce their set up times.",
+      "cited_by_count": 0,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover case study empirical results",
+      "extra": {
+        "publisher": "Blue Eyes Intelligence Engineering and Sciences Engineering and Sciences Publication - BEIESP",
+        "type": "journal-article"
+      },
+      "source_id": "doi:10.35940/ijeat.a1075.1291s419",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Single Minute Exchange of Dies as The Solution on Setup Processes Optimization by Decreasing Changeover Time, A Case Study in Automotive Part Industry",
+      "url": "https://doi.org/10.1088/1757-899x/598/1/012026",
+      "provider": "crossref",
+      "tier": "peer_reviewed",
+      "authors": [
+        "M Sugarindra",
+        "M Ikhwan",
+        "M R Suryoputro"
+      ],
+      "year": 2019,
+      "venue": "IOP Conference Series: Materials Science and Engineering",
+      "doi": "10.1088/1757-899x/598/1/012026",
+      "abstract": "Abstract Industrial competition nowadays demanding automotive manufacturers to increase productivity and organise lean production to meet all the targets. The rear axle manufacturer, one of the automotive industry in 2018, experienced production constraints that were unable to meet production targets. The Line Housing F as the object of this research had 9 machines that involved setup time for the changeover process out of 24 machines. The setup process was not being standardized, conducted manually and involved readjustment on the engine jig, which would, causes a long changeover time because the process was repeatedly carried out. This study aimed to optimize setup activities in order to reduce changeover time. The Single Minute Exchange of Dies (SMED) method was one of the applicable tools to reduce change over time, by changing the internal activities into external activities. In the final stage, SMED simplified the jig setting process by changing the jig design on the M16.3 machine and parallelizing the setup and process operations of the machine. The final results improved the 33% overall changeover time, from 58.36 to 39.22 minutes.",
+      "cited_by_count": 3,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover case study empirical results",
+      "extra": {
+        "publisher": "IOP Publishing",
+        "type": "journal-article"
+      },
+      "source_id": "doi:10.1088/1757-899x/598/1/012026",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Setup and Quick Changeover",
+      "url": "https://doi.org/10.1201/b19520-1",
+      "provider": "crossref",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Chris A. Ortiz"
+      ],
+      "year": 2016,
+      "venue": "The Quick Changeover Playbook",
+      "doi": "10.1201/b19520-1",
+      "abstract": null,
+      "cited_by_count": 0,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover comparison alternative approach",
+      "extra": {
+        "publisher": "Productivity Press",
+        "type": "book-chapter"
+      },
+      "source_id": "doi:10.1201/b19520-1",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Pollution in manufacturing: An unavoidable incidence?: A simulation study into cross-contamination effects in a multi-product factory",
+      "url": "http://resolver.tudelft.nl/uuid:37f99789-cc22-47a7-ae81-7ca5014ce72c",
+      "provider": "openalex",
+      "tier": "peer_reviewed",
+      "authors": [
+        "P.T. Kolodziejczyk"
+      ],
+      "year": 2015,
+      "venue": "Research Repository (Delft University of Technology)",
+      "doi": null,
+      "abstract": "Companies can lose a substantial portion of their revenues due to deterioration in value of their products as a result of processing impediments, which might occur in the entire supply chain. Sometimes, the reasons for a decline in product quality are not fully understood, and thus there are no appropriate measures taken to prevent it. Yet, it is vital to comprehend what is actually happening during production and material handling so that proper, well-informed decisions can be made. This project deals with one of the unexplored problems -- quality loss due to product cross-contamination, which is a common occurrence in material handling, multi-product plants. It is a process of mixing product going through multi-purpose equipment and piping with leftover residue that is currently there, which takes place when there is no intermediate cleaning in between two consecutive products, though the precise character of it is usually not known. Omitting cleaning runs to save production time and money is a common practice in the industry. This research introduces a novel simulation method to quantify and predict the extent of cross-\\\\-con\\\\-ta\\\\-mi\\\\-na\\\\-tion as well as to assess its effects. Many models for material handling in multi-product plant have been made in the past but very few relate to the issue of cross-contamination, which is of extreme importance in quality assurance and informed decision-making. As no similar models have been developed previously, or other research done based on a real industrial setting, it is a truly innovative study, intended to establish foundation for further research, and to raise awareness of the issue by starting to fill a gap of knowledge about what can happen during material processing. Initially, a thorough literature research is done, dealing with issues of trade-offs in manufacturing, cross-contamination in production, as well as how to combine scheduling methodologies with a powder mixing model in a discrete event simulation (DES). Then modelling boundaries and assumptions are established together with a conceptual model. Based on that, a general DES building blocks -- class models for a bagging machine, conveyor, mixer, silo as well as product batches and orders are created. Specific analysis is performed in Sloten, a young animal feed plant in Deventer, the Netherlands, in order to find a more precise character of cross-contamination over time, as well as to test the model application in a realistic setting. Contamination measurements using tracer--collector method over material flow with multiple intermediate sampling points help, together with relevant theoretical models, build mathematical representation of chaotic changes occurring within material flow. Obtained curves fitted with a sum of two exponentially decreasing curves correspond well to the measurements but do not explain everything that happens during the process. Nevertheless they are used to model the cross-contamination phenomenon. Two unique cross-contamination models suitable for implementation in DES are developed, basing on principles of segmentation, quantity conservation, product similarity and proportionality, and are fundamentally models of mixing between material flow and residue in the crossed container. More general one, called partial mass exchange model, allows to customize fraction of material mixed, characteristic to a given piece of equipment, while the other, mixing model, assumes homogeneous resulting composition. Finally, a case-specific simulation model, joining material handling system with cross-contamination calculations as well as customizable layout configuration and settable scheduling methodologies, is established. Experimental setup with four-stage production process consisting of ingredient feeder, a single mixer, limited intermediate storage buffers and multiple system exits, mostly bagging machines, connected by conveying equipment, is discussed. All of the machines involved are multi-purpose, flexible but with some limitations, together with the interconnections and logic among them, basing on a genuine example. Analysis shows considerable impact of system layout and scheduling rules on product contamination. In order to limit cross-contamination appropriate product sequencing, minimising the differences between consecutive products in all stages of the process in needed, while that might impede throughput because of resulting constraints. There is thus a trade-off relation among various aspects of production efficiency, as well as amidst that efficiency and flexibility, when number of storage buffers and their capacity is changed. In the end, research first benefits from measuring the extent of cross-contamination, then succeeding in giving an original example of how to build a cross-contamination model, and how to combine it with a stochastic DES, capable of suiting different designs and scheduling methodologies. Performed experiments show, that cross-contamination effects can be reasonably well simulated with a DES model. It also describes possible effects of certain interventions on various performance indicators, and demonstrates possible risks of increasing flexibility in the system. Additional, more thorough trials are needed in the future to improve the model and generalise it further. Yet, the very important first step to understand the issue has been taken, which will aid in application to other types of systems as well as help in mitigating product contamination.",
+      "cited_by_count": 1,
+      "is_open_access": true,
+      "language": "en",
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover quantitative impact measured",
+      "extra": {
+        "openalex_id": "https://openalex.org/W1902073100",
+        "type": "dissertation",
+        "topics": [
+          "Advanced Manufacturing and Logistics Optimization",
+          "Scheduling and Optimization Algorithms",
+          "Simulation and Modeling Applications"
+        ]
+      },
+      "source_id": "url:7d63d74c1195",
+      "domain": "resolver.tudelft.nl"
+    },
+    {
+      "title": "Application of genetic algorithm in integrated setup planning and operation sequencing",
+      "url": "https://doi.org/10.1063/1.3552384",
+      "provider": "crossref",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Sajad Kafashi",
+        "Mohsen Shakeri",
+        "Francisco Chinesta",
+        "Yvan Chastel",
+        "Mohamed El Mansori"
+      ],
+      "year": 2011,
+      "venue": "AIP Conference Proceedings",
+      "doi": "10.1063/1.3552384",
+      "abstract": null,
+      "cited_by_count": 0,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+      "extra": {
+        "publisher": "AIP",
+        "type": "proceedings-article"
+      },
+      "source_id": "doi:10.1063/1.3552384",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Setup Planning and Operation Sequencing Using Neural Network and Genetic Algorithm",
+      "url": "https://doi.org/10.1109/itng.2008.94",
+      "provider": "crossref",
+      "tier": "peer_reviewed",
+      "authors": [
+        "Ravinder Singh Joshi",
+        "Navdeep Kumar",
+        "Anju Sharma"
+      ],
+      "year": 2008,
+      "venue": "Fifth International Conference on Information Technology: New Generations (itng 2008)",
+      "doi": "10.1109/itng.2008.94",
+      "abstract": null,
+      "cited_by_count": 1,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+      "extra": {
+        "publisher": "IEEE",
+        "type": "proceedings-article"
+      },
+      "source_id": "doi:10.1109/itng.2008.94",
+      "domain": "doi.org"
+    },
+    {
+      "title": "An introduction to pharmaceutical packaging",
+      "url": "https://doi.org/10.1201/b12651-7",
+      "provider": "crossref",
+      "tier": "peer_reviewed",
+      "authors": [],
+      "year": 2000,
+      "venue": "Pharmaceutical Packaging Technology",
+      "doi": "10.1201/b12651-7",
+      "abstract": null,
+      "cited_by_count": 0,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+      "extra": {
+        "publisher": "CRC Press",
+        "type": "book-chapter"
+      },
+      "source_id": "doi:10.1201/b12651-7",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Regulatory aspects of pharmaceutical packaging",
+      "url": "https://doi.org/10.1201/b12651-9",
+      "provider": "crossref",
+      "tier": "peer_reviewed",
+      "authors": [],
+      "year": 2000,
+      "venue": "Pharmaceutical Packaging Technology",
+      "doi": "10.1201/b12651-9",
+      "abstract": null,
+      "cited_by_count": 0,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+      "extra": {
+        "publisher": "CRC Press",
+        "type": "book-chapter",
+        "confirmed_by": [
+          "crossref"
+        ]
+      },
+      "source_id": "doi:10.1201/b12651-9",
+      "domain": "doi.org"
+    },
+    {
+      "title": "Setup Generation and Feature Sequencing Using an Unsupervised Learning Algorithm",
+      "url": "https://doi.org/10.1142/9789814350969_0006",
+      "provider": "crossref",
+      "tier": "peer_reviewed",
+      "authors": [
+        "C. L. Philip Chen"
+      ],
+      "year": 1993,
+      "venue": "Neural Networks in Design and Manufacturing",
+      "doi": "10.1142/9789814350969_0006",
+      "abstract": null,
+      "cited_by_count": 0,
+      "is_open_access": null,
+      "language": null,
+      "retrieved_at": "2026-10-06T20:00:14+00:00",
+      "found_by_query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+      "extra": {
+        "publisher": "WORLD SCIENTIFIC",
+        "type": "book-chapter"
+      },
+      "source_id": "doi:10.1142/9789814350969_0006",
+      "domain": "doi.org"
+    }
+  ],
+  "audit_trail": [
+    {
+      "round_number": 1,
+      "provider": "openalex",
+      "query": "setup sequencing packaging pharmaceutical changeover definition framework",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "crossref",
+      "query": "setup sequencing packaging pharmaceutical changeover definition framework",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "arxiv",
+      "query": "setup sequencing packaging pharmaceutical changeover definition framework",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "wikipedia",
+      "query": "setup sequencing packaging pharmaceutical changeover definition framework",
+      "results": 0,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "openalex",
+      "query": "setup sequencing packaging pharmaceutical changeover concept review",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "crossref",
+      "query": "setup sequencing packaging pharmaceutical changeover concept review",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "arxiv",
+      "query": "setup sequencing packaging pharmaceutical changeover concept review",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "wikipedia",
+      "query": "setup sequencing packaging pharmaceutical changeover concept review",
+      "results": 0,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "openalex",
+      "query": "setup sequencing packaging pharmaceutical changeover case study empirical results",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "crossref",
+      "query": "setup sequencing packaging pharmaceutical changeover case study empirical results",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "arxiv",
+      "query": "setup sequencing packaging pharmaceutical changeover case study empirical results",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "wikipedia",
+      "query": "setup sequencing packaging pharmaceutical changeover case study empirical results",
+      "results": 0,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "openalex",
+      "query": "setup sequencing packaging pharmaceutical changeover quantitative impact measured",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "crossref",
+      "query": "setup sequencing packaging pharmaceutical changeover quantitative impact measured",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "arxiv",
+      "query": "setup sequencing packaging pharmaceutical changeover quantitative impact measured",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "wikipedia",
+      "query": "setup sequencing packaging pharmaceutical changeover quantitative impact measured",
+      "results": 0,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "openalex",
+      "query": "setup sequencing packaging pharmaceutical changeover model formulation methodology",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "crossref",
+      "query": "setup sequencing packaging pharmaceutical changeover model formulation methodology",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "arxiv",
+      "query": "setup sequencing packaging pharmaceutical changeover model formulation methodology",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "wikipedia",
+      "query": "setup sequencing packaging pharmaceutical changeover model formulation methodology",
+      "results": 0,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "openalex",
+      "query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "crossref",
+      "query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "arxiv",
+      "query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "wikipedia",
+      "query": "setup sequencing packaging pharmaceutical changeover algorithm implementation",
+      "results": 0,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "openalex",
+      "query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+      "results": 5,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "crossref",
+      "query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "arxiv",
+      "query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "wikipedia",
+      "query": "setup sequencing packaging pharmaceutical changeover limitations criticism",
+      "results": 0,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "openalex",
+      "query": "setup sequencing packaging pharmaceutical changeover comparison alternative approach",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "crossref",
+      "query": "setup sequencing packaging pharmaceutical changeover comparison alternative approach",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "arxiv",
+      "query": "setup sequencing packaging pharmaceutical changeover comparison alternative approach",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "wikipedia",
+      "query": "setup sequencing packaging pharmaceutical changeover comparison alternative approach",
+      "results": 0,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "openalex",
+      "query": "setup sequencing packaging pharmaceutical changeover recent advances",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "crossref",
+      "query": "setup sequencing packaging pharmaceutical changeover recent advances",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "arxiv",
+      "query": "setup sequencing packaging pharmaceutical changeover recent advances",
+      "results": 3,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "wikipedia",
+      "query": "setup sequencing packaging pharmaceutical changeover recent advances",
+      "results": 0,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "openalex",
+      "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "crossref",
+      "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+      "results": 8,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "arxiv",
+      "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+      "results": 2,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    },
+    {
+      "round_number": 1,
+      "provider": "wikipedia",
+      "query": "setup sequencing packaging pharmaceutical changeover state of the art",
+      "results": 0,
+      "timestamp": "2026-10-06T20:00:14+00:00",
+      "note": ""
+    }
+  ],
+  "open_questions": [
+    "30 afirmación(es) dependen de una sola fuente y no están trianguladas; no deberían presentarse como conclusión firme."
+  ]
+}

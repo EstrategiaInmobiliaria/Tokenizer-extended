@@ -57,7 +57,44 @@ def dedupe_sources(sources: Iterable[Source]) -> List[Source]:
         existing = by_title.get(title_key)
         by_title[title_key] = _merge(existing, source) if existing else source
 
-    return list(by_title.values())
+    return _merge_near_duplicate_titles(list(by_title.values()))
+
+
+def _merge_near_duplicate_titles(sources: List[Source], threshold: float = 0.85) -> List[Source]:
+    """
+    Funde trabajos cuyo título coincide casi del todo.
+
+    Es el caso del preprint y su versión publicada: no comparten DOI y el título
+    cambia en una palabra («…for Product Sequencing» frente a «…for Modeling
+    Product Sequencing»), así que la comparación exacta los deja como dos. Si se
+    cuelan los dos, el agente los toma por confirmación independiente y declara
+    consenso donde sólo hay un trabajo contado dos veces.
+    """
+    survivors: List[Source] = []
+
+    for source in sources:
+        tokens = _title_tokens(source.title)
+        duplicate_of = None
+
+        if len(tokens) >= 4:
+            for index, kept in enumerate(survivors):
+                other = _title_tokens(kept.title)
+                if len(other) < 4:
+                    continue
+                if len(tokens & other) / len(tokens | other) >= threshold:
+                    duplicate_of = index
+                    break
+
+        if duplicate_of is None:
+            survivors.append(source)
+        else:
+            survivors[duplicate_of] = _merge(survivors[duplicate_of], source)
+
+    return survivors
+
+
+def _title_tokens(title: str) -> Set[str]:
+    return content_words(title)
 
 
 def _merge(primary: Optional[Source], secondary: Source) -> Source:
@@ -114,6 +151,29 @@ def term_overlap_ratio(source: Source, question_terms: Set[str]) -> float:
         return 0.0
     haystack = content_words(f"{source.title} {source.abstract or ''}")
     return len(question_terms & haystack) / len(question_terms)
+
+
+def is_on_topic(
+    source: Source,
+    question_terms: Set[str],
+    min_ratio: float = 0.30,
+    min_terms: int = 2,
+) -> bool:
+    """
+    Decide si una fuente entra en el informe.
+
+    Combina fracción y conteo absoluto a propósito. Sólo con la fracción, una
+    pregunta formulada con términos muy específicos se vuelve casi imposible de
+    satisfacer y el agente devuelve tres resultados; sólo con el conteo, una
+    pregunta larga admitiría cualquier cosa que coincida en dos palabras. El
+    doble criterio sostiene los dos extremos.
+    """
+    if not question_terms:
+        return False
+    haystack = content_words(f"{source.title} {source.abstract or ''}")
+    matched = len(question_terms & haystack)
+    required = min(min_terms, len(question_terms))
+    return matched >= required and matched / len(question_terms) >= min_ratio
 
 
 def score_relevance(source: Source, query_terms: Set[str], current_year: int = 2026) -> float:

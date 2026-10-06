@@ -22,7 +22,7 @@ import re
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Set
 
 
 def _utc_now() -> str:
@@ -110,20 +110,27 @@ class Source:
         return host[4:] if host.startswith("www.") else host
 
     @property
-    def independence_key(self) -> str:
+    def identity_keys(self) -> Set[str]:
         """
-        Clave que decide si dos fuentes cuentan como confirmación independiente.
+        Señas que determinan si dos fuentes son realmente independientes.
 
         El dominio no sirve para literatura académica: casi todos los artículos
         resuelven por `doi.org`, así que usarlo haría que veinte papers de veinte
         equipos distintos parecieran una sola fuente. Para trabajos académicos la
-        unidad de independencia es el **grupo autoral** —confirmar algo significa
-        que otro equipo llegó a lo mismo—, y para el resto de la web sigue siendo
+        unidad de independencia es el **equipo autoral completo**, no el primer
+        autor: el preprint y la versión publicada del mismo trabajo suelen listar
+        a los mismos investigadores en distinto orden, y mirar sólo al primero los
+        haría pasar por dos confirmaciones. Para el resto de la web sigue valiendo
         el dominio.
         """
         if self.tier in (SourceTier.PEER_REVIEWED, SourceTier.PREPRINT) and self.authors:
-            return f"autores:{self.first_author_surname.lower()}"
-        return f"dominio:{self.domain}"
+            return {f"autor:{_surname(author)}" for author in self.authors if _surname(author)}
+        return {f"dominio:{self.domain}"}
+
+    @property
+    def independence_key(self) -> str:
+        """Representante estable del grupo, para mostrar y para agrupar en un set."""
+        return sorted(self.identity_keys)[0] if self.identity_keys else f"dominio:{self.domain}"
 
     @property
     def first_author_surname(self) -> str:
@@ -175,12 +182,17 @@ class Claim:
 
     @property
     def independent_groups(self) -> List[str]:
-        """Grupos independientes que respaldan la afirmación (orden de aparición)."""
-        seen: List[str] = []
-        for item in self.evidence:
-            if item.source.independence_key not in seen:
-                seen.append(item.source.independence_key)
-        return seen
+        """
+        Grupos verdaderamente independientes que respaldan la afirmación.
+
+        Se agrupan por solapamiento: si dos fuentes comparten aunque sea un autor,
+        pertenecen al mismo grupo, y ese agrupamiento es transitivo. Un
+        investigador que firma dos trabajos los encadena, que es exactamente lo
+        que debe pasar: no son confirmaciones mutuamente independientes.
+        """
+        return [
+            sorted(group)[0] for group in group_by_shared_identity(e.source for e in self.evidence)
+        ]
 
     @property
     def is_triangulated(self) -> bool:
@@ -293,6 +305,37 @@ class ResearchReport:
             "audit_trail": [step.to_dict() for step in self.audit_trail],
             "open_questions": self.open_questions,
         }
+
+
+def group_by_shared_identity(sources: Iterable["Source"]) -> List[Set[str]]:
+    """
+    Agrupa fuentes que comparten señas de identidad, de forma transitiva.
+
+    Devuelve los conjuntos de claves de cada grupo. Un autor repetido entre dos
+    artículos los une, y si un tercero comparte autor con cualquiera de ellos,
+    cae en el mismo grupo. Es lo que impide contar como confirmaciones
+    independientes a varios trabajos del mismo equipo.
+    """
+    groups: List[Set[str]] = []
+
+    for source in sources:
+        keys = source.identity_keys
+        if not keys:
+            continue
+
+        overlapping = [group for group in groups if group & keys]
+        merged = set(keys)
+        for group in overlapping:
+            merged |= group
+            groups.remove(group)
+        groups.append(merged)
+
+    return groups
+
+
+def _surname(author: str) -> str:
+    parts = [part for part in (author or "").replace(",", " ").split() if part]
+    return parts[-1].lower() if parts else ""
 
 
 def normalize_doi(doi: str) -> str:

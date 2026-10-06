@@ -90,9 +90,12 @@ def format_authors(authors: Sequence[str], max_listed: int = 3) -> str:
     formatted = [_initialize(author) for author in authors[:max_listed]]
     if len(authors) > max_listed:
         return ", ".join(formatted) + ", et al."
-    if len(formatted) == 1:
-        return formatted[0] + "."
-    return ", ".join(formatted[:-1]) + f", & {formatted[-1]}."
+    joined = (
+        formatted[0] if len(formatted) == 1
+        else ", ".join(formatted[:-1]) + f", & {formatted[-1]}"
+    )
+    # Las iniciales ya terminan en punto; añadir otro produce «Lovelace, A..».
+    return joined if joined.endswith(".") else joined + "."
 
 
 def _initialize(author: str) -> str:

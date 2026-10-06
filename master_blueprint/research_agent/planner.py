@@ -62,9 +62,24 @@ SUBQUESTION_TEMPLATES: Dict[SubQuestionKind, str] = {
 class ResearchPlanner:
     """Genera el plan inicial y las reformulaciones de cada ronda."""
 
-    def __init__(self, question: str, max_core_terms: int = 6):
+    def __init__(
+        self,
+        question: str,
+        max_core_terms: int = 6,
+        core_terms: Optional[Sequence[str]] = None,
+    ):
+        """
+        `core_terms` permite separar el idioma de la pregunta del idioma de la
+        búsqueda. Preguntar en español y buscar en inglés no es un capricho:
+        OpenAlex, Crossref y arXiv indexan sobre todo en inglés, así que los
+        términos extraídos de una pregunta en español recuperan mucho menos.
+        """
         self.question = question.strip()
-        self.core_terms = extract_key_terms(self.question, limit=max_core_terms)
+        self.core_terms = (
+            [term.lower() for term in core_terms]
+            if core_terms
+            else extract_key_terms(self.question, limit=max_core_terms)
+        )
         self.core = " ".join(self.core_terms) if self.core_terms else self.question
         self._used_queries: set[str] = set()
 

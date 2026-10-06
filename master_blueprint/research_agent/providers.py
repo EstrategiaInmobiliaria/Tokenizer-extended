@@ -139,7 +139,7 @@ class CrossrefProvider(SearchProvider):
                     title=_clean(titles[0]),
                     url=item.get("URL") or "",
                     provider=self.name,
-                    tier=SourceTier.PEER_REVIEWED,
+                    tier=_crossref_tier(item.get("type")),
                     authors=[
                         _clean(f"{a.get('given', '')} {a.get('family', '')}")
                         for a in item.get("author", [])
@@ -388,6 +388,26 @@ def _strip_tags(text: Optional[str]) -> Optional[str]:
     if not text:
         return None
     return _clean(re.sub(r"<[^>]+>", " ", text)) or None
+
+
+#: Crossref registra DOIs de todo, no sólo de artículos revisados. Dar por
+#: revisado por pares lo que en realidad es un preprint infla directamente el
+#: nivel de confianza del informe, así que el tipo se traduce explícitamente.
+_CROSSREF_TIERS: Dict[str, SourceTier] = {
+    "journal-article": SourceTier.PEER_REVIEWED,
+    "proceedings-article": SourceTier.PEER_REVIEWED,
+    "book-chapter": SourceTier.PEER_REVIEWED,
+    "monograph": SourceTier.PEER_REVIEWED,
+    "book": SourceTier.PEER_REVIEWED,
+    "posted-content": SourceTier.PREPRINT,
+    "report": SourceTier.INSTITUTIONAL,
+    "standard": SourceTier.INSTITUTIONAL,
+    "dissertation": SourceTier.INSTITUTIONAL,
+}
+
+
+def _crossref_tier(item_type: Optional[str]) -> SourceTier:
+    return _CROSSREF_TIERS.get((item_type or "").lower(), SourceTier.UNKNOWN)
 
 
 def _crossref_year(item: Dict[str, Any]) -> Optional[int]:
