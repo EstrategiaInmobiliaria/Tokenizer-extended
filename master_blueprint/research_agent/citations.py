@@ -9,7 +9,7 @@ bibliografía liste otra cosa en esa posición.
 
 from __future__ import annotations
 
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Dict, Iterable, List, Sequence, Tuple
 
 from .models import Evidence, Source, normalize_doi
 

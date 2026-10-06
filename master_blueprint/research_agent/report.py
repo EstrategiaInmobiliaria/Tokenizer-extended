@@ -10,10 +10,10 @@ final lista todas las consultas lanzadas con su número de resultados.
 from __future__ import annotations
 
 import json
-from typing import List, Optional, Sequence
+from typing import List, Optional
 
 from .citations import CitationRegistry, inline_quote
-from .models import Claim, Confidence, Finding, ResearchReport
+from .models import Claim, Confidence, ResearchReport
 
 CONFIDENCE_BADGE = {
     Confidence.ALTA: "🟢 Alta",
