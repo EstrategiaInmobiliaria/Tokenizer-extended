@@ -69,6 +69,14 @@ master_blueprint/
 │   ├── real_estate_dcf.py    # Análisis DCF inmobiliario
 │   └── ops_optimizer.py      # Optimización con restricciones
 │
+├── research_agent/            # 🔎 Agente de investigación web con citas
+│   ├── agent.py              # Orquestador multi-paso
+│   ├── planner.py            # Descomposición y reformulación de consultas
+│   ├── providers.py          # OpenAlex, Crossref, arXiv, Wikipedia, Tavily, Brave
+│   ├── synthesis.py          # Deduplicación, triangulación y confianza
+│   ├── citations.py          # Registro de citas y bibliografía
+│   └── report.py             # Informe Markdown y exportación JSON
+│
 ├── api/                       # 🌐 API REST con FastAPI
 │   └── main.py               # Endpoints y modelos Pydantic
 │
@@ -175,6 +183,22 @@ Content-Type: application/json
 }
 ```
 
+### 3.bis Investigación con fuentes citadas
+
+El módulo `research_agent` no se expone por HTTP; se usa desde la línea de
+comandos o como librería:
+
+```bash
+cd master_blueprint
+python -m research_agent "reducción de tiempos de setup en líneas de empaque" \
+  --rounds 3 --out informe.md --json auditoria.json
+```
+
+Produce un informe donde cada afirmación lleva su cita literal, su nivel de
+confianza y el registro de todas las consultas lanzadas. Funciona sin API keys.
+Ver [`research_agent/README.md`](research_agent/README.md) y el
+[protocolo de revisión](docs/AGENTE_INVESTIGACION.md).
+
 ### 3. Optimización de Mix
 
 ```http
@@ -229,6 +253,7 @@ pytest --cov=core --cov=api --cov-report=html
 # Tests específicos
 pytest tests/test_wacc.py -v
 pytest tests/test_api.py -v
+pytest tests/test_research_agent.py -v   # agente de investigación (offline)
 ```
 
 ---
@@ -253,6 +278,15 @@ Este documento incluye:
 - Arquitectura en tres capas
 - Casos de uso y ejemplos
 - Referencias bibliográficas
+
+### Agente de investigación
+
+🔎 **[AGENTE_INVESTIGACION.md](docs/AGENTE_INVESTIGACION.md)** — diseño del agente,
+las decisiones que sostienen la credibilidad de sus informes, y el protocolo para
+revisar y documentar los hallazgos que produce.
+
+Ejemplo aplicado en [`docs/investigacion/`](docs/investigacion/): informe generado
+automáticamente, su auditoría, y la revisión humana correspondiente.
 
 ---
 
