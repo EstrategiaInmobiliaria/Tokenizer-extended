@@ -43,3 +43,8 @@ yarn-error.log*
 
 # hf
 public/hf
+
+# python
+__pycache__/
+*.py[cod]
+.pytest_cache/

@@ -31,6 +31,16 @@ python3 test_plot.py
 
 ---
 
+## 🔬 Agente de investigación web + briefing de empaque
+
+Kit reutilizable (prompt, skill, plantillas de citas) y el primer corrido sobre el paper de secuenciación farmacéutica, 7 MUDA, LPS vs “LFI”, y un laboratorio de gráficos:
+
+- [`research_agent/README.md`](research_agent/README.md) — qué entorno usar y cómo documentar hallazgos
+- [`research_agent/briefings/2026-packaging-tsp-lfi/HALLAZGOS.md`](research_agent/briefings/2026-packaging-tsp-lfi/HALLAZGOS.md) — síntesis con DOI
+- `python3 research_agent/briefings/2026-packaging-tsp-lfi/simulations/run_lab.py` — PNG + CSV de clase
+
+---
+
 ## 📂 Estructura de Archivos
 
 ### 📜 Scripts de Ejecución

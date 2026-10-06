@@ -1,0 +1,128 @@
+{
+  "accessed": "2026-10-06",
+  "briefing": "2026-packaging-tsp-lfi",
+  "sources": [
+    {
+      "id": "SRC-001",
+      "type": "paper",
+      "title": "Mathematical Model for Product Family Design and Product Sequencing for a Pharmaceutical Company",
+      "authors": ["Isidro Soria-Arguello", "Mariana Ruiz-Morales", "Alberto Ochoa-Zezzatti"],
+      "year": 2024,
+      "doi": "10.1007/978-3-031-67440-2_20",
+      "url": "https://perfiles.ibero.mx/en/publications/mathematical-model-for-product-family-design-and-product-sequenci-3/"
+    },
+    {
+      "id": "SRC-002",
+      "type": "preprint-abstract-secondary",
+      "title": "A prescriptive analytics framework for product sequencing in pharmaceutical packaging lines",
+      "year": 2026,
+      "url": "https://exa.ai/library/publication/0fvpvd4877k",
+      "notes": "Reports up to 13.6% setup reduction; MTZ; 9 months of data"
+    },
+    {
+      "id": "SRC-003",
+      "type": "preprint",
+      "title": "A Prescriptive Analytics Framework for Modeling Product Sequencing in Pharmaceutical Packaging Lines",
+      "authors": ["Isidro Soria-Arguello", "Esbeydi Villicaña-García", "Edwin Montes-Orozco", "Luis Eduardo Urbán-Rivero"],
+      "year": 2026,
+      "doi": "10.2139/ssrn.6416055",
+      "url": "https://perfiles.ibero.mx/es/publications/a-prescriptive-analytics-framework-for-modeling-product-sequencin/",
+      "notes": "IBERO abstract reports up to 19.3% setup reduction"
+    },
+    {
+      "id": "SRC-004",
+      "type": "thesis",
+      "title": "The last planner system of production control",
+      "authors": ["Glenn Ballard"],
+      "year": 2000,
+      "url": "https://etheses.bham.ac.uk/id/eprint/4789/1/Ballard00PhD.pdf"
+    },
+    {
+      "id": "SRC-005",
+      "type": "benchmark",
+      "title": "2020 Current Process Benchmark for the Last Planner System",
+      "authors": ["Glenn Ballard", "Iris Tommelein"],
+      "year": 2021,
+      "url": "https://p2sl.berkeley.edu/wp-content/uploads/2021/03/Ballard_Tommelein-2021-LPS-Benchmark-2020-2.pdf"
+    },
+    {
+      "id": "SRC-006",
+      "type": "paper",
+      "title": "Integer programming formulation of traveling salesman problems",
+      "authors": ["C. E. Miller", "A. W. Tucker", "R. A. Zemlin"],
+      "year": 1960,
+      "doi": "10.1145/321043.321046"
+    },
+    {
+      "id": "SRC-007",
+      "type": "book",
+      "title": "Toyota Production System: Beyond Large-Scale Production",
+      "authors": ["Taiichi Ohno"],
+      "year": 1988
+    },
+    {
+      "id": "SRC-008",
+      "type": "review",
+      "title": "Simulation software for smart manufacturing: a review",
+      "authors": ["Vitalii Ivanov", "Mykhailo Amelin", "Bohdan Haidabrus"],
+      "year": 2025,
+      "doi": "10.1007/s42452-025-08012-y"
+    },
+    {
+      "id": "SRC-009",
+      "type": "review",
+      "title": "Review of simulation software for cyber-physical production systems with intelligent distributed production control",
+      "year": 2024,
+      "doi": "10.1080/0951192X.2023.2228270"
+    },
+    {
+      "id": "SRC-010",
+      "type": "practitioner",
+      "title": "Función de pérdida de calidad - Taguchi",
+      "url": "https://ingenieriaindustrialonline.com/gestion-de-calidad/funcion-de-perdida-de-calidad-taguchi/"
+    },
+    {
+      "id": "SRC-011",
+      "type": "paper",
+      "title": "Fit manufacturing: Production Waste Index and its effect on Production Profitability",
+      "url": "https://exa.ai/library/publication/59ymg0nd35d"
+    },
+    {
+      "id": "SRC-012",
+      "type": "practitioner",
+      "title": "Matriz de Perdas vs Custos",
+      "url": "https://www.cltservices.net/artigos-e-noticias/matriz-de-perdas-vs-custos-desbloquear-e-priorizar-os-ganhos-em-tpm/"
+    },
+    {
+      "id": "SRC-013",
+      "type": "docs",
+      "title": "SimPy shared resources",
+      "url": "https://simpy.readthedocs.io/en/latest/simpy_intro/shared_resources.html"
+    },
+    {
+      "id": "SRC-014",
+      "type": "software",
+      "title": "workflowio",
+      "url": "https://pypi.org/project/workflowio/"
+    },
+    {
+      "id": "SRC-015",
+      "type": "review",
+      "title": "Discrete-Event Simulation for Smart Manufacturing: Assessing Software, Industry Adoption, and Future Research Challenges",
+      "year": 2025,
+      "doi": "10.2478/bipcm-2025-0009"
+    },
+    {
+      "id": "SRC-016",
+      "type": "software",
+      "title": "FactorySimPy",
+      "url": "https://factorysimpy.github.io/FactorySimPy/"
+    },
+    {
+      "id": "SRC-D01",
+      "type": "didactic",
+      "title": "Teaching lab in this repository",
+      "url": "simulations/"
+    }
+  ]
+}

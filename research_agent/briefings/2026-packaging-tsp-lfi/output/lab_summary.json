@@ -1,0 +1,33 @@
+{
+  "label": "didactic-lab",
+  "lfi": {
+    "costo_por_paro": 4200.0,
+    "paros_antes": 18,
+    "paros_despues": 6,
+    "paros_evitados": 12,
+    "perdida_antes": 75600.0,
+    "perdida_despues": 25287.0,
+    "costo_limpieza": 87.0,
+    "ahorro_diario": 50313.0,
+    "ahorro_mensual": 1257825.0,
+    "perdida_mensual_antes": 1890000.0,
+    "roi": 578.3103448275862
+  },
+  "manual_sequence": "ACBDACBD",
+  "clustered_sequence": "ABABCDCD",
+  "manual_setup_h": 31.5,
+  "clustered_setup_h": 13.5,
+  "des": {
+    "manual_setup_h": 31.5,
+    "clustered_setup_h": 13.5,
+    "delta_h": 18.0,
+    "major": 4.5,
+    "minor": 1.5
+  },
+  "csv": "/workspace/research_agent/briefings/2026-packaging-tsp-lfi/output/paros_30_dias.csv",
+  "pngs": [
+    "/workspace/research_agent/briefings/2026-packaging-tsp-lfi/output/lfi_comparacion.png",
+    "/workspace/research_agent/briefings/2026-packaging-tsp-lfi/output/secuenciacion_tsp.png",
+    "/workspace/research_agent/briefings/2026-packaging-tsp-lfi/output/bucle_mejora.png"
+  ]
+}

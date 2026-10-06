@@ -35,6 +35,9 @@ python3 test_plot.py
 - ✅ **Financial analysis templates**: VPN, DCF, Break-even, Pareto, Sensitivity Analysis
 - ✅ **Engineering charts**: Time series, regression, dashboards, cost composition
 
+### 🔬 Web research agent
+Reusable multi-step research kit (citations, claim audit) plus a first briefing on pharmaceutical packaging sequencing: [`research_agent/README.md`](research_agent/README.md).
+
 ### 📖 Documentation
 - **[INDEX.md](INDEX.md)** - Complete navigation and overview
 - **[INICIO_RAPIDO.md](INICIO_RAPIDO.md)** - Quick start guide (30 seconds to first plot)
